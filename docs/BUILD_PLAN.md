@@ -105,6 +105,44 @@ GATE: Project builds, deploys to Vercel, shows Next.js default page
 
 ---
 
+### Sprint 0: Pre-Launch Waitlist Page (Parallel with Pre-Sprint, Day 0–3)
+
+**Goal:** Live "coming soon" page at fyrk.com from day one. Capture early interest while the product is being built.
+
+```
+FRONTEND AGENT:
+□ Pre-launch landing page at fyrk.com with:
+  - Hero section: headline, value prop, brand visuals
+  - "What is Fyrk?" — 3–4 feature pillars (icons + short copy)
+  - Social proof placeholder ("Built for Swedish couples" / early stats)
+  - Email signup form (name + email + optional: household situation)
+□ Thank-you / confirmation state after signup
+□ Mobile-responsive from the start
+□ SEO: meta tags, OG image, page title
+□ Favicon + brand assets deployed
+
+BACKEND AGENT:
+□ POST /api/waitlist (store email + metadata in Supabase)
+□ Supabase table: waitlist_signups (email, name, source, signed_up_at)
+□ RLS policy: insert-only public, read restricted to admin
+□ Duplicate email handling (upsert, no error to user)
+□ Optional: confirmation email via Resend ("You're on the list!")
+
+ARCHITECT:
+□ Deploy to Vercel production (fyrk.com) immediately
+□ Cloudflare DNS pointed to Vercel
+□ Basic analytics (Vercel Analytics) tracking page visits + signups
+
+GATE:
+  ✓ fyrk.com shows branded waitlist page
+  ✓ User can enter email → stored in Supabase
+  ✓ Confirmation shown (and optional email sent)
+  ✓ Page scores 95+ on Lighthouse
+  ✓ Looks polished on mobile + desktop
+```
+
+---
+
 ### Sprint 1: Foundation (Weeks 1–2)
 
 **Goal:** Auth working, household creation, basic app shell with navigation.
@@ -351,7 +389,8 @@ DB AGENT:
 □ Pre-generate quarterly reviews + fitness scores for demo data
 
 FRONTEND AGENT:
-□ Landing / marketing page
+□ Evolve waitlist landing page → full marketing page (add demo CTA, feature deep-dives, social proof)
+□ Waitlist → conversion: add "Create Account" CTA alongside waitlist signup
 □ Demo mode selector (4 household variants with descriptions)
 □ Demo mode indicator (persistent banner: "Viewing demo data")
 □ "Switch to real data" conversion flow
