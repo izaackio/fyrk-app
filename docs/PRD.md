@@ -19,7 +19,7 @@
 | F04 | Manual account entry | Pillar 1 | Add accounts with provider, type, wrapper, currency |
 | F05 | CSV import (Avanza) | Pillar 1 | Parse Avanza transaction/holding exports |
 | F06 | CSV import (Nordnet) | Pillar 1 | Parse Nordnet transaction/holding exports |
-| F07 | Holdings management | Pillar 1 | View, edit, delete holdings; auto-price via market data |
+| F07 | Holdings management | Pillar 1 | View, edit, delete holdings; use provider-reported values (no live security repricing in prototype) |
 | F08 | Household Balance Sheet | Pillar 1 | Unified net worth, asset allocation, exposure charts |
 | F09 | "What Changed" narrative | Pillar 1 | AI-generated weekly summary of household financial changes |
 | F10 | Financial Timeline | Core UX | Chronological view of events, decisions, outcomes |

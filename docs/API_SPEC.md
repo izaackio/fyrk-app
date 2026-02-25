@@ -243,7 +243,7 @@ List holdings in an account.
       },
       "quantity": 1500.5,
       "averageCost": 12050,             // 120.50 SEK per unit
-      "marketValue": 19507650,          // ~195,076.50 SEK
+      "marketValue": 19507650,          // provider-reported/imported value in prototype
       "valueCurrency": "SEK",
       "unrealizedPnl": 1432150,         // +14,321.50 SEK
       "unrealizedPnlPct": 7.93,

@@ -74,7 +74,7 @@ The prototype is a **single Next.js application** with clear internal service bo
 │  ┌──────────────────────────────────────────────────────┐    │
 │  │               EXTERNAL INTEGRATIONS                    │    │
 │  │                                                        │    │
-│  │  OpenAI API    Market Data API    (Future: Tink/FiDA) │    │
+│  │  OpenAI API    ECB FX API         (Future: Tink/FiDA) │    │
 │  └──────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -378,7 +378,7 @@ OPENAI_ORG_ID=
 # Resend (email)
 RESEND_API_KEY=
 
-# Market Data
+# Market Data (optional in prototype; required only for non-ECB providers)
 MARKET_DATA_API_KEY=
 
 # App

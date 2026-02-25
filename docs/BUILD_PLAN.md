@@ -202,9 +202,8 @@ DATA AGENT:
 □ Avanza CSV parser (transactions + portfolio)
 □ Nordnet CSV parser (transactions)
 □ Instrument resolver (ISIN → lookup/create)
-□ Yahoo Finance price fetcher
 □ ECB FX rate fetcher
-□ Daily price refresh cron job
+□ FX refresh cache job (daily)
 
 BACKEND AGENT:
 □ POST /api/accounts (create)
@@ -223,7 +222,7 @@ FRONTEND AGENT:
 □ Add Account page (provider selection, type, wrapper)
 □ CSV import flow (upload → preview → confirm)
 □ Account detail page (holdings list, transactions list)
-□ Holdings table component (sortable, with prices)
+□ Holdings table component (sortable, with provider-reported values)
 □ AmountDisplay component
 □ AccountCard component
 □ Provider logo/icon set
@@ -233,7 +232,8 @@ GATE:
   ✓ User can import Avanza CSV → holdings + transactions appear
   ✓ User can import Nordnet CSV → holdings + transactions appear
   ✓ Instruments are auto-resolved by ISIN
-  ✓ Market prices refresh daily
+  ✓ FX rates refresh daily for cross-currency aggregation
+  ✓ Imported/provider-reported values are preserved as source of truth
   ✓ Account visibility (full/hidden/private) works between partners
 ```
 

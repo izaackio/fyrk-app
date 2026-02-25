@@ -18,7 +18,7 @@
 | **Pension data** | Manual entry | User enters PPM + tjänstepension balances | Free | On entry |
 | **Insurance data** | Manual entry | User enters policy details | Free | On entry |
 | **Loan/mortgage data** | Manual entry | User enters terms & balance | Free | On entry |
-| **Instrument prices** | Yahoo Finance (unofficial) or Nasdaq Nordic | API | Free | Daily |
+| **Portfolio/account values** | Provider-reported CSV values | Parsed from uploaded exports | Free | On upload |
 | **FX rates** | European Central Bank (ECB) | API | Free | Daily |
 | **Swedish fund data** | Morningstar basic / Fondbolagens förening | Web scrape / API | Free | Daily |
 | **Broker fee schedules** | Static JSON (manually curated) | Internal config | Free | Updated manually |
@@ -36,6 +36,8 @@
 
 > [!IMPORTANT]
 > **All commercial data providers require signed agreements with SLAs and incur ongoing costs.** These are deferred to v1 with sufficient funding. The prototype must deliver full value using manual/CSV/free data.
+>
+> **Valuation scope (prototype):** Fyrk does **not** run a live security-pricing/valuation engine in prototype. Holdings and account values are taken from provider-reported/imported values; FX normalization is applied for cross-currency aggregation.
 
 ---
 
@@ -137,61 +139,9 @@ async function resolveInstrument(isin: string, name: string): Promise<Instrument
 
 ---
 
-## 3. Market Data Integration
+## 3. FX Integration (Prototype)
 
-### Instrument pricing (prototype)
-
-```typescript
-// src/lib/market-data/pricing.ts
-
-// Primary: Yahoo Finance (unofficial API via yahoo-finance2 npm package)
-// Fallback: manual price entry
-
-import yahooFinance from 'yahoo-finance2'
-
-export async function fetchPrice(ticker: string): Promise<{
-  price: number      // minor units
-  currency: string
-  timestamp: Date
-} | null> {
-  try {
-    const quote = await yahooFinance.quote(ticker)
-    return {
-      price: Math.round(quote.regularMarketPrice * 100),
-      currency: quote.currency,
-      timestamp: new Date(quote.regularMarketTime),
-    }
-  } catch {
-    return null  // instrument not found or API error
-  }
-}
-
-// Batch pricing for daily refresh
-export async function refreshAllPrices(): Promise<{
-  updated: number
-  failed: number
-  skipped: number
-}> {
-  const allInstruments = await db.query.instruments.findMany({
-    where: isNotNull(instruments.ticker),
-  })
-  
-  // Batch in groups of 20 with rate limiting
-  for (const batch of chunk(allInstruments, 20)) {
-    await Promise.all(batch.map(async (inst) => {
-      const price = await fetchPrice(inst.ticker!)
-      if (price) {
-        await db.update(instruments)
-          .set({ lastPrice: price.price, lastPriceAt: price.timestamp })
-          .where(eq(instruments.id, inst.id))
-      }
-    }))
-    await sleep(1000)  // rate limit
-  }
-}
-```
-
-### FX Rates
+### FX rates for cross-currency aggregation
 
 ```typescript
 // src/lib/market-data/fx.ts
@@ -204,6 +154,13 @@ export async function fetchFxRates(): Promise<Map<string, number>> {
   // Cache for 24 hours
 }
 ```
+
+### Valuation policy (prototype)
+
+- Portfolio and account values come from user input / CSV exports.
+- No live repricing of securities is required in prototype.
+- FX conversion is used only when aggregating accounts with mixed currencies.
+- UI must show `asOf` / staleness indicators so users know when values were last updated.
 
 ---
 
@@ -325,7 +282,7 @@ interface ProviderConnection {
 |---|---|---|---|
 | Manual entry | At user's discretion | 30 days | "Last updated X days ago" warning |
 | CSV import | At upload | 14 days | "Data from [date] — import newer export?" |
-| Market prices | Daily | 3 days | "Price may be outdated" badge |
+| Provider-reported values | On upload/manual update | 14 days | "Value from [date] — import newer export?" |
 | FX rates | Daily | 3 days | "FX rate from [date]" |
 | PSD2 (future) | Real-time to daily | 3 days | Auto-refresh |
 
