@@ -84,23 +84,25 @@ const isActivePath = (pathname: string, href: string): boolean =>
 
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [density, setDensity] = useState<"narrative" | "terminal">("narrative");
-  const [session, setSession] = useState<SessionResponseData | null>(null);
-  const [activeHouseholdId, setActiveHouseholdId] = useState<string>();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") {
+      return "light";
+    }
 
-  useEffect(() => {
     const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-    if (savedTheme === "light" || savedTheme === "dark") {
-      setTheme(savedTheme);
+    return savedTheme === "dark" ? "dark" : "light";
+  });
+  const [density, setDensity] = useState<"narrative" | "terminal">(() => {
+    if (typeof window === "undefined") {
+      return "narrative";
     }
 
     const savedDensity = window.localStorage.getItem(DENSITY_STORAGE_KEY);
-    if (savedDensity === "narrative" || savedDensity === "terminal") {
-      setDensity(savedDensity);
-    }
-  }, []);
+    return savedDensity === "terminal" ? "terminal" : "narrative";
+  });
+  const [session, setSession] = useState<SessionResponseData | null>(null);
+  const [activeHouseholdId, setActiveHouseholdId] = useState<string>();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);

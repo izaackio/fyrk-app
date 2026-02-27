@@ -14,7 +14,6 @@ export function DashboardPlaceholder() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
 
     void getSession()
       .then((response) => {
