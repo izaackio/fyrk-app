@@ -129,6 +129,21 @@ AS $$
   );
 $$;
 
+CREATE OR REPLACE FUNCTION public.is_household_creator(target_household_id uuid, target_user_id uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.households h
+    WHERE h.id = target_household_id
+      AND h.created_by = target_user_id
+  );
+$$;
+
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.households ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.household_members ENABLE ROW LEVEL SECURITY;
@@ -195,12 +210,7 @@ WITH CHECK (
   user_id = auth.uid()
   AND role = 'owner'
   AND status = 'active'
-  AND EXISTS (
-    SELECT 1
-    FROM public.households h
-    WHERE h.id = household_id
-      AND h.created_by = auth.uid()
-  )
+  AND public.is_household_creator(household_id, auth.uid())
 );
 
 CREATE POLICY household_members_insert_manager
