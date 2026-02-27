@@ -82,7 +82,7 @@ const writeState = (state: MockState): void => {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 };
 
-const useFallbackByDefault = (): boolean =>
+const shouldUseFallbackByDefault = (): boolean =>
   process.env.NEXT_PUBLIC_USE_MOCK_API !== "false";
 
 const jsonHeaders = {
@@ -94,7 +94,7 @@ const requestWithFallback = async <T,>(
   init: RequestInit,
   fallback: () => Promise<T>,
 ): Promise<T> => {
-  if (useFallbackByDefault() || typeof window === "undefined") {
+  if (shouldUseFallbackByDefault() || typeof window === "undefined") {
     return fallback();
   }
 

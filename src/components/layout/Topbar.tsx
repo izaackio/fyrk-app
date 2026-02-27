@@ -8,7 +8,7 @@ interface TopbarProps {
   title: string;
   subtitle: string;
   households: HouseholdSummary[];
-  activeHouseholdId?: string;
+  activeHouseholdId: string | undefined;
   onHouseholdChange: (householdId: string) => void;
   theme: "light" | "dark";
   density: "narrative" | "terminal";
@@ -41,6 +41,9 @@ export function Topbar({
           },
         ];
 
+  const selectedHouseholdId =
+    activeHouseholdId ?? fallbackHouseholds[0]?.id ?? "placeholder";
+
   return (
     <header className={styles.topbar}>
       <div className={styles.topbarHeading}>
@@ -65,7 +68,7 @@ export function Topbar({
           className={styles.selectControl}
           id="household-selector"
           onChange={(event) => onHouseholdChange(event.target.value)}
-          value={activeHouseholdId ?? fallbackHouseholds[0].id}
+          value={selectedHouseholdId}
         >
           {fallbackHouseholds.map((household) => (
             <option key={household.id} value={household.id}>

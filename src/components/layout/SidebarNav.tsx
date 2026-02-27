@@ -26,10 +26,11 @@ export function SidebarNav({ items, onNavigate }: SidebarNavProps) {
           const className = [styles.navLink, active ? styles.navLinkActive : ""]
             .filter(Boolean)
             .join(" ");
+          const linkProps = onNavigate ? { onClick: onNavigate } : {};
 
           return (
             <li key={item.href}>
-              <Link className={className} href={item.href} onClick={onNavigate}>
+              <Link className={className} href={item.href} {...linkProps}>
                 <span aria-hidden className={styles.navIcon}>
                   {item.icon}
                 </span>

@@ -90,7 +90,7 @@ export function MagicLinkForm({ mode }: MagicLinkFormProps) {
           placeholder="you@household.com"
           type="email"
           value={email}
-          error={error || undefined}
+          {...(error ? { error } : {})}
           hint="We only use your email for sign-in and household invites."
         />
 

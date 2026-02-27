@@ -13,15 +13,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: styles.buttonPrimary,
-  secondary: styles.buttonSecondary,
-  ghost: styles.buttonGhost,
+  primary: styles.buttonPrimary ?? "",
+  secondary: styles.buttonSecondary ?? "",
+  ghost: styles.buttonGhost ?? "",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: styles.buttonSm,
-  md: styles.buttonMd,
-  lg: styles.buttonLg,
+  sm: styles.buttonSm ?? "",
+  md: styles.buttonMd ?? "",
+  lg: styles.buttonLg ?? "",
 };
 
 export function Button({
