@@ -6,5 +6,7 @@ export * from "./instruments";
 export * from "./holdings";
 export * from "./transactions";
 export * from "./account_snapshots";
+export * from "./household_snapshots";
 export * from "./import_jobs";
 export * from "./import_rows";
+export * from "./weekly_narrative_cache";
