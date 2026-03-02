@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { AccountDetailView } from "../../../../components/accounts/AccountDetailView";
 import styles from "../../../../components/theme/theme.module.css";
 
@@ -16,7 +18,9 @@ export default function AccountDetailPage({ params }: AccountDetailPageProps) {
           Holdings and transaction history from provider-reported account data.
         </p>
       </header>
-      <AccountDetailView accountId={params.id} />
+      <Suspense fallback={<p className={styles.sectionDescription}>Loading account view…</p>}>
+        <AccountDetailView accountId={params.id} />
+      </Suspense>
     </section>
   );
 }

@@ -1,5 +1,7 @@
-import styles from "../../../components/theme/theme.module.css";
+import { Suspense } from "react";
+
 import { CsvImportFlow } from "../../../components/accounts/CsvImportFlow";
+import styles from "../../../components/theme/theme.module.css";
 
 export default function ImportPage() {
   return (
@@ -10,7 +12,9 @@ export default function ImportPage() {
           Upload, preview, and confirm transaction and holdings imports.
         </p>
       </header>
-      <CsvImportFlow />
+      <Suspense fallback={<p className={styles.sectionDescription}>Preparing import flow…</p>}>
+        <CsvImportFlow />
+      </Suspense>
     </section>
   );
 }
