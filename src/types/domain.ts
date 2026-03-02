@@ -81,6 +81,9 @@ export const accountTransactionTypes = [
 ] as const;
 export type AccountTransactionType = (typeof accountTransactionTypes)[number];
 
+export const balanceSheetHistoryPeriods = ["1m", "3m", "6m", "12m", "24m", "all"] as const;
+export type BalanceSheetHistoryPeriod = (typeof balanceSheetHistoryPeriods)[number];
+
 export const importFormats = ["avanza", "nordnet", "unknown"] as const;
 export type ImportFormat = (typeof importFormats)[number];
 
@@ -145,6 +148,81 @@ export interface AccountTransactionsMeta {
   cursor: string | null;
   hasMore: boolean;
   total: number;
+}
+
+export interface BalanceSheetMemberNetWorthView {
+  userId: string;
+  displayName: string;
+  netWorth: number;
+}
+
+export interface BalanceSheetAccountTypeBreakdownView {
+  type: AccountType | "other";
+  value: number;
+}
+
+export interface BalanceSheetByAssetClassView {
+  class: string;
+  value: number;
+  pct: number;
+}
+
+export interface BalanceSheetByGeographyView {
+  country: string;
+  value: number;
+  pct: number;
+}
+
+export interface BalanceSheetByCurrencyView {
+  currency: string;
+  value: number;
+  pct: number;
+}
+
+export interface BalanceSheetBySectorView {
+  sector: string;
+  value: number;
+  pct: number;
+}
+
+export interface BalanceSheetDataQualityView {
+  coveragePct: number;
+  staleAccounts: number;
+  lastFullUpdate: string | null;
+}
+
+export interface BalanceSheetView {
+  totalNetWorth: number;
+  totalAssets: number;
+  totalLiabilities: number;
+  currency: string;
+  asOfDate: string;
+  byMember: BalanceSheetMemberNetWorthView[];
+  byAccountType: BalanceSheetAccountTypeBreakdownView[];
+  allocation: {
+    byAssetClass: BalanceSheetByAssetClassView[];
+    byGeography: BalanceSheetByGeographyView[];
+    byCurrency: BalanceSheetByCurrencyView[];
+    bySector: BalanceSheetBySectorView[];
+  };
+  dataQuality: BalanceSheetDataQualityView;
+}
+
+export interface BalanceSheetHistoryPointView {
+  date: string;
+  netWorth: number;
+  assets: number;
+  liabilities: number;
+}
+
+export interface BalanceSheetHistoryView {
+  period: BalanceSheetHistoryPeriod;
+  currency: string;
+  history: BalanceSheetHistoryPointView[];
+  change: {
+    amount: number;
+    pct: number | null;
+  };
 }
 
 export interface ImportPreviewHoldingView {
