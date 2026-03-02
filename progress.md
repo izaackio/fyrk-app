@@ -9,17 +9,17 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 - `Blocked`: cannot proceed due to dependency or external constraint
 
 ## Current Snapshot
-- Last updated: 2026-02-27
+- Last updated: 2026-03-02
 - Baseline branch: `main`
-- Latest merged commit on `main`: `e4d360c`
+- Latest merged commit on `main`: `7ebebe9`
 - Product phase: Prototype build-out
 
 | Sprint | Scope | Status | Notes |
 |---|---|---|---|
 | Sprint 0 | Pre-launch waitlist page | In Progress | Planning and runbook added; implementation pending |
 | Sprint 1 | Foundation (arch + DB + backend + frontend shell) | Completed | All Sprint 1 agent tracks merged to `main` |
-| Sprint 2 | Accounts & data (manual + CSV + FX) | Next Up | Branches prepared for parallel execution |
-| Sprint 3 | Balance sheet + first AI narrative | Not Started | Pending Sprint 2 completion |
+| Sprint 2 | Accounts & data (manual + CSV + FX) | Completed | DB, data, backend, and frontend tracks merged to `main`; QA track intentionally skipped for now |
+| Sprint 3 | Balance sheet + first AI narrative | Not Started | Next up after Sprint 2 merge completion |
 | Sprint 4 | Timeline + life event + fitness | Not Started | Pending Sprint 3 completion |
 | Sprint 5 | Quarterly review + governance | Not Started | Pending Sprint 4 completion |
 | Sprint 6 | Demo data + polish + launch prep | Not Started | Pending Sprint 5 completion |
@@ -42,25 +42,33 @@ Merged PR track summary:
 - Backend track merged (`codex/s1-backend`)
 - Frontend track merged (`codex/s1-frontend`)
 
-## Next Sprint Plan (Sprint 2)
-Objective: make the prototype usable with real user financial data imports.
+### Sprint 2 (Completed)
+Objective: deliver first real-data usable prototype workflow from account onboarding through CSV imports and normalized aggregation.
+
+Delivered:
+- Manual account setup flow
+- CSV import parsing pipeline (Avanza + Nordnet) with normalized row modeling
+- Accounts/import DB schema additions with RLS controls
+- Accounts and import backend APIs/services (preview + confirm flow)
+- ECB FX utility/cache for cross-currency normalization
+- Frontend account views, add account flow, and CSV import UX
+- Parser fixtures and tests for CSV and FX utility paths
+
+Merged PR track summary:
+- Data track merged (`codex/s2-data`, PR #7)
+- DB track merged (`codex/s2-db`, PR #8)
+- Backend track merged (`codex/s2-backend`, PR #10)
+- Frontend track merged (`codex/s2-frontend-writable`, PR #9)
+- Integration/QA track intentionally deferred/skipped in this cycle
+
+## Next Sprint Plan (Sprint 3)
+Objective: deliver balance-sheet level visibility and first AI narrative layer on top of the imported household/account data foundation.
 
 Planned delivery:
-- Manual account setup flow
-- CSV import pipeline (Avanza + Nordnet)
-- Holdings/transactions persistence and views
-- ECB FX integration for cross-currency normalization
-- Provider-reported values as source of truth (no live security repricing engine in prototype)
-
-Parallel workstreams:
-- `codex/s2-data-fx-csv`: CSV parsers + ECB FX utility
-- `codex/s2-backend`: account/import APIs and services
-- `codex/s2-frontend`: add-account/import/account detail UX
-
-Merge sequence for Sprint 2:
-1. Data utilities
-2. Backend APIs/services
-3. Frontend integration
+- Household-level balance sheet aggregation and presentation
+- Narrative/insight generation pass over imported account and transaction data
+- Clear as-of/freshness handling in portfolio narrative surfaces
+- Strengthened test coverage around aggregation and narrative endpoints
 
 ## Open Risks / Watchpoints
 - Single Supabase environment across preview + production increases risk of accidental production data writes from previews.
