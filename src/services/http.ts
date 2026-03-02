@@ -7,6 +7,11 @@ export interface ApiSuccessResponse<T> {
   data: T;
 }
 
+export interface ApiSuccessWithMetaResponse<T, M> {
+  data: T;
+  meta: M;
+}
+
 export interface ApiErrorResponse {
   error: {
     code: string;
@@ -48,6 +53,14 @@ export async function parseRouteParams<T>(
 
 export function successResponse<T>(data: T, status = 200): NextResponse<ApiSuccessResponse<T>> {
   return NextResponse.json({ data }, { status });
+}
+
+export function successResponseWithMeta<T, M>(
+  data: T,
+  meta: M,
+  status = 200,
+): NextResponse<ApiSuccessWithMetaResponse<T, M>> {
+  return NextResponse.json({ data, meta }, { status });
 }
 
 export function errorResponse(error: unknown): NextResponse<ApiErrorResponse> {

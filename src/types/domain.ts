@@ -41,3 +41,150 @@ export interface HouseholdView {
   members: HouseholdMemberView[];
   createdAt: string;
 }
+
+export const accountTypes = [
+  "investment",
+  "savings",
+  "pension",
+  "loan",
+  "mortgage",
+  "insurance",
+] as const;
+export type AccountType = (typeof accountTypes)[number];
+
+export const accountWrapperTypes = [
+  "ISK",
+  "KF",
+  "depa",
+  "PPM",
+  "tjanstepension",
+  "private_pension",
+] as const;
+export type AccountWrapperType = (typeof accountWrapperTypes)[number];
+
+export const accountVisibilities = ["full", "amount_hidden", "private"] as const;
+export type AccountVisibility = (typeof accountVisibilities)[number];
+
+export const accountSyncSources = ["manual", "csv", "psd2", "fida"] as const;
+export type AccountSyncSource = (typeof accountSyncSources)[number];
+
+export const accountTransactionTypes = [
+  "buy",
+  "sell",
+  "dividend",
+  "deposit",
+  "withdrawal",
+  "fee",
+  "interest",
+  "transfer",
+  "tax",
+] as const;
+export type AccountTransactionType = (typeof accountTransactionTypes)[number];
+
+export const importFormats = ["avanza", "nordnet", "unknown"] as const;
+export type ImportFormat = (typeof importFormats)[number];
+
+export const importStatuses = ["preview", "confirmed", "failed", "cancelled", "expired"] as const;
+export type ImportStatus = (typeof importStatuses)[number];
+
+export interface AccountSummaryView {
+  id: string;
+  householdId: string;
+  name: string;
+  providerId: string;
+  providerName: string;
+  accountType: AccountType;
+  wrapperType: AccountWrapperType | null;
+  currency: string;
+  visibility: AccountVisibility;
+  ownerDisplayName: string;
+  isOwn: boolean;
+  totalValue: number | null;
+  holdingsCount: number;
+  lastSynced: string | null;
+  syncSource: AccountSyncSource;
+}
+
+export interface AccountDetailView extends AccountSummaryView {
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AccountHoldingView {
+  id: string;
+  instrument: {
+    id: string;
+    isin: string | null;
+    ticker: string | null;
+    name: string;
+    assetClass: string;
+    currency: string;
+  };
+  quantity: number;
+  averageCost: number | null;
+  marketValue: number | null;
+  valueCurrency: string;
+  unrealizedPnl: number | null;
+  unrealizedPnlPct: number | null;
+  asOfDate: string;
+}
+
+export interface AccountTransactionView {
+  id: string;
+  transactionDate: string;
+  type: AccountTransactionType;
+  instrumentName: string | null;
+  isin: string | null;
+  quantity: number | null;
+  price: number | null;
+  amount: number | null;
+  currency: string;
+}
+
+export interface AccountTransactionsMeta {
+  cursor: string | null;
+  hasMore: boolean;
+  total: number;
+}
+
+export interface ImportPreviewHoldingView {
+  name: string;
+  ticker: string | null;
+  isin: string | null;
+  quantity: number | null;
+  marketValue: number | null;
+  valueCurrency: string | null;
+  asOfDate: string | null;
+}
+
+export interface ImportPreviewTransactionView {
+  transactionDate: string | null;
+  type: string | null;
+  instrumentName: string | null;
+  isin: string | null;
+  quantity: number | null;
+  price: number | null;
+  amount: number | null;
+  currency: string | null;
+}
+
+export interface CsvImportPreviewView {
+  importId: string;
+  format: Exclude<ImportFormat, "unknown">;
+  rowsParsed: number;
+  holdingsDetected: number;
+  transactionsDetected: number;
+  instrumentsResolved: number;
+  instrumentsUnresolved: number;
+  preview: {
+    holdings: ImportPreviewHoldingView[];
+    transactions: ImportPreviewTransactionView[];
+  };
+  status: "preview";
+}
+
+export interface CsvImportConfirmView {
+  holdingsCreated: number;
+  transactionsCreated: number;
+  accountUpdated: boolean;
+}
