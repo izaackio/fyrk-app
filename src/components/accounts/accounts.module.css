@@ -1,0 +1,300 @@
+.accountGrid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.accountCard {
+  background: var(--co-bg-surface);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+}
+
+.accountHeader {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.providerBadge {
+  align-items: center;
+  background: var(--co-bg-hover);
+  border-radius: 10px;
+  color: var(--co-brand-primary);
+  display: inline-flex;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  height: 34px;
+  justify-content: center;
+  min-width: 34px;
+  padding: 0 6px;
+}
+
+.accountHeading {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.accountTitle {
+  font-size: var(--text-lg);
+  margin: 0;
+}
+
+.accountMeta {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.visibilityTag {
+  background: var(--co-bg-hover);
+  border-radius: var(--radius-full);
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  margin-left: auto;
+  padding: 4px 10px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.accountValueBlock {
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.accountValueLabel {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.accountValueNumber {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.inlineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.freshnessMessage {
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.freshnessFresh {
+  background: var(--co-info-bg);
+  color: var(--co-info);
+}
+
+.freshnessAged {
+  background: var(--co-bg-hover);
+  color: var(--co-text-secondary);
+}
+
+.freshnessStale {
+  background: var(--co-status-down-bg);
+  color: var(--co-status-down);
+}
+
+.freshnessUnknown {
+  background: var(--co-bg-hover);
+  color: var(--co-text-secondary);
+}
+
+.stateCard,
+.infoCard,
+.accountHeaderCard,
+.tableCard {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.stateMessage {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.errorText {
+  color: var(--co-status-down);
+  margin: 0;
+}
+
+.formLayout {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.formRow {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.accountHeaderGrid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.detailTitle {
+  font-size: var(--text-2xl);
+  margin: 0;
+}
+
+.detailActions {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+.tabGroup {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.tabButton {
+  background: var(--co-bg-surface);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-full);
+  color: var(--co-text-secondary);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  min-height: 36px;
+  padding: 0 14px;
+}
+
+.tabButtonActive {
+  background: var(--co-bg-hover);
+  border-color: var(--co-brand-primary);
+  color: var(--co-brand-primary);
+}
+
+.tableWrap {
+  overflow: auto;
+}
+
+.dataTable {
+  border-collapse: collapse;
+  min-width: 720px;
+  width: 100%;
+}
+
+.dataTable th,
+.dataTable td {
+  border-bottom: 1px solid var(--co-border);
+  font-size: var(--text-sm);
+  padding: 10px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.dataTable th {
+  color: var(--co-text-secondary);
+  font-weight: 600;
+}
+
+.cellMeta {
+  color: var(--co-text-secondary);
+  display: block;
+  font-size: var(--text-xs);
+  margin-top: 2px;
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.importForm {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.importSummaryGrid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.summaryMetric {
+  background: var(--co-bg-subtle);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+}
+
+.summaryLabel {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.summaryValue {
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  margin: 0;
+}
+
+.successBanner {
+  background: var(--co-status-up-bg);
+  border: 1px solid color-mix(in srgb, var(--co-status-up), transparent 45%);
+  border-radius: var(--radius-sm);
+  color: var(--co-status-up);
+  padding: 12px;
+}
+
+.warningText {
+  color: var(--co-status-down);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .formRow,
+  .accountHeaderGrid,
+  .importSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .visibilityTag {
+    margin-left: 0;
+    margin-top: 2px;
+  }
+
+  .accountHeader {
+    flex-direction: column;
+  }
+
+  .detailActions {
+    justify-content: flex-start;
+  }
+
+  .dataTable {
+    min-width: 600px;
+  }
+}
