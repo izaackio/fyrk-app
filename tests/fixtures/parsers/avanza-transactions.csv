@@ -1,0 +1,4 @@
+Datum;Konto;Typ av transaktion;Värdepapper;ISIN;Antal;Kurs;Belopp;Courtage;Valuta
+2025-01-10;ISK 1234567;Köp;Avanza Zero;SE0011527613;10;278,45;-2784,50;0,00;SEK
+2025-01-31;ISK 1234567;Utdelning;Investor B;SE0000107419;;;125,00;0,00;SEK
+2025-02-05;ISK 1234567;Sälj;XACT Norden;SE0001733997;2;325,10;650,20;1,00;SEK
