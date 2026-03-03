@@ -1,0 +1,55 @@
+{
+  "asOfWeek": "2026-03-02",
+  "household": {
+    "id": "11111111-1111-4111-8111-111111111111",
+    "name": "Andersson Household",
+    "baseCurrency": "SEK",
+    "memberCount": 2,
+    "members": [
+      {
+        "displayName": "Isac",
+        "role": "owner"
+      },
+      {
+        "displayName": "Partner",
+        "role": "member"
+      }
+    ]
+  },
+  "financials": {
+    "totalNetWorth": 8423400,
+    "totalAssets": 10923400,
+    "totalLiabilities": 2500000,
+    "currency": "SEK"
+  },
+  "recentChanges": {
+    "periodStart": "2026-03-02",
+    "periodEnd": "2026-03-03",
+    "asOfDate": "2026-03-03",
+    "previousNetWorth": 8299000,
+    "netWorthChange": 124400,
+    "netWorthChangePct": 1.5,
+    "newTransactions": 5,
+    "significantEvents": [
+      "deposit 50 000 SEK on 2026-03-02",
+      "buy 24 000 SEK on 2026-03-02"
+    ]
+  },
+  "accounts": {
+    "totalCount": 4,
+    "byType": {
+      "investment": 2,
+      "savings": 1,
+      "mortgage": 1
+    },
+    "sample": [
+      {
+        "name": "ISK Avanza",
+        "accountType": "investment",
+        "wrapperType": "ISK",
+        "provider": "Avanza",
+        "currency": "SEK"
+      }
+    ]
+  }
+}
