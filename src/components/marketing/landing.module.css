@@ -1,0 +1,387 @@
+.page {
+  min-height: 100vh;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 8% -10%, rgba(107, 142, 155, 0.22) 0%, rgba(107, 142, 155, 0) 42%),
+    radial-gradient(circle at 100% 0%, rgba(212, 184, 114, 0.24) 0%, rgba(212, 184, 114, 0) 38%),
+    #fdfdfc;
+  color: #1a1a1a;
+}
+
+.shell {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 72rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.hero {
+  padding-bottom: 1.5rem;
+}
+
+.prelaunchBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #d4d4d4;
+  background: #eff4f6;
+  color: #2a3b4c;
+  padding: 0.3rem 0.8rem;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  margin: 0.9rem 0 0;
+  font-family:
+    "Playfair Display",
+    Georgia,
+    serif;
+  font-size: clamp(2rem, 7vw, 3.25rem);
+  font-weight: 600;
+  line-height: 1.16;
+  color: #1a1a1a;
+}
+
+.heroLead {
+  margin: 1rem 0 0;
+  max-width: 42rem;
+  color: #3d4347;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.ctaRow {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.primaryCta,
+.secondaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  padding: 0.78rem 1rem;
+  text-decoration: none;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+  font-weight: 600;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.primaryCta {
+  background: #2a3b4c;
+  color: #ffffff;
+}
+
+.primaryCta:hover {
+  background: #3a5068;
+  transform: translateY(-1px);
+}
+
+.secondaryCta {
+  border-color: #d4d4d4;
+  background: #f8f7f5;
+  color: #2a3b4c;
+}
+
+.secondaryCta:hover {
+  background: #f0efeb;
+  transform: translateY(-1px);
+}
+
+.primaryCta:focus-visible,
+.secondaryCta:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible,
+.submitButton:focus-visible {
+  outline: 2px solid #6b8e9b;
+  outline-offset: 2px;
+}
+
+.disclaimer {
+  margin: 0.95rem 0 0;
+  color: #5e6266;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family:
+    "Playfair Display",
+    Georgia,
+    serif;
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.sectionLead {
+  margin: 0.65rem 0 0;
+  max-width: 44rem;
+  color: #4a5054;
+  line-height: 1.6;
+}
+
+.pillarGrid {
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pillarCard {
+  border: 1px solid #eaeaea;
+  border-radius: 0.9rem;
+  background: #fdfdfc;
+  padding: 0.95rem;
+}
+
+.pillarTitle {
+  margin: 0;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.pillarDescription {
+  margin: 0.45rem 0 0;
+  color: #4a5054;
+  line-height: 1.58;
+}
+
+.socialProof {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f7f5 100%);
+}
+
+.statsGrid {
+  margin: 1rem 0 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.statCard {
+  border-radius: 0.9rem;
+  border: 1px solid #e2e3e4;
+  background: #ffffff;
+  padding: 0.9rem;
+}
+
+.statLabel {
+  color: #5e6266;
+  font-size: 0.83rem;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  margin: 0.45rem 0 0;
+  color: #1a1a1a;
+  font-size: 1.02rem;
+  font-weight: 600;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+}
+
+.waitlistSection {
+  scroll-margin-top: 1rem;
+}
+
+.waitlistForm {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.95rem;
+}
+
+.fieldGrid {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.fieldBlock {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.label {
+  color: #1a1a1a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+}
+
+.requiredMarker {
+  color: #cc5a50;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border-radius: 0.65rem;
+  border: 1px solid #d4d4d4;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.4;
+}
+
+.input {
+  padding: 0.7rem 0.8rem;
+}
+
+.textarea {
+  padding: 0.72rem 0.8rem;
+  resize: vertical;
+}
+
+.fieldHint {
+  margin: 0;
+  color: #6d7378;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.inlineError {
+  margin: 0;
+  color: #cc5a50;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.submitButton {
+  border: 1px solid #2a3b4c;
+  border-radius: 0.75rem;
+  background: #2a3b4c;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+  line-height: 1;
+  padding: 0.88rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #3a5068;
+  border-color: #3a5068;
+}
+
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.privacyNote {
+  margin: 0;
+  color: #5e6266;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.feedback {
+  margin: 0;
+  border-radius: 0.7rem;
+  border: 1px solid transparent;
+  padding: 0.7rem 0.78rem;
+  font-size: 0.9rem;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+}
+
+.feedbackSuccess {
+  background: #edf5f0;
+  border-color: #b6d1bc;
+  color: #27523a;
+}
+
+.feedbackDuplicate {
+  background: #eff4f6;
+  border-color: #c4d6dd;
+  color: #294652;
+}
+
+.feedbackError {
+  background: #fdf0ef;
+  border-color: #e6beb9;
+  color: #8d372f;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 1.25rem;
+  }
+
+  .panel {
+    padding: 1.6rem;
+  }
+
+  .ctaRow {
+    flex-direction: row;
+  }
+
+  .primaryCta,
+  .secondaryCta {
+    width: auto;
+    justify-content: center;
+    padding-inline: 1.3rem;
+  }
+
+  .pillarGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .fieldGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
