@@ -1,0 +1,17 @@
+{
+  "narrative": "This week your household net worth increased by 1 244 SEK (1.5%) and ended at 84 234 SEK. The largest movement was a 50 000 SEK deposit that strengthened your cash position before new buys. We recorded five transactions, with activity mostly concentrated in your investment accounts. Keep an eye on mortgage exposure as rates remain uncertain.",
+  "highlights": [
+    {
+      "type": "positive",
+      "text": "Net worth increased by 1 244 SEK this week."
+    },
+    {
+      "type": "neutral",
+      "text": "Five transactions were recorded across household accounts."
+    },
+    {
+      "type": "action",
+      "text": "Review mortgage terms alongside new investment contributions."
+    }
+  ]
+}
