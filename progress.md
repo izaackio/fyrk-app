@@ -9,9 +9,9 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 - `Blocked`: cannot proceed due to dependency or external constraint
 
 ## Current Snapshot
-- Last updated: 2026-03-02
+- Last updated: 2026-03-03
 - Baseline branch: `main`
-- Latest merged commit on `main`: `7ebebe9`
+- Latest merged commit on `main`: `89dcb95`
 - Product phase: Prototype build-out
 
 | Sprint | Scope | Status | Notes |
@@ -19,8 +19,8 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 | Sprint 0 | Pre-launch waitlist page | In Progress | Planning and runbook added; implementation pending |
 | Sprint 1 | Foundation (arch + DB + backend + frontend shell) | Completed | All Sprint 1 agent tracks merged to `main` |
 | Sprint 2 | Accounts & data (manual + CSV + FX) | Completed | DB, data, backend, and frontend tracks merged to `main`; QA track intentionally skipped |
-| Sprint 3 | Balance sheet + first AI narrative | Not Started | Execution runbook prepared; kickoff ready |
-| Sprint 4 | Timeline + life event + fitness | Not Started | Pending Sprint 3 completion |
+| Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; integration lane not run |
+| Sprint 4 | Timeline + life event + fitness | Not Started | Next up after Sprint 3 completion |
 | Sprint 5 | Quarterly review + governance | Not Started | Pending Sprint 4 completion |
 | Sprint 6 | Demo data + polish + launch prep | Not Started | Pending Sprint 5 completion |
 
@@ -61,17 +61,40 @@ Merged PR track summary:
 - Frontend track merged (`codex/s2-frontend-writable`, PR #9)
 - Integration/QA track intentionally deferred for later pass
 
-## Next Sprint Plan (Sprint 3)
+### Sprint 3 (Completed)
 Objective: turn imported account data into a household-level intelligence layer with reliable aggregation and first AI narrative output.
 
-Planned delivery:
-- Balance sheet APIs (`/api/balance-sheet`, `/api/balance-sheet/history`)
-- Net worth and allocation experience in UI (household + per-member view)
-- Daily snapshots for history continuity
-- Weekly AI narrative pipeline with fallback behavior
-- Dashboard cards for live net worth + "What Changed This Week"
+Delivered:
+- Household balance sheet APIs with history endpoint
+- Daily snapshot cron route/service with idempotent writes
+- Balance sheet calculation service and validation layer
+- Weekly AI narrative endpoint with cache + fallback behavior
+- Balance sheet and dashboard insight UI experiences
+- Sprint 3 schema additions for household snapshots and narrative cache
 
-## Sprint 3 Deep-Dive Section
+Merged PR track summary:
+- DB track merged (`codex/s3-db`, PR #11)
+- Backend track merged (`codex/s3-backend`, PR #13)
+- Frontend track merged (`codex/s3-frontend`, PR #14)
+- AI track merged (`codex/s3-ai`, PR #15)
+- Integration lane (`codex/s3-integration`) intentionally not run in this cycle
+
+Release train summary:
+- Sprint 3 DB + backend merged on 2026-03-03
+- Sprint 3 frontend + AI merged on 2026-03-03
+- Docs runbook merged on 2026-03-02 (PR #12)
+
+## Next Sprint Plan (Sprint 4)
+Objective: add household financial timeline, first life-event playbook flow, and initial fitness scoring surfaces.
+
+Planned delivery:
+- Timeline entry APIs and timeline UX
+- Life event library + trigger flow with generated playbook actions
+- Fitness score calculation and visualization foundations
+- Integration between timeline, events, and score changes
+- Clear carry-forward from Sprint 3 data + narrative foundations
+
+## Sprint 3 Deep-Dive Section (Archived Plan)
 
 ### Sprint Goal Compared to Sprint 1 and 2
 
