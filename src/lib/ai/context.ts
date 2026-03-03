@@ -1,5 +1,7 @@
 import type { AuthContext } from "@/lib/auth/middleware";
 import { createServiceRoleSupabaseClient } from "@/lib/auth/supabase";
+import { buildDeterministicNetWorthChangePayload } from "@/lib/calculations/net-worth";
+import type { DeterministicNetWorthChangePayload } from "@/lib/calculations/types";
 import { ServiceError } from "@/services/errors";
 import type { HouseholdRole, HouseholdMemberStatus } from "@/types/domain";
 
@@ -88,6 +90,9 @@ export interface WeeklyNarrativeContext {
     netWorthChangePct: number | null;
     newTransactions: number;
     significantEvents: string[];
+  };
+  calculations: {
+    netWorthChange: DeterministicNetWorthChangePayload;
   };
   accounts: {
     totalCount: number;
@@ -267,13 +272,26 @@ export async function assembleWeeklyNarrativeContext(
     snapshots.find((row) => row.snapshot_date < weekStart) ??
     (snapshots.length > 1 ? snapshots[1] : null);
 
-  const currentNetWorth = latest ? toInt(latest.total_net_worth) : 0;
-  const previousNetWorth = previous ? toInt(previous.total_net_worth) : null;
-  const netWorthChange = previousNetWorth === null ? 0 : currentNetWorth - previousNetWorth;
-  const netWorthChangePct =
-    previousNetWorth === null || previousNetWorth === 0
-      ? null
-      : Number(((netWorthChange / previousNetWorth) * 100).toFixed(2));
+  const netWorthChange = buildDeterministicNetWorthChangePayload({
+    periodStart: weekStart,
+    periodEnd: today,
+    current: {
+      date: latest?.snapshot_date ?? today,
+      netWorth: latest ? toInt(latest.total_net_worth) : 0,
+      assets: latest ? toInt(latest.total_assets) : 0,
+      liabilities: latest ? toInt(latest.total_liabilities) : 0,
+      currency: latest?.currency ?? household.base_currency,
+    },
+    previous: previous
+      ? {
+          date: previous.snapshot_date,
+          netWorth: toInt(previous.total_net_worth),
+          assets: toInt(previous.total_assets),
+          liabilities: toInt(previous.total_liabilities),
+          currency: previous.currency,
+        }
+      : null,
+  });
 
   let newTransactions = 0;
   let significantEvents: string[] = [];
@@ -325,20 +343,23 @@ export async function assembleWeeklyNarrativeContext(
       members: memberContexts,
     },
     financials: {
-      totalNetWorth: currentNetWorth,
+      totalNetWorth: netWorthChange.currentNetWorth,
       totalAssets: latest ? toInt(latest.total_assets) : 0,
       totalLiabilities: latest ? toInt(latest.total_liabilities) : 0,
       currency: latest?.currency ?? household.base_currency,
     },
     recentChanges: {
-      periodStart: weekStart,
-      periodEnd: today,
-      asOfDate: latest?.snapshot_date ?? today,
-      previousNetWorth,
-      netWorthChange,
-      netWorthChangePct,
+      periodStart: netWorthChange.periodStart,
+      periodEnd: netWorthChange.periodEnd,
+      asOfDate: netWorthChange.asOfDate,
+      previousNetWorth: netWorthChange.previousNetWorth,
+      netWorthChange: netWorthChange.netWorthChange,
+      netWorthChangePct: netWorthChange.netWorthChangePct,
       newTransactions,
       significantEvents,
+    },
+    calculations: {
+      netWorthChange,
     },
     accounts: {
       totalCount: accounts.length,
