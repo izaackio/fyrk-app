@@ -1,4 +1,4 @@
-import { DashboardPlaceholder } from "../../../components/dashboard/DashboardPlaceholder";
+import { DashboardInsights } from "../../../components/dashboard/DashboardInsights";
 import styles from "../../../components/theme/theme.module.css";
 
 export default function DashboardPage() {
@@ -7,11 +7,10 @@ export default function DashboardPage() {
       <header className={styles.sectionHeading}>
         <h2 className={styles.sectionTitle}>Good morning</h2>
         <p className={styles.sectionDescription}>
-          Household overview with Sprint 1 placeholders for balances, fitness, and
-          narrative context.
+          Live household net worth and weekly insight narrative with graceful fallbacks.
         </p>
       </header>
-      <DashboardPlaceholder />
+      <DashboardInsights />
     </section>
   );
 }

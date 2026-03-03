@@ -1,10 +1,16 @@
-import { FeaturePlaceholder } from "../../../components/dashboard/FeaturePlaceholder";
+import { BalanceSheetExperience } from "../../../components/balance-sheet/BalanceSheetExperience";
+import styles from "../../../components/theme/theme.module.css";
 
 export default function BalanceSheetPage() {
   return (
-    <FeaturePlaceholder
-      description="Charts, account cards, and allocation drill-downs will be connected in Sprint 2."
-      title="Balance Sheet"
-    />
+    <section className={styles.pageSection}>
+      <header className={styles.sectionHeading}>
+        <h2 className={styles.sectionTitle}>Balance Sheet</h2>
+        <p className={styles.sectionDescription}>
+          Unified net worth, allocation views, and data quality across the household.
+        </p>
+      </header>
+      <BalanceSheetExperience />
+    </section>
   );
 }
