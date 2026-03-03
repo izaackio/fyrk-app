@@ -30,65 +30,102 @@ const pillars = [
   },
 ] as const;
 
-const socialProofItems = [
+const launchSignals = [
   {
-    label: "Early access focus",
-    value: "Swedish households",
+    label: "Pilot cohort",
+    value: "Q2 2026",
+    note: "Small-group onboarding",
   },
   {
-    label: "Product stage",
-    value: "Pre-launch",
+    label: "Launch market",
+    value: "Sweden",
+    note: "Households first",
   },
   {
-    label: "Experience goal",
-    value: "Calm + decision-ready",
+    label: "Experience",
+    value: "Narrative",
+    note: "Calm by default",
   },
+] as const;
+
+const onboardingSteps = [
+  "Join the waitlist with your context and priorities.",
+  "Receive staged onboarding updates during the pre-launch window.",
+  "Get invited to early access or private demo rounds as capacity opens.",
 ] as const;
 
 export function LandingPage() {
   return (
     <main className={styles.page}>
+      <div className={styles.ambientBackdrop} aria-hidden="true" />
       <div className={styles.shell}>
+        <header className={styles.header}>
+          <p className={styles.wordmark}>FYRK</p>
+          <p className={styles.headerMeta}>Warm Authority | Pre-launch</p>
+        </header>
+
         <section className={`${styles.panel} ${styles.hero}`} aria-labelledby="landing-title">
-          <span className={styles.prelaunchBadge}>Pre-launch</span>
-          <h1 id="landing-title" className={styles.heroTitle}>
-            Household money planning that feels calm, clear, and shared.
-          </h1>
-          <p className={styles.heroLead}>
-            Fyrk helps couples track what matters, understand progress, and make financial decisions together.
-            The full app is still in active build. Join the waitlist for launch updates and early onboarding.
-          </p>
+          <div className={styles.heroGrid}>
+            <div className={styles.heroContent}>
+              <span className={styles.prelaunchBadge}>Pre-launch</span>
+              <h1 id="landing-title" className={styles.heroTitle}>
+                Household money planning that feels calm, clear, and shared.
+              </h1>
+              <p className={styles.heroLead}>
+                Fyrk helps couples track what matters, understand progress, and make financial decisions together.
+                The product is in active build, and this page is the early-access gateway.
+              </p>
 
-          <div className={styles.ctaRow}>
-            <Link
-              href="/signup"
-              className={styles.primaryCta}
-              onClick={() => {
-                trackLandingEvent("cta_signup_click", { placement: "hero" });
-              }}
-            >
-              Continue to signup
-            </Link>
-            <a
-              href="#waitlist"
-              className={styles.secondaryCta}
-              onClick={() => {
-                trackLandingEvent("cta_demo_interest_click", { placement: "hero" });
-              }}
-            >
-              Request private demo access
-            </a>
+              <div className={styles.ctaRow}>
+                <Link
+                  href="/signup"
+                  className={styles.primaryCta}
+                  onClick={() => {
+                    trackLandingEvent("cta_signup_click", { placement: "hero" });
+                  }}
+                >
+                  Continue to signup
+                </Link>
+                <a
+                  href="#waitlist"
+                  className={styles.secondaryCta}
+                  onClick={() => {
+                    trackLandingEvent("cta_demo_interest_click", { placement: "hero" });
+                  }}
+                >
+                  Request private demo access
+                </a>
+              </div>
+
+              <p className={styles.disclaimer}>
+                Early-access communication only. No live banking or portfolio automation is available yet.
+              </p>
+            </div>
+
+            <aside className={styles.heroAside} aria-label="Launch signals">
+              <p className={styles.asideEyebrow}>Launch signals</p>
+              <dl className={styles.signalGrid}>
+                {launchSignals.map((signal) => {
+                  return (
+                    <div key={signal.label} className={styles.signalCard}>
+                      <dt className={styles.signalLabel}>{signal.label}</dt>
+                      <dd className={styles.signalValue}>{signal.value}</dd>
+                      <p className={styles.signalNote}>{signal.note}</p>
+                    </div>
+                  );
+                })}
+              </dl>
+            </aside>
           </div>
-
-          <p className={styles.disclaimer}>
-            This page is for early access only. No live banking or portfolio automation is available yet.
-          </p>
         </section>
 
         <section className={styles.panel} aria-labelledby="what-is-fyrk-title">
           <h2 id="what-is-fyrk-title" className={styles.sectionTitle}>
             What is Fyrk?
           </h2>
+          <p className={styles.sectionLead}>
+            A household-first planning experience that combines narrative clarity with financial precision.
+          </p>
           <ul className={styles.pillarGrid}>
             {pillars.map((pillar) => {
               return (
@@ -101,33 +138,41 @@ export function LandingPage() {
           </ul>
         </section>
 
-        <section className={`${styles.panel} ${styles.socialProof}`} aria-labelledby="social-proof-title">
-          <h2 id="social-proof-title" className={styles.sectionTitle}>
-            Built for Swedish couples preparing ahead
+        <section className={styles.panel} aria-labelledby="onboarding-title">
+          <h2 id="onboarding-title" className={styles.sectionTitle}>
+            How pre-launch onboarding works
           </h2>
-          <p className={styles.sectionLead}>
-            We are onboarding small cohorts first to tune reliability, clarity, and household collaboration flows.
-          </p>
-          <dl className={styles.statsGrid}>
-            {socialProofItems.map((item) => {
+          <ol className={styles.stepList}>
+            {onboardingSteps.map((step) => {
               return (
-                <div key={item.label} className={styles.statCard}>
-                  <dt className={styles.statLabel}>{item.label}</dt>
-                  <dd className={styles.statValue}>{item.value}</dd>
-                </div>
+                <li key={step} className={styles.stepItem}>
+                  {step}
+                </li>
               );
             })}
-          </dl>
+          </ol>
         </section>
 
-        <section id="waitlist" className={`${styles.panel} ${styles.waitlistSection}`} aria-labelledby="waitlist-title">
-          <h2 id="waitlist-title" className={styles.sectionTitle}>
-            Join the waitlist
-          </h2>
-          <p className={styles.sectionLead}>
-            Share a few details so we can prioritize onboarding and invite relevant early demo sessions.
-          </p>
-          <WaitlistForm />
+        <section id="waitlist" className={`${styles.panel} ${styles.waitlistPanel}`} aria-labelledby="waitlist-title">
+          <div className={styles.waitlistGrid}>
+            <div>
+              <h2 id="waitlist-title" className={styles.sectionTitle}>
+                Join the waitlist
+              </h2>
+              <p className={styles.sectionLead}>
+                Share your household context so we can prioritize relevant onboarding and demo invites.
+              </p>
+              <ul className={styles.waitlistPoints}>
+                <li className={styles.waitlistPoint}>Name and email for launch communication</li>
+                <li className={styles.waitlistPoint}>Optional context to shape cohort prioritization</li>
+                <li className={styles.waitlistPoint}>Clear feedback for submitted, duplicate, and error states</li>
+              </ul>
+            </div>
+
+            <div className={styles.waitlistCard}>
+              <WaitlistForm />
+            </div>
+          </div>
         </section>
       </div>
     </main>
