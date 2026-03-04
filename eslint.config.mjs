@@ -24,7 +24,15 @@ const eslintConfig = [
     }
   },
   {
-    ignores: ["node_modules/**", ".next/**", "out/**", "dist/**", "coverage/**"]
+    ignores: [
+      "node_modules/**",
+      ".next/**",
+      "**/.next/**",
+      ".worktrees/**",
+      "out/**",
+      "dist/**",
+      "coverage/**"
+    ]
   }
 ];
 

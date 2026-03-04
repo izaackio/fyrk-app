@@ -154,6 +154,8 @@ export interface BalanceSheetMemberNetWorthView {
   userId: string;
   displayName: string;
   netWorth: number;
+  assets?: number;
+  liabilities?: number;
 }
 
 export interface BalanceSheetAccountTypeBreakdownView {
@@ -161,34 +163,151 @@ export interface BalanceSheetAccountTypeBreakdownView {
   value: number;
 }
 
+export interface BalanceSheetWrapperTypeBreakdownView {
+  wrapperType: string;
+  value: number;
+}
+
 export interface BalanceSheetByAssetClassView {
   class: string;
   value: number;
   pct: number;
+  percentage?: number;
+  memberBreakdown?: Record<string, number>;
 }
 
 export interface BalanceSheetByGeographyView {
   country: string;
   value: number;
   pct: number;
+  percentage?: number;
+  memberBreakdown?: Record<string, number>;
 }
 
 export interface BalanceSheetByCurrencyView {
   currency: string;
   value: number;
   pct: number;
+  percentage?: number;
+  memberBreakdown?: Record<string, number>;
 }
 
 export interface BalanceSheetBySectorView {
   sector: string;
   value: number;
   pct: number;
+  percentage?: number;
+  memberBreakdown?: Record<string, number>;
+}
+
+export interface BalanceSheetConcentrationRiskView {
+  type: "single_holding" | "single_sector" | "single_currency" | "single_country";
+  name: string;
+  percentage: number;
+  severity: "info" | "warning" | "critical";
 }
 
 export interface BalanceSheetDataQualityView {
   coveragePct: number;
   staleAccounts: number;
   lastFullUpdate: string | null;
+  score?: "high" | "medium" | "low";
+  coveragePercent?: number;
+  staleAccountIds?: string[];
+  missingPrices?: string[];
+  estimatedValues?: string[];
+  missingValuationAccountIds?: string[];
+  staleFxRates?: boolean;
+}
+
+export interface BalanceSheetAssumptionValueView {
+  value: number;
+  source: "system_default" | "user_override" | "historical_derived";
+}
+
+export interface BalanceSheetAssumptionsView {
+  sourceTier: "system_default" | "user_override" | "historical_derived";
+  assumptions: {
+    equityReturn: BalanceSheetAssumptionValueView;
+    fixedIncomeReturn: BalanceSheetAssumptionValueView;
+    cashReturn: BalanceSheetAssumptionValueView;
+    inflation: BalanceSheetAssumptionValueView;
+    salaryGrowth: BalanceSheetAssumptionValueView;
+    monthlyExpenses: BalanceSheetAssumptionValueView;
+    governmentBorrowingRate: BalanceSheetAssumptionValueView;
+    staleAccountDays: BalanceSheetAssumptionValueView;
+    staleFxHours: BalanceSheetAssumptionValueView;
+  };
+}
+
+export interface BalanceSheetMetadataView {
+  calculatedAt: string;
+  assumptions: BalanceSheetAssumptionsView;
+  fx: {
+    source: string;
+    asOfDate: string | null;
+    stale: boolean;
+  };
+  deterministicPayload: {
+    netWorth: {
+      totalNetWorth: number;
+      totalAssets: number;
+      totalLiabilities: number;
+      byMember: Record<string, { assets: number; liabilities: number; netWorth: number }>;
+      byAccountType: Record<string, number>;
+      byWrapperType: Record<string, number>;
+      liquidAssets: number;
+      illiquidAssets: number;
+    };
+    allocation: {
+      byAssetClass: Array<{
+        category: string;
+        value: number;
+        percentage: number;
+        memberBreakdown?: Record<string, number>;
+      }>;
+      byGeography: Array<{
+        category: string;
+        value: number;
+        percentage: number;
+        memberBreakdown?: Record<string, number>;
+      }>;
+      byCurrency: Array<{
+        category: string;
+        value: number;
+        percentage: number;
+        memberBreakdown?: Record<string, number>;
+      }>;
+      bySector: Array<{
+        category: string;
+        value: number;
+        percentage: number;
+        memberBreakdown?: Record<string, number>;
+      }>;
+      concentrationRisks: BalanceSheetConcentrationRiskView[];
+    };
+    dataQuality: {
+      score: "high" | "medium" | "low";
+      coveragePercent: number;
+      staleAccountIds: string[];
+      missingPrices: string[];
+      estimatedValues: string[];
+      missingValuationAccountIds: string[];
+      staleFxRates: boolean;
+    };
+  };
+}
+
+export interface BalanceSheetHistoryMetadataView {
+  calculatedAt: string;
+  assumptions: BalanceSheetAssumptionsView;
+  source: "household_snapshots" | "account_snapshots";
+  fallbackReason:
+    | "no_viewable_accounts"
+    | "household_snapshots_empty"
+    | "household_snapshots_unavailable"
+    | "visibility_restricted"
+    | null;
 }
 
 export interface BalanceSheetView {
@@ -199,13 +318,18 @@ export interface BalanceSheetView {
   asOfDate: string;
   byMember: BalanceSheetMemberNetWorthView[];
   byAccountType: BalanceSheetAccountTypeBreakdownView[];
+  byWrapperType: BalanceSheetWrapperTypeBreakdownView[];
+  liquidAssets: number;
+  illiquidAssets: number;
   allocation: {
     byAssetClass: BalanceSheetByAssetClassView[];
     byGeography: BalanceSheetByGeographyView[];
     byCurrency: BalanceSheetByCurrencyView[];
     bySector: BalanceSheetBySectorView[];
   };
+  concentrationRisks: BalanceSheetConcentrationRiskView[];
   dataQuality: BalanceSheetDataQualityView;
+  metadata: BalanceSheetMetadataView;
 }
 
 export interface BalanceSheetHistoryPointView {
@@ -223,6 +347,7 @@ export interface BalanceSheetHistoryView {
     amount: number;
     pct: number | null;
   };
+  metadata: BalanceSheetHistoryMetadataView;
 }
 
 export interface ImportPreviewHoldingView {
