@@ -11,7 +11,7 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 ## Current Snapshot
 - Last updated: 2026-03-05
 - Baseline branch: `main`
-- Latest merged commit on `main`: `90f3995`
+- Latest merged commit on `main`: `4a22318`
 - Product phase: Prototype build-out
 
 | Sprint | Scope | Status | Notes |
@@ -21,7 +21,7 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 | Sprint 2 | Accounts & data (manual + CSV + FX) | Completed | DB, data, backend, and frontend tracks merged to `main`; QA track intentionally skipped |
 | Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; integration lane not run |
 | Sprint 4 | Timeline + life event + fitness | Completed | DB + AI + frontend lanes merged; integration sanity pass completed on `codex/s4-integration` |
-| Sprint 5 | Quarterly review + governance | Not Started | Unblocked after Sprint 4 scope lock; pending kickoff |
+| Sprint 5 | Quarterly review + governance | In Progress | DB + AI + frontend lanes merged; integration/QA fix-forward active on `codex/s5-integration` |
 | Sprint 6 | Demo data + polish + launch prep | Not Started | Baseline demo-readiness sprint before premium design hardening |
 | Sprint 6.5 | Design system hardening + UX QA | Not Started | Planned quality bridge between Sprint 6 delivery and Sprint 7 excellence pass |
 | Sprint 7 | Brand excellence + interaction quality | Not Started | Final premium UI/UX hardening benchmarked to top-tier product quality |
@@ -114,6 +114,30 @@ Sprint 4 agent status snapshot:
 - AI agent: Completed and merged (PR #23)
 - Frontend agent: Completed and merged (PR #22)
 - Integration/QA agent: Completed and merged (PR #24)
+
+### Sprint 5 (In Progress)
+Objective: deliver quarterly review generation and governance proposal workflows.
+
+Merged PR track summary:
+- DB track merged (`codex/s5-db`, PR #26)
+- AI track merged (`codex/s5-ai`, PR #27)
+- Frontend track merged (`codex/s5-frontend`, PR #28)
+- Backend lane status: no dedicated `codex/s5-backend` merge present on `main` as of commit `4a22318`; frontend currently uses fallback clients for `/api/reviews` and `/api/proposals` routes
+
+Sprint 5 integration/QA summary (2026-03-05):
+- Branch: `codex/s5-integration`
+- Sanity checks executed:
+  - `npx tsx --test src/components/sprint5/fallback.integration.test.ts`
+  - `npm run lint`
+  - `npm run type-check`
+  - `npm test`
+- Result: all checks green
+- Fix-forward outcomes:
+  - Proposal approval now stays `pending` until all required household approvals are recorded
+  - Proposal approve/reject transitions now write decision timeline entries and populate `timelineEntryId`
+  - Quarterly review generation now writes a review timeline entry and populates `timelineEntryId`
+  - Approval actions now append audit comments to proposal discussion history
+  - Proposal UI now distinguishes partial approval recording vs final approval completion
 
 ## Next Sprint Plan (Sprint 5)
 Objective: deliver quarterly review generation and governance proposal workflows.

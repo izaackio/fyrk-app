@@ -1,4 +1,5 @@
 import { ApiClientError } from "../sprint4/http";
+import { createTimelineEntryFallback } from "../sprint4/fallback";
 import type {
   CreateProposalInput,
   ProposalActorView,
@@ -14,6 +15,8 @@ import type {
 } from "./contracts";
 
 const STORAGE_KEY = "fyrk:sprint5:governance-state";
+const SPRINT1_STORAGE_KEY = "fyrk:sprint1:ui-state";
+const SECONDARY_APPROVER_PLACEHOLDER = "__secondary_household_member__";
 const API_DELAY_MS = 280;
 
 interface HouseholdState {
@@ -29,6 +32,16 @@ interface Sprint5State {
 const DEFAULT_STATE: Sprint5State = {
   households: {},
 };
+
+interface Sprint1HouseholdSummary {
+  id: string;
+  role: "owner" | "admin" | "member";
+  memberCount: number;
+}
+
+interface Sprint1UiState {
+  households?: Sprint1HouseholdSummary[];
+}
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
@@ -98,6 +111,81 @@ const ensureHouseholdState = (
 
   state.households[householdId] = next;
   return next;
+};
+
+const readSprint1HouseholdSummary = (
+  householdId: string,
+): Sprint1HouseholdSummary | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const raw = window.localStorage.getItem(SPRINT1_STORAGE_KEY);
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Sprint1UiState;
+    if (!Array.isArray(parsed.households)) {
+      return null;
+    }
+
+    const match = parsed.households.find((household) => household.id === householdId);
+    if (!match) {
+      return null;
+    }
+
+    return {
+      ...match,
+      memberCount:
+        Number.isFinite(match.memberCount) && match.memberCount > 0
+          ? Math.round(match.memberCount)
+          : 1,
+    };
+  } catch {
+    return null;
+  }
+};
+
+const resolveRequiredApprovers = (
+  householdId: string,
+  creatorId: string,
+): string[] => {
+  const summary = readSprint1HouseholdSummary(householdId);
+  if (!summary || summary.memberCount < 2) {
+    return [creatorId];
+  }
+
+  return [creatorId, SECONDARY_APPROVER_PLACEHOLDER];
+};
+
+const canActorResolveProposal = (
+  proposal: ProposalView,
+  actorId: string,
+): boolean =>
+  proposal.requiresApprovalFrom.includes(actorId) ||
+  (proposal.requiresApprovalFrom.includes(SECONDARY_APPROVER_PLACEHOLDER) &&
+    actorId !== proposal.createdBy.id);
+
+const hasAllRequiredApprovals = (
+  proposal: ProposalView,
+  approvedBy: string[],
+): boolean =>
+  proposal.requiresApprovalFrom.every((requiredApproverId) => {
+    if (requiredApproverId === SECONDARY_APPROVER_PLACEHOLDER) {
+      return approvedBy.some((approverId) => approverId !== proposal.createdBy.id);
+    }
+
+    return approvedBy.includes(requiredApproverId);
+  });
+
+const timelineCategoryByProposalCategory: Record<ProposalCategory, "investing" | "debt" | "insurance" | "planning" | "other"> = {
+  debt: "debt",
+  insurance: "insurance",
+  investment: "investing",
+  other: "other",
+  savings: "planning",
 };
 
 const parseAmountMinor = (text: string): number | null => {
@@ -254,6 +342,32 @@ const buildFallbackRecommendations = (
   return recommendations.slice(0, 3);
 };
 
+const appendAuditComment = ({
+  actor,
+  content,
+  householdState,
+  proposalId,
+  timestamp,
+}: {
+  actor: ProposalActorView;
+  content: string;
+  householdState: HouseholdState;
+  proposalId: string;
+  timestamp: string;
+}): void => {
+  const comment: ProposalCommentView = {
+    author: actor,
+    content,
+    createdAt: timestamp,
+    id: createId(),
+    proposalId,
+    userId: actor.id,
+  };
+
+  const existing = householdState.commentsByProposalId[proposalId] ?? [];
+  householdState.commentsByProposalId[proposalId] = [...existing, comment];
+};
+
 const findProposal = (
   householdState: HouseholdState,
   proposalId: string,
@@ -374,6 +488,22 @@ export const generateReviewFallback = async (
     updatedAt: now.toISOString(),
   };
 
+  const timelineEntry = await createTimelineEntryFallback({
+    actor: {
+      displayName: "Fyrk System",
+      id: "fyrk-system",
+    },
+    category: "planning",
+    description:
+      `${period.quarterLabel} quarterly review was generated from deterministic data inputs.`,
+    entryDate: toIsoDate(now),
+    entryType: "review",
+    householdId,
+    title: `${period.quarterLabel} quarterly review generated`,
+  });
+
+  review.timelineEntryId = timelineEntry.id;
+
   householdState.reviews.unshift(review);
   writeState(state);
 
@@ -458,7 +588,7 @@ export const createProposalFallback = async (
     id: createId(),
     impactAnalysis: buildImpactAnalysis(input),
     rejectedBy: null,
-    requiresApprovalFrom: [actor.id],
+    requiresApprovalFrom: resolveRequiredApprovers(input.householdId, actor.id),
     resolvedAt: null,
     status: "pending",
     timelineEntryId: null,
@@ -497,17 +627,52 @@ export const approveProposalFallback = async (
     throw transitionError("Only pending proposals can be approved");
   }
 
+  if (!canActorResolveProposal(proposal, actor.id)) {
+    throw new ApiClientError("FORBIDDEN", "Actor is not allowed to approve this proposal");
+  }
+
   const nextApprovedBy = proposal.approvedBy.includes(actor.id)
     ? proposal.approvedBy
     : [...proposal.approvedBy, actor.id];
+  const nowIso = new Date().toISOString();
+  const approvalRecorded = !proposal.approvedBy.includes(actor.id);
+
+  if (approvalRecorded) {
+    appendAuditComment({
+      actor,
+      content: `[Audit] ${actor.displayName} approved this proposal.`,
+      householdState,
+      proposalId,
+      timestamp: nowIso,
+    });
+  }
+
+  const fullyApproved = hasAllRequiredApprovals(proposal, nextApprovedBy);
+  const timelineEntryId = fullyApproved
+    ? (
+        await createTimelineEntryFallback({
+          actor,
+          category: timelineCategoryByProposalCategory[proposal.category],
+          description:
+            `${proposal.title} was approved. All required household approvals were recorded.`,
+          entryDate: toIsoDate(new Date(nowIso)),
+          entryType: "decision",
+          householdId,
+          title: `Proposal approved: ${proposal.title}`,
+        })
+      ).id
+    : proposal.timelineEntryId;
+  const nextComments = householdState.commentsByProposalId[proposal.id] ?? [];
 
   const next: ProposalView = {
     ...proposal,
     approvedBy: nextApprovedBy,
+    commentsCount: nextComments.length,
     rejectedBy: null,
-    resolvedAt: proposal.resolvedAt ?? new Date().toISOString(),
-    status: "approved",
-    updatedAt: new Date().toISOString(),
+    resolvedAt: fullyApproved ? proposal.resolvedAt ?? nowIso : null,
+    status: fullyApproved ? "approved" : "pending",
+    timelineEntryId,
+    updatedAt: nowIso,
   };
 
   householdState.proposals[index] = next;
@@ -541,6 +706,10 @@ export const rejectProposalFallback = async (
     throw transitionError("Only pending proposals can be rejected");
   }
 
+  if (!canActorResolveProposal(proposal, actor.id)) {
+    throw new ApiClientError("FORBIDDEN", "Actor is not allowed to reject this proposal");
+  }
+
   const nowIso = new Date().toISOString();
   const rejectionComment: ProposalCommentView = {
     author: actor,
@@ -554,6 +723,15 @@ export const rejectProposalFallback = async (
   const existingComments = householdState.commentsByProposalId[proposal.id] ?? [];
   const nextComments = [...existingComments, rejectionComment];
   householdState.commentsByProposalId[proposal.id] = nextComments;
+  const timelineEntry = await createTimelineEntryFallback({
+    actor,
+    category: timelineCategoryByProposalCategory[proposal.category],
+    description: `${proposal.title} was rejected. Reason: ${reason.trim()}`,
+    entryDate: toIsoDate(new Date(nowIso)),
+    entryType: "decision",
+    householdId,
+    title: `Proposal rejected: ${proposal.title}`,
+  });
 
   const next: ProposalView = {
     ...proposal,
@@ -561,6 +739,7 @@ export const rejectProposalFallback = async (
     rejectedBy: actor.id,
     resolvedAt: proposal.resolvedAt ?? nowIso,
     status: "rejected",
+    timelineEntryId: timelineEntry.id,
     updatedAt: nowIso,
   };
 

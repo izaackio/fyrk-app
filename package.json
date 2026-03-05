@@ -12,7 +12,7 @@
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
-    "test": "tsx --test src/**/*.test.ts",
+    "test": "tsx --test $(find src -name '*.test.ts' -print)",
     "test:sprint3-backend": "tsx --test src/services/balance-sheet.contract.test.ts src/services/snapshot.contract.test.ts"
   },
   "dependencies": {
