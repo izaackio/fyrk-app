@@ -46,6 +46,8 @@ export const timelineEntries = pgTable(
     index("idx_timeline_date").on(table.entryDate),
     index("idx_timeline_type").on(table.entryType),
     index("idx_timeline_created_by").on(table.createdBy),
+    index("idx_timeline_linked_proposal").on(table.linkedProposalId),
+    index("idx_timeline_linked_review").on(table.linkedReviewId),
     check(
       "timeline_entries_entry_type_check",
       sql`${table.entryType} in ('life_event', 'decision', 'milestone', 'review', 'system', 'note')`,
