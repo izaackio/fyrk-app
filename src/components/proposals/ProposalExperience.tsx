@@ -382,7 +382,14 @@ export function ProposalExperience() {
 
     try {
       const response = await approveProposal(activeHouseholdId, selectedProposal.id, actor);
-      setTransitionMessage(`Proposal approved at ${formatDateTime(response.data.updatedAt)}.`);
+      if (response.data.status === "approved") {
+        setTransitionMessage(`Proposal approved at ${formatDateTime(response.data.updatedAt)}.`);
+      } else {
+        const required = Math.max(response.data.requiresApprovalFrom.length, 1);
+        setTransitionMessage(
+          `Approval recorded. ${response.data.approvedBy.length}/${required} approvals complete.`,
+        );
+      }
       setShowRejectForm(false);
       setRejectReason("");
 
