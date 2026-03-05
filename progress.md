@@ -11,7 +11,7 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 ## Current Snapshot
 - Last updated: 2026-03-05
 - Baseline branch: `main`
-- Latest merged commit on `main`: `75074f1`
+- Latest merged commit on `main`: `90f3995`
 - Product phase: Prototype build-out
 
 | Sprint | Scope | Status | Notes |
@@ -22,7 +22,9 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 | Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; integration lane not run |
 | Sprint 4 | Timeline + life event + fitness | Completed | DB + AI + frontend lanes merged; integration sanity pass completed on `codex/s4-integration` |
 | Sprint 5 | Quarterly review + governance | Not Started | Unblocked after Sprint 4 scope lock; pending kickoff |
-| Sprint 6 | Demo data + polish + launch prep | Not Started | Pending Sprint 5 completion |
+| Sprint 6 | Demo data + polish + launch prep | Not Started | Baseline demo-readiness sprint before premium design hardening |
+| Sprint 6.5 | Design system hardening + UX QA | Not Started | Planned quality bridge between Sprint 6 delivery and Sprint 7 excellence pass |
+| Sprint 7 | Brand excellence + interaction quality | Not Started | Final premium UI/UX hardening benchmarked to top-tier product quality |
 
 ## Completed Work So Far
 
@@ -98,12 +100,20 @@ Merged PR track summary:
 - DB track merged (`codex/s4-db`, PR #21)
 - AI/services track merged (`codex/s4-ai`, PR #23)
 - Frontend track merged (`codex/s4-frontend`, PR #22)
+- Backend API/services scope delivered in `codex/s4-ai` lane for this sprint cycle (no dedicated `codex/s4-backend` branch)
 
 Sprint 4 integration/scope-lock summary (2026-03-05):
 - Branch: `codex/s4-integration` from latest `origin/main`
 - Sanity checks executed: `npm run lint`, `npm run type-check`, `npm test`, `npm run test:sprint3-backend`, `npm run build`
 - Result: all checks green; no reproducible regressions found in integration lane
 - Scope lock: no net-new features added during integration pass; bug-fix-only policy maintained
+
+Sprint 4 agent status snapshot:
+- DB agent: Completed and merged (PR #21)
+- Backend agent: Completed via AI/services lane merge (PR #23)
+- AI agent: Completed and merged (PR #23)
+- Frontend agent: Completed and merged (PR #22)
+- Integration/QA agent: Completed and merged (PR #24)
 
 ## Next Sprint Plan (Sprint 5)
 Objective: deliver quarterly review generation and governance proposal workflows.
@@ -114,6 +124,11 @@ Planned delivery:
 - Backend/DB governance primitives aligned with household role model
 - Frontend review and proposal experiences with clear decision state tracking
 - Integration of Sprint 5 features with Sprint 3/4 balance, timeline, and fitness context
+
+Upcoming quality runway after Sprint 5:
+- Sprint 6: demo data, onboarding polish, launch baseline
+- Sprint 6.5: focused design-system consistency, interaction QA, and accessibility/performance regression hardening
+- Sprint 7: benchmark-grade brand and interaction excellence pass
 
 ## Sprint 3 Deep-Dive Section (Archived Plan)
 
