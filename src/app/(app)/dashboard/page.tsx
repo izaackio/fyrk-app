@@ -1,4 +1,5 @@
 import { DashboardInsights } from "../../../components/dashboard/DashboardInsights";
+import { Sprint5SummaryCards } from "../../../components/dashboard/Sprint5SummaryCards";
 import styles from "../../../components/theme/theme.module.css";
 
 export default function DashboardPage() {
@@ -11,6 +12,7 @@ export default function DashboardPage() {
         </p>
       </header>
       <DashboardInsights />
+      <Sprint5SummaryCards />
     </section>
   );
 }
