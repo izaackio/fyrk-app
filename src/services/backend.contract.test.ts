@@ -13,6 +13,15 @@ import {
   createHouseholdSchema,
   updateHouseholdMemberSchema,
 } from "../lib/validations/household";
+import {
+  createLifeEventSchema,
+  updatePlaybookActionSchema,
+} from "../lib/validations/events";
+import { fitnessQuerySchema } from "../lib/validations/fitness";
+import {
+  timelineQuerySchema,
+  updateTimelineEntrySchema,
+} from "../lib/validations/timeline";
 import { ServiceError } from "./errors";
 
 function buildRequest(ip: string): Request {
@@ -92,6 +101,58 @@ test("import schemas validate file metadata and optional confirm body", () => {
 
   assert.equal(previewParsed.format, "avanza");
   assert.deepEqual(confirmParsed, {});
+});
+
+test("timeline query schema parses entry filters and defaults", () => {
+  const parsed = timelineQuerySchema.parse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+    types: "life_event,decision",
+    limit: "25",
+  });
+
+  assert.equal(parsed.limit, 25);
+  assert.deepEqual(parsed.types, ["life_event", "decision"]);
+});
+
+test("timeline update schema requires at least one field", () => {
+  const valid = updateTimelineEntrySchema.safeParse({ title: "Updated title" });
+  const invalid = updateTimelineEntrySchema.safeParse({});
+
+  assert.equal(valid.success, true);
+  assert.equal(invalid.success, false);
+});
+
+test("life event schemas validate create and action update payloads", () => {
+  const createParsed = createLifeEventSchema.parse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+    eventType: "buying_apartment",
+    title: "Buying our first apartment",
+    inputs: {
+      budget: 350_000_000,
+      targetDate: "2026-09-01",
+    },
+  });
+  const updateValid = updatePlaybookActionSchema.safeParse({
+    status: "completed",
+    completionNotes: "Done",
+  });
+  const updateInvalid = updatePlaybookActionSchema.safeParse({});
+
+  assert.equal(createParsed.eventType, "buying_apartment");
+  assert.equal(updateValid.success, true);
+  assert.equal(updateInvalid.success, false);
+});
+
+test("fitness query schema requires a valid household id", () => {
+  const valid = fitnessQuerySchema.safeParse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+  });
+  const invalid = fitnessQuerySchema.safeParse({
+    householdId: "not-a-uuid",
+  });
+
+  assert.equal(valid.success, true);
+  assert.equal(invalid.success, false);
 });
 
 test("auth bucket rate limiting blocks request 11 within the same window", () => {
