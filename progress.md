@@ -9,9 +9,9 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 - `Blocked`: cannot proceed due to dependency or external constraint
 
 ## Current Snapshot
-- Last updated: 2026-03-03
+- Last updated: 2026-03-05
 - Baseline branch: `main`
-- Latest merged commit on `main`: `89dcb95`
+- Latest merged commit on `main`: `75074f1`
 - Product phase: Prototype build-out
 
 | Sprint | Scope | Status | Notes |
@@ -20,8 +20,8 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 | Sprint 1 | Foundation (arch + DB + backend + frontend shell) | Completed | All Sprint 1 agent tracks merged to `main` |
 | Sprint 2 | Accounts & data (manual + CSV + FX) | Completed | DB, data, backend, and frontend tracks merged to `main`; QA track intentionally skipped |
 | Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; integration lane not run |
-| Sprint 4 | Timeline + life event + fitness | Not Started | Next up after Sprint 3 completion |
-| Sprint 5 | Quarterly review + governance | Not Started | Pending Sprint 4 completion |
+| Sprint 4 | Timeline + life event + fitness | Completed | DB + AI + frontend lanes merged; integration sanity pass completed on `codex/s4-integration` |
+| Sprint 5 | Quarterly review + governance | Not Started | Unblocked after Sprint 4 scope lock; pending kickoff |
 | Sprint 6 | Demo data + polish + launch prep | Not Started | Pending Sprint 5 completion |
 
 ## Completed Work So Far
@@ -84,15 +84,36 @@ Release train summary:
 - Sprint 3 frontend + AI merged on 2026-03-03
 - Docs runbook merged on 2026-03-02 (PR #12)
 
-## Next Sprint Plan (Sprint 4)
+### Sprint 4 (Completed)
 Objective: add household financial timeline, first life-event playbook flow, and initial fitness scoring surfaces.
 
+Delivered:
+- Timeline API + UI delivery (`/api/timeline`, `/timeline`) including create/update/delete support
+- Life-event library, trigger flow, and playbook action update endpoints
+- Fitness score APIs, deterministic calculation coverage, and frontend score surfaces
+- Sprint 4 schema/migration additions for timeline entries, life events, playbook actions, and fitness scores
+- AI interpretation for life-event playbooks and fitness explanation fallbacks
+
+Merged PR track summary:
+- DB track merged (`codex/s4-db`, PR #21)
+- AI/services track merged (`codex/s4-ai`, PR #23)
+- Frontend track merged (`codex/s4-frontend`, PR #22)
+
+Sprint 4 integration/scope-lock summary (2026-03-05):
+- Branch: `codex/s4-integration` from latest `origin/main`
+- Sanity checks executed: `npm run lint`, `npm run type-check`, `npm test`, `npm run test:sprint3-backend`, `npm run build`
+- Result: all checks green; no reproducible regressions found in integration lane
+- Scope lock: no net-new features added during integration pass; bug-fix-only policy maintained
+
+## Next Sprint Plan (Sprint 5)
+Objective: deliver quarterly review generation and governance proposal workflows.
+
 Planned delivery:
-- Timeline entry APIs and timeline UX
-- Life event library + trigger flow with generated playbook actions
-- Fitness score calculation and visualization foundations
-- Integration between timeline, events, and score changes
-- Clear carry-forward from Sprint 3 data + narrative foundations
+- Quarterly review generation pipeline (deterministic input + AI interpretation layer)
+- Proposal creation, comment, approval, and audit logging flow
+- Backend/DB governance primitives aligned with household role model
+- Frontend review and proposal experiences with clear decision state tracking
+- Integration of Sprint 5 features with Sprint 3/4 balance, timeline, and fitness context
 
 ## Sprint 3 Deep-Dive Section (Archived Plan)
 
