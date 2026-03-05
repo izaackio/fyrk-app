@@ -1,0 +1,240 @@
+.stack {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.stateCard,
+.heroCard {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.stateMessage {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.errorText {
+  color: var(--co-status-down);
+  margin: 0;
+}
+
+.heroGrid {
+  align-items: center;
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.gaugeWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.gauge {
+  --gauge-angle: calc(var(--gauge-value, 0%) * 3.6deg);
+
+  align-items: center;
+  background: conic-gradient(
+    var(--co-brand-primary) var(--gauge-angle),
+    color-mix(in srgb, var(--co-bg-hover), var(--co-border) 45%) var(--gauge-angle)
+  );
+  border-radius: 999px;
+  display: flex;
+  height: 210px;
+  justify-content: center;
+  padding: 12px;
+  width: 210px;
+}
+
+.gaugeInner {
+  align-items: center;
+  background: var(--co-bg-surface);
+  border: 1px solid var(--co-border);
+  border-radius: 999px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+}
+
+.scoreLabel {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.scoreValue {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.scoreScale {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.heroBody {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.explanation {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.calculatedAt {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  margin: 0;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.componentGrid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.componentCard {
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: var(--space-sm);
+  padding: 12px;
+}
+
+.componentHeader {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.componentTitle {
+  margin: 0;
+}
+
+.componentDescription {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+  margin: 3px 0 0;
+}
+
+.componentScore {
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.componentBar {
+  background: var(--co-bg-hover);
+  border-radius: var(--radius-full);
+  height: 8px;
+  overflow: hidden;
+}
+
+.componentFill {
+  background: linear-gradient(90deg, var(--co-brand-primary), var(--co-info));
+  display: block;
+  height: 100%;
+}
+
+.analyticsGrid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.trendChart {
+  background: var(--co-bg-subtle);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  height: 120px;
+  width: 100%;
+}
+
+.trendLine {
+  fill: none;
+  stroke: var(--co-brand-primary);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.historyList {
+  display: grid;
+  gap: 6px;
+}
+
+.historyRow {
+  color: var(--co-text-secondary);
+  display: flex;
+  font-size: var(--text-sm);
+  justify-content: space-between;
+}
+
+.actionList {
+  display: grid;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.actionItem {
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+}
+
+.actionHeader {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.actionImpact {
+  color: var(--co-status-up);
+  font-size: var(--text-sm);
+}
+
+.actionTitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  margin: 0;
+}
+
+.actionDescription {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+@media (max-width: 1040px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .heroBody {
+    width: 100%;
+  }
+
+  .analyticsGrid,
+  .componentGrid {
+    grid-template-columns: 1fr;
+  }
+}
