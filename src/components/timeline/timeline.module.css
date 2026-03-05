@@ -1,0 +1,241 @@
+.stack {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.controlCard,
+.stateCard {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.filtersGrid,
+.formGrid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.form {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.textarea {
+  background: var(--co-bg-surface);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  min-height: 96px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.textarea:hover {
+  border-color: var(--co-border-strong);
+}
+
+.textarea:focus-visible {
+  outline: 2px solid var(--co-focus-ring);
+  outline-offset: var(--co-focus-ring-offset);
+}
+
+.filterActions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.checkboxLabel {
+  align-items: center;
+  color: var(--co-text-secondary);
+  display: inline-flex;
+  font-size: var(--text-sm);
+  gap: 8px;
+}
+
+.submitRow {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.stateMessage {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.errorText {
+  color: var(--co-status-down);
+  margin: 0;
+}
+
+.timelineList {
+  display: grid;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.timelineItem {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: 16px minmax(0, 1fr);
+}
+
+.timelineRail {
+  align-items: flex-start;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.timelineRail::after {
+  background: var(--co-border);
+  content: "";
+  inset: 20px auto -12px 7px;
+  position: absolute;
+  width: 2px;
+}
+
+.timelineItem:last-child .timelineRail::after {
+  display: none;
+}
+
+.timelineDot {
+  background: var(--co-brand-primary);
+  border: 2px solid var(--co-bg-surface);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--co-border);
+  height: 14px;
+  margin-top: 8px;
+  position: relative;
+  width: 14px;
+  z-index: 2;
+}
+
+.dotlife_event {
+  background: var(--co-info);
+}
+
+.dotdecision {
+  background: #8e6b4a;
+}
+
+.dotmilestone {
+  background: var(--co-status-up);
+}
+
+.dotreview {
+  background: #6f6cc8;
+}
+
+.dotsystem {
+  background: var(--co-text-muted);
+}
+
+.dotnote {
+  background: #b47c41;
+}
+
+.timelineCard {
+  background: var(--co-bg-surface);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: var(--space-sm);
+  padding: 14px;
+}
+
+.cardHeader {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.cardHeading {
+  display: grid;
+  gap: 3px;
+}
+
+.entryDate {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.entryTitle {
+  font-size: var(--text-lg);
+  margin: 0;
+}
+
+.badges {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.categoryBadge {
+  background: var(--co-bg-subtle);
+  border-radius: var(--radius-full);
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 6px 10px;
+}
+
+.entryDescription {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.cardFooter {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.entryMeta {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 1120px) {
+  .filtersGrid,
+  .formGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .filtersGrid,
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+  }
+
+  .badges {
+    justify-content: flex-start;
+  }
+
+  .cardFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

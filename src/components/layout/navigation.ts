@@ -21,8 +21,8 @@ export const SECONDARY_NAV_ITEMS: NavItem[] = [
 
 export const MOBILE_NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", icon: "▣", label: "Home" },
-  { href: "/balance-sheet", icon: "◔", label: "Sheet" },
   { href: "/timeline", icon: "◷", label: "Timeline" },
-  { href: "/proposals", icon: "✎", label: "Proposals" },
+  { href: "/events", icon: "◎", label: "Events" },
+  { href: "/fitness", icon: "◉", label: "Fitness" },
   { href: "/settings", icon: "⚙", label: "Settings" },
 ];

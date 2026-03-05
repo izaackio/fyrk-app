@@ -34,7 +34,7 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   },
   "/events": {
     title: "Life Events",
-    subtitle: "Launch event playbooks when important moments happen.",
+    subtitle: "Launch event playbooks and track checklist progress.",
   },
   "/review": {
     title: "Quarterly Review",
@@ -42,7 +42,7 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   },
   "/fitness": {
     title: "Financial Fitness",
-    subtitle: "Fitness score placeholder and improvement path.",
+    subtitle: "Score breakdown, trend momentum, and improvement actions.",
   },
   "/proposals": {
     title: "Proposals",
