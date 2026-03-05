@@ -14,3 +14,8 @@ export * from "./timeline_entries";
 export * from "./life_events";
 export * from "./playbook_actions";
 export * from "./fitness_scores";
+export * from "./quarterly_reviews";
+export * from "./proposals";
+export * from "./proposal_approvals";
+export * from "./proposal_comments";
+export * from "./audit_log";
