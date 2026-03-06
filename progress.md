@@ -9,9 +9,9 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 - `Blocked`: cannot proceed due to dependency or external constraint
 
 ## Current Snapshot
-- Last updated: 2026-03-05
+- Last updated: 2026-03-06
 - Baseline branch: `main`
-- Latest merged commit on `main`: `4a22318`
+- Latest merged commit on `main`: `b87938a`
 - Product phase: Prototype build-out
 
 | Sprint | Scope | Status | Notes |
@@ -21,7 +21,7 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 | Sprint 2 | Accounts & data (manual + CSV + FX) | Completed | DB, data, backend, and frontend tracks merged to `main`; QA track intentionally skipped |
 | Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; integration lane not run |
 | Sprint 4 | Timeline + life event + fitness | Completed | DB + AI + frontend lanes merged; integration sanity pass completed on `codex/s4-integration` |
-| Sprint 5 | Quarterly review + governance | In Progress | DB + AI + frontend lanes merged; integration/QA fix-forward active on `codex/s5-integration` |
+| Sprint 5 | Quarterly review + governance | Completed | DB, backend, AI, frontend, and integration lanes merged to `main` |
 | Sprint 6 | Demo data + polish + launch prep | Not Started | Baseline demo-readiness sprint before premium design hardening |
 | Sprint 6.5 | Design system hardening + UX QA | Not Started | Planned quality bridge between Sprint 6 delivery and Sprint 7 excellence pass |
 | Sprint 7 | Brand excellence + interaction quality | Not Started | Final premium UI/UX hardening benchmarked to top-tier product quality |
@@ -115,16 +115,24 @@ Sprint 4 agent status snapshot:
 - Frontend agent: Completed and merged (PR #22)
 - Integration/QA agent: Completed and merged (PR #24)
 
-### Sprint 5 (In Progress)
+### Sprint 5 (Completed)
 Objective: deliver quarterly review generation and governance proposal workflows.
+
+Delivered:
+- Quarterly review persistence, APIs, generation flow, and PDF readiness contract
+- Proposal governance persistence, APIs, approvals, rejection, comments, and audit trail support
+- AI quarterly review and proposal-impact pipelines with schema validation
+- Frontend quarterly review and proposal governance UX, including dashboard summary states
+- Integration fix-forward pass to stabilize approval, timeline-linking, and review-generation flows
 
 Merged PR track summary:
 - DB track merged (`codex/s5-db`, PR #26)
+- Backend track merged (`codex/s5-backend`, PR #30)
 - AI track merged (`codex/s5-ai`, PR #27)
 - Frontend track merged (`codex/s5-frontend`, PR #28)
-- Backend lane status: no dedicated `codex/s5-backend` merge present on `main` as of commit `4a22318`; frontend currently uses fallback clients for `/api/reviews` and `/api/proposals` routes
+- Integration track merged (`codex/s5-integration`, PR #29)
 
-Sprint 5 integration/QA summary (2026-03-05):
+Sprint 5 integration/QA summary (2026-03-06):
 - Branch: `codex/s5-integration`
 - Sanity checks executed:
   - `npx tsx --test src/components/sprint5/fallback.integration.test.ts`
@@ -139,15 +147,25 @@ Sprint 5 integration/QA summary (2026-03-05):
   - Approval actions now append audit comments to proposal discussion history
   - Proposal UI now distinguishes partial approval recording vs final approval completion
 
-## Next Sprint Plan (Sprint 5)
-Objective: deliver quarterly review generation and governance proposal workflows.
+Sprint 5 agent status snapshot:
+- DB agent: Completed and merged (PR #26)
+- Backend agent: Completed and merged (PR #30)
+- AI agent: Completed and merged (PR #27)
+- Frontend agent: Completed and merged (PR #28)
+- Integration/QA agent: Completed and merged (PR #29)
+
+Sprint 5 achieved outcome:
+- Fyrk now supports household review generation and governance workflows end-to-end: reviews can be generated and read, proposals can be created and discussed, approvals/rejections are tracked, and governance events are written back into the household timeline with auditability.
+
+## Next Sprint Plan (Sprint 6)
+Objective: deliver demo-mode readiness, onboarding polish, and launch-baseline product hardening.
 
 Planned delivery:
-- Quarterly review generation pipeline (deterministic input + AI interpretation layer)
-- Proposal creation, comment, approval, and audit logging flow
-- Backend/DB governance primitives aligned with household role model
-- Frontend review and proposal experiences with clear decision state tracking
-- Integration of Sprint 5 features with Sprint 3/4 balance, timeline, and fitness context
+- Seed 4 high-quality demo household variants with realistic data and derived artifacts
+- Add demo-mode initialization and GDPR/data-handling endpoints
+- Polish onboarding, empty/loading/error states, and public-to-product transitions
+- Strengthen launch-quality reliability, security, accessibility, and performance
+- Prepare a demo-ready release baseline before Sprint 6.5/7 quality hardening
 
 Upcoming quality runway after Sprint 5:
 - Sprint 6: demo data, onboarding polish, launch baseline
