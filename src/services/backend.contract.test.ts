@@ -19,6 +19,17 @@ import {
 } from "../lib/validations/events";
 import { fitnessQuerySchema } from "../lib/validations/fitness";
 import {
+  createProposalSchema,
+  proposalCommentSchema,
+  proposalListQuerySchema,
+  proposalRejectSchema,
+} from "../lib/validations/proposals";
+import {
+  generateReviewSchema,
+  reviewListQuerySchema,
+  reviewPathParamsSchema,
+} from "../lib/validations/reviews";
+import {
   timelineQuerySchema,
   updateTimelineEntrySchema,
 } from "../lib/validations/timeline";
@@ -153,6 +164,45 @@ test("fitness query schema requires a valid household id", () => {
 
   assert.equal(valid.success, true);
   assert.equal(invalid.success, false);
+});
+
+test("review schemas validate generate, list query, and path params", () => {
+  const generateParsed = generateReviewSchema.parse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+  });
+  const queryParsed = reviewListQuerySchema.parse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+  });
+  const pathParsed = reviewPathParamsSchema.parse({
+    id: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+  });
+
+  assert.equal(generateParsed.householdId, queryParsed.householdId);
+  assert.equal(pathParsed.id, "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6");
+});
+
+test("proposal schemas parse list filters and validate reject/comment payloads", () => {
+  const createParsed = createProposalSchema.parse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+    title: "Increase monthly investing",
+    description: "Propose moving 10k SEK per month into global index funds.",
+    category: "investment",
+  });
+  const queryParsed = proposalListQuerySchema.parse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+    status: "pending,rejected",
+  });
+  const rejectParsed = proposalRejectSchema.parse({
+    reason: "This is too large for this quarter's budget.",
+  });
+  const commentParsed = proposalCommentSchema.parse({
+    content: "Let's revisit this after the next salary review.",
+  });
+
+  assert.equal(createParsed.category, "investment");
+  assert.deepEqual(queryParsed.status, ["pending", "rejected"]);
+  assert.equal(rejectParsed.reason.length > 0, true);
+  assert.equal(commentParsed.content.length > 0, true);
 });
 
 test("auth bucket rate limiting blocks request 11 within the same window", () => {
