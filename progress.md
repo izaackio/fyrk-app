@@ -16,7 +16,7 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 
 | Sprint | Scope | Status | Notes |
 |---|---|---|---|
-| Sprint 0 | Pre-launch waitlist page | In Progress | Planning and runbook added; implementation pending |
+| Sprint 0 | Pre-launch waitlist page | In Progress | Landing assets, waitlist API, schema, and analytics hooks are merged; root route + full payload persistence still need final alignment |
 | Sprint 1 | Foundation (arch + DB + backend + frontend shell) | Completed | All Sprint 1 agent tracks merged to `main` |
 | Sprint 2 | Accounts & data (manual + CSV + FX) | Completed | DB, data, backend, and frontend tracks merged to `main`; QA track intentionally skipped |
 | Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; integration lane not run |
@@ -27,6 +27,28 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 | Sprint 7 | Brand excellence + interaction quality | Not Started | Final premium UI/UX hardening benchmarked to top-tier product quality |
 
 ## Completed Work So Far
+
+### Sprint 0 (In Progress)
+Objective: launch a branded pre-launch landing page on `fyrk.com` and capture early household interest while the product is still being built.
+
+Delivered on `main`:
+- Marketing landing components and branded pre-launch copy were merged in frontend PRs #17 and #19
+- Waitlist API route, validation path, service, and Supabase persistence table are present on `main`
+- Duplicate-safe waitlist submission flow exists, with a no-op confirmation email service interface
+- Marketing analytics events and Vercel insights script hooks are present in the app shell
+
+Sprint 0 agent status snapshot:
+- Frontend agent: Partially completed and merged (PR #17, PR #19)
+- Backend agent: Partially completed on `main` (waitlist API + table merged; Build Plan payload shape not fully implemented)
+- Architect/deployment lane: Not repo-verifiable from codebase state alone
+
+Remaining gaps against Build Plan:
+- Root route `/` still renders the old Sprint 1 baseline page instead of the pre-launch landing experience
+- Waitlist validation and persistence currently accept/store only `email`; Build Plan calls for `name`, `source`, and signup metadata, and the UI collects extra context that is not persisted
+- The gated acceptance criteria for live landing quality, polished production deployment, and Lighthouse score are not verifiable from repo state alone
+
+Sprint 0 achieved outcome so far:
+- Fyrk has the core assets needed for a pre-launch funnel on `main`, but the landing experience is not yet fully wired as the public entry point and the waitlist backend is still narrower than the planned product capture model.
 
 ### Sprint 1 (Completed)
 Objective: establish production-grade project foundation and core household/auth workflows.
