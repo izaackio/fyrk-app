@@ -9,24 +9,47 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 - `Blocked`: cannot proceed due to dependency or external constraint
 
 ## Current Snapshot
-- Last updated: 2026-03-06
+- Last updated: 2026-03-09
 - Baseline branch: `main`
-- Latest merged commit on `main`: `b87938a`
+- Latest merged commit on `main`: `c61fe8b`
 - Product phase: Prototype build-out
 
 | Sprint | Scope | Status | Notes |
 |---|---|---|---|
-| Sprint 0 | Pre-launch waitlist page | In Progress | Planning and runbook added; implementation pending |
+| Sprint 0 | Pre-launch waitlist page | In Progress | Landing page is live on `/`, but the waitlist API + persistence lane is not merged to `main` |
 | Sprint 1 | Foundation (arch + DB + backend + frontend shell) | Completed | All Sprint 1 agent tracks merged to `main` |
 | Sprint 2 | Accounts & data (manual + CSV + FX) | Completed | DB, data, backend, and frontend tracks merged to `main`; QA track intentionally skipped |
-| Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; integration lane not run |
-| Sprint 4 | Timeline + life event + fitness | Completed | DB + AI + frontend lanes merged; integration sanity pass completed on `codex/s4-integration` |
+| Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; backend financial-logic follow-up also merged; integration lane not run |
+| Sprint 4 | Timeline + life event + fitness | Completed | DB, backend/AI-services, frontend, and integration lanes merged to `main` |
 | Sprint 5 | Quarterly review + governance | Completed | DB, backend, AI, frontend, and integration lanes merged to `main` |
-| Sprint 6 | Demo data + polish + launch prep | Not Started | Baseline demo-readiness sprint before premium design hardening |
+| Sprint 6 | Demo data + polish + launch prep | In Progress | Demo seed foundation merged to `main`; backend hardening, AI precompute, frontend polish, and release lanes still pending |
 | Sprint 6.5 | Design system hardening + UX QA | Not Started | Planned quality bridge between Sprint 6 delivery and Sprint 7 excellence pass |
 | Sprint 7 | Brand excellence + interaction quality | Not Started | Final premium UI/UX hardening benchmarked to top-tier product quality |
 
-## Completed Work So Far
+## Sprint-by-Sprint Progress
+
+### Sprint 0 (In Progress)
+Objective: launch a branded pre-launch landing page on `fyrk.com` and capture early interest while the product is still being built.
+
+Delivered on `main`:
+- Root route `/` now serves the branded pre-launch landing page
+- Marketing sections, waitlist form UX, and signup/demo CTAs are merged
+- SEO metadata for the landing page is present
+- Vercel analytics and Speed Insights script hooks are present in the root layout
+
+Sprint 0 agent status snapshot:
+- Frontend agent: Completed and merged (PR #17, PR #19)
+- Backend agent: Not merged to `main` (no merged `POST /api/waitlist` route or persistence table/schema)
+- Architect/deployment lane: Not repo-verifiable from codebase state alone
+
+Remaining gaps against Build Plan:
+- The waitlist form on the landing page posts to `/api/waitlist`, but that route is not present on `main`
+- The planned `waitlist_signups` persistence layer is not present on `main`
+- End-to-end signup storage and duplicate-safe confirmation are therefore not complete on `main`
+- Production deployment, DNS, and Lighthouse gate results cannot be verified from repo state alone
+
+Sprint 0 achieved outcome so far:
+- Fyrk has a production-facing pre-launch landing experience on `main`, but it does not yet have the merged backend needed to capture real waitlist signups end-to-end.
 
 ### Sprint 1 (Completed)
 Objective: establish production-grade project foundation and core household/auth workflows.
@@ -43,6 +66,12 @@ Merged PR track summary:
 - DB track merged (`codex/s1-db`)
 - Backend track merged (`codex/s1-backend`)
 - Frontend track merged (`codex/s1-frontend`)
+
+Sprint 1 agent status snapshot:
+- Architect agent: Completed and merged (PR #2)
+- DB agent: Completed and merged (PR #3)
+- Backend agent: Completed and merged (PR #5)
+- Frontend agent: Completed and merged (PR #4)
 
 ### Sprint 2 (Completed)
 Objective: deliver the first real-data usable prototype flow from account setup through CSV imports and cross-currency normalization.
@@ -63,6 +92,13 @@ Merged PR track summary:
 - Frontend track merged (`codex/s2-frontend-writable`, PR #9)
 - Integration/QA track intentionally deferred for later pass
 
+Sprint 2 agent status snapshot:
+- Data agent: Completed and merged (PR #7)
+- DB agent: Completed and merged (PR #8)
+- Backend agent: Completed and merged (PR #10)
+- Frontend agent: Completed and merged (PR #9)
+- Integration/QA agent: Intentionally skipped in this sprint cycle
+
 ### Sprint 3 (Completed)
 Objective: turn imported account data into a household-level intelligence layer with reliable aggregation and first AI narrative output.
 
@@ -77,6 +113,7 @@ Delivered:
 Merged PR track summary:
 - DB track merged (`codex/s3-db`, PR #11)
 - Backend track merged (`codex/s3-backend`, PR #13)
+- Backend financial-logic follow-up merged (`codex/s3-backend-finlogic-release`, PR #20)
 - Frontend track merged (`codex/s3-frontend`, PR #14)
 - AI track merged (`codex/s3-ai`, PR #15)
 - Integration lane (`codex/s3-integration`) intentionally not run in this cycle
@@ -84,7 +121,15 @@ Merged PR track summary:
 Release train summary:
 - Sprint 3 DB + backend merged on 2026-03-03
 - Sprint 3 frontend + AI merged on 2026-03-03
+- Sprint 3 backend financial-logic alignment follow-up merged on 2026-03-04
 - Docs runbook merged on 2026-03-02 (PR #12)
+
+Sprint 3 agent status snapshot:
+- DB agent: Completed and merged (PR #11)
+- Backend agent: Completed and merged (PR #13), with follow-up release merged (PR #20)
+- Frontend agent: Completed and merged (PR #14)
+- AI agent: Completed and merged (PR #15)
+- Integration/QA agent: Intentionally not run in this sprint cycle
 
 ### Sprint 4 (Completed)
 Objective: add household financial timeline, first life-event playbook flow, and initial fitness scoring surfaces.
@@ -157,8 +202,29 @@ Sprint 5 agent status snapshot:
 Sprint 5 achieved outcome:
 - Fyrk now supports household review generation and governance workflows end-to-end: reviews can be generated and read, proposals can be created and discussed, approvals/rejections are tracked, and governance events are written back into the household timeline with auditability.
 
-## Next Sprint Plan (Sprint 6)
+### Sprint 6 (In Progress)
 Objective: deliver demo-mode readiness, onboarding polish, and launch-baseline product hardening.
+
+Delivered on `main` so far:
+- Deterministic demo household dataset builder and seed runner
+- Demo dataset tests to verify repeatability and exact record counts
+- Seeding documentation and package scripts for reset/seed flows
+
+Merged PR track summary:
+- Data/DB seed track merged (`codex/s6-data-seed`, PR #32)
+
+Sprint 6 agent status snapshot:
+- Data/DB seed agent: Completed and merged (PR #32)
+- Backend hardening agent: Not started on `main`
+- AI precompute agent: Not started on `main`
+- Frontend polish agent: Not started on `main`
+- Integration/release agent: Not started on `main`
+
+Sprint 6 achieved outcome so far:
+- Fyrk now has a deterministic demo-data foundation for launch prep, but the runtime demo mode, hardening, and final release lanes are still pending.
+
+## Current Active Sprint (Sprint 6)
+Objective: finish demo-mode readiness, onboarding polish, and launch-baseline product hardening.
 
 Planned delivery:
 - Seed 4 high-quality demo household variants with realistic data and derived artifacts
