@@ -17,6 +17,7 @@ import type {
   NetWorthHoldingInput,
 } from "@/lib/calculations/types";
 import type { AuthContext } from "@/lib/auth/middleware";
+import { isActiveDemoContext } from "@/lib/demo";
 import { createServiceRoleSupabaseClient } from "@/lib/auth/supabase";
 import { fetchEcbFxSnapshot, type FxRatesSnapshot } from "@/lib/market-data/fx";
 import { ServiceError } from "@/services/errors";
@@ -725,8 +726,9 @@ export class BalanceSheetService {
     }
 
     const allAccounts = await this.listActiveHouseholdAccounts(authContext.supabase, householdId);
+    const demoAccess = isActiveDemoContext(authContext, householdId);
     const visibleAccounts = allAccounts
-      .map((account) => this.resolveVisibleAccount(account, authContext.user.id))
+      .map((account) => this.resolveVisibleAccount(account, authContext.user.id, demoAccess))
       .filter((entry): entry is VisibleAccount => entry !== null);
 
     return {
@@ -815,18 +817,22 @@ export class BalanceSheetService {
     return (data ?? []) as AccountRow[];
   }
 
-  private resolveVisibleAccount(account: AccountRow, requestingUserId: string): VisibleAccount | null {
+  private resolveVisibleAccount(
+    account: AccountRow,
+    requestingUserId: string,
+    forceFullAccess = false,
+  ): VisibleAccount | null {
     const visibility = this.normalizeVisibility(account.visibility);
     const isOwner = account.owner_user_id === requestingUserId;
 
-    if (!isOwner && visibility === "private") {
+    if (!forceFullAccess && !isOwner && visibility === "private") {
       return null;
     }
 
     return {
       account,
       visibility,
-      canViewAmounts: isOwner || visibility === "full",
+      canViewAmounts: forceFullAccess || isOwner || visibility === "full",
     };
   }
 

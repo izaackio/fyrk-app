@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { AuthContext } from "@/lib/auth/middleware";
+import { assertHouseholdWritable } from "@/lib/demo";
 import { createServiceRoleSupabaseClient } from "@/lib/auth/supabase";
 import type {
   CreateTimelineEntryInput,
@@ -158,6 +159,7 @@ export class TimelineService {
   async create(authContext: AuthContext, input: CreateTimelineEntryInput): Promise<TimelineEntryView> {
     const { supabase, user } = authContext;
     await this.requireHouseholdMembership(supabase, input.householdId, user.id);
+    await assertHouseholdWritable(supabase, input.householdId);
 
     const linkedAccountIds = await this.assertLinkedAccountsAreVisible(
       supabase,
@@ -461,6 +463,7 @@ export class TimelineService {
       entry.household_id,
       authContext.user.id,
     );
+    await assertHouseholdWritable(authContext.supabase, entry.household_id);
 
     if (entry.created_by !== authContext.user.id && !householdManagerRoles.includes(membership.role)) {
       throw new ServiceError("FORBIDDEN", "You are not allowed to modify this timeline entry");

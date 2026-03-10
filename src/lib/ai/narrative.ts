@@ -15,6 +15,7 @@ import {
   type WeeklyNarrativeOutput,
 } from "@/lib/ai/schemas";
 import type { AuthContext } from "@/lib/auth/middleware";
+import { isActiveDemoContext } from "@/lib/demo";
 
 interface WeeklyNarrativeCacheRow {
   context_hash: string;
@@ -249,6 +250,7 @@ export async function generateWeeklyNarrative(
   authContext: AuthContext,
   householdId: string,
 ): Promise<WeeklyNarrativeResult> {
+  const demoAccess = isActiveDemoContext(authContext, householdId);
   const context = await assembleWeeklyNarrativeContext(authContext, householdId);
   const contextHash = buildContextHash(context);
   const cached = await loadCachedNarrative(authContext.supabase, householdId, context.asOfWeek);
@@ -267,14 +269,16 @@ export async function generateWeeklyNarrative(
   const generatedAt = toIsoTimestamp();
   const generationResult = await generateWithFallback(context);
 
-  await persistNarrativeCache(authContext.supabase, {
-    householdId,
-    asOfWeek: context.asOfWeek,
-    contextHash,
-    output: generationResult.output,
-    source: generationResult.source,
-    generatedAt,
-  });
+  if (!demoAccess) {
+    await persistNarrativeCache(authContext.supabase, {
+      householdId,
+      asOfWeek: context.asOfWeek,
+      contextHash,
+      output: generationResult.output,
+      source: generationResult.source,
+      generatedAt,
+    });
+  }
 
   return {
     narrative: generationResult.output.narrative,

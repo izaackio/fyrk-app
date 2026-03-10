@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateLifeEventPlaybook } from "@/lib/ai/playbook";
 import type { PlaybookAiAction } from "@/lib/ai/schemas";
 import type { AuthContext } from "@/lib/auth/middleware";
+import { assertHouseholdWritable } from "@/lib/demo";
 import { balanceSheetService } from "@/services/balance-sheet.service";
 import { ServiceError } from "@/services/errors";
 import type {
@@ -226,6 +227,7 @@ export class EventService {
   async create(authContext: AuthContext, input: CreateLifeEventInput): Promise<EventCreateResponse> {
     const { supabase, user } = authContext;
     await this.requireHouseholdMembership(supabase, input.householdId, user.id);
+    await assertHouseholdWritable(supabase, input.householdId);
 
     const libraryItem = eventLibrary.find((item) => item.eventType === input.eventType);
     if (!libraryItem) {
@@ -366,6 +368,7 @@ export class EventService {
     }
 
     await this.requireHouseholdMembership(supabase, event.household_id, user.id);
+    await assertHouseholdWritable(supabase, event.household_id);
 
     const action = await this.getPlaybookActionById(supabase, eventId, actionId);
     if (!action) {

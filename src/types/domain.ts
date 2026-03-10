@@ -1,3 +1,5 @@
+import type { DemoVariant } from "@/lib/demo";
+
 export const householdRoles = ["owner", "admin", "member", "viewer"] as const;
 export type HouseholdRole = (typeof householdRoles)[number];
 
@@ -20,6 +22,15 @@ export interface SessionHouseholdSummary {
   name: string;
   role: HouseholdRole;
   memberCount: number;
+  isDemo?: boolean;
+  demoVariant?: DemoVariant | null;
+}
+
+export interface SessionDemoContext {
+  householdId: string;
+  householdName: string;
+  variant: DemoVariant;
+  readOnly: true;
 }
 
 export interface HouseholdMemberView {
