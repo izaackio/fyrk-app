@@ -1,5 +1,7 @@
 import type { Session, SupabaseClient, User } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 
+import { DEMO_CONTEXT_COOKIE, resolveDemoContext, type DemoContext } from "@/lib/demo";
 import { createRouteSupabaseClient } from "@/lib/auth/supabase";
 import { ServiceError } from "@/services/errors";
 import type { HouseholdMemberStatus, HouseholdRole } from "@/types/domain";
@@ -25,6 +27,7 @@ export interface AuthContext {
   session: Session;
   user: User;
   profile: ProfileRow;
+  demoContext: DemoContext | null;
 }
 
 export interface HouseholdAccessContext extends AuthContext {
@@ -75,7 +78,14 @@ export async function requireAuth(): Promise<AuthContext> {
   }
 
   const profile = await ensureProfile(supabase, session.user);
-  return { supabase, session, user: session.user, profile };
+  const cookieStore = await cookies();
+  const demoContext = await resolveDemoContext(
+    supabase,
+    session.user.id,
+    cookieStore.get(DEMO_CONTEXT_COOKIE)?.value,
+  );
+
+  return { supabase, session, user: session.user, profile, demoContext };
 }
 
 export async function requireHouseholdAccess(householdId: string): Promise<HouseholdAccessContext> {

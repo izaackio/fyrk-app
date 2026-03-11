@@ -7,6 +7,7 @@ import {
   type FitnessSuggestedAction,
 } from "@/lib/calculations/fitness";
 import { resolveAssumptionSet } from "@/lib/calculations/assumptions";
+import { isActiveDemoContext } from "@/lib/demo";
 import { balanceSheetService } from "@/services/balance-sheet.service";
 import { ServiceError } from "@/services/errors";
 import type { AccountVisibility, HouseholdMemberStatus, HouseholdRole } from "@/types/domain";
@@ -116,12 +117,13 @@ const wrapperTaxWeight: Record<string, number> = {
 export class FitnessService {
   async getFitness(authContext: AuthContext, householdId: string): Promise<FitnessResponseView> {
     await this.requireHouseholdMembership(authContext.supabase, householdId, authContext.user.id);
+    const demoAccess = isActiveDemoContext(authContext, householdId);
 
     const today = toIsoDate();
     let rows = await this.listRecentScores(authContext.supabase, householdId, 36);
     let currentRow = rows[0] ?? null;
 
-    if (!currentRow || currentRow.calculated_at !== today) {
+    if ((!currentRow || currentRow.calculated_at !== today) && !demoAccess) {
       currentRow = await this.calculateAndPersist(authContext, householdId, rows);
       rows = await this.listRecentScores(authContext.supabase, householdId, 36);
     }
@@ -151,6 +153,7 @@ export class FitnessService {
       authContext.supabase,
       householdId,
       authContext.user.id,
+      isActiveDemoContext(authContext, householdId),
     );
 
     const monthlyExpenses = await this.estimateMonthlyExpenses(
@@ -408,6 +411,7 @@ export class FitnessService {
     supabase: SupabaseClient,
     householdId: string,
     userId: string,
+    forceFullAccess = false,
   ): Promise<string[]> {
     const { data, error } = await supabase
       .from("accounts")
@@ -427,7 +431,7 @@ export class FitnessService {
 
       const visibility = this.normalizeVisibility(row.visibility);
       const isOwner = row.owner_user_id === userId;
-      if (isOwner || visibility === "full") {
+      if (forceFullAccess || isOwner || visibility === "full") {
         output.push(row.id);
       }
     }

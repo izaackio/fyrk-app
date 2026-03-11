@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { AuthContext } from "@/lib/auth/middleware";
+import { assertHouseholdWritable } from "@/lib/demo";
 import type { GenerateReviewInput } from "@/lib/validations/reviews";
 import { ServiceError } from "@/services/errors";
 import type {
@@ -209,6 +210,7 @@ function normalizeUpcomingEvents(value: unknown): Record<string, unknown>[] {
 
 export class ReviewService {
   async generate(authContext: AuthContext, input: GenerateReviewInput): Promise<ReviewGenerateView> {
+    await assertHouseholdWritable(authContext.supabase, input.householdId);
     const membership = await this.requireHouseholdMembership(
       authContext.supabase,
       input.householdId,

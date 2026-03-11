@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { demoVariants } from "@/lib/demo";
 import { emailSchema } from "@/lib/validations/auth";
 import { householdManageableRoles } from "@/types/domain";
 
@@ -38,6 +39,12 @@ export const inviteHouseholdMemberSchema = z
   })
   .strict();
 
+export const initializeDemoHouseholdSchema = z
+  .object({
+    variant: z.enum(demoVariants),
+  })
+  .strict();
+
 const roleUpdateSchema = z
   .object({
     role: z.enum(householdManageableRoles),
@@ -54,4 +61,5 @@ export const updateHouseholdMemberSchema = z.union([roleUpdateSchema, removeMemb
 
 export type CreateHouseholdInput = z.infer<typeof createHouseholdSchema>;
 export type InviteHouseholdMemberInput = z.infer<typeof inviteHouseholdMemberSchema>;
+export type InitializeDemoHouseholdInput = z.infer<typeof initializeDemoHouseholdSchema>;
 export type UpdateHouseholdMemberInput = z.infer<typeof updateHouseholdMemberSchema>;

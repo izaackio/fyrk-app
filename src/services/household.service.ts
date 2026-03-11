@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { AuthContext } from "@/lib/auth/middleware";
+import { assertHouseholdWritable } from "@/lib/demo";
 import {
   createServiceRoleSupabaseClient,
   createStatelessSupabaseClient,
@@ -156,6 +157,7 @@ export class HouseholdService {
   ): Promise<{ invitationId: string; email: string; status: "invited" }> {
     const { supabase, profile, user } = authContext;
     await this.requireManagerMembership(supabase, householdId, user.id);
+    await assertHouseholdWritable(supabase, householdId);
 
     if (profile.email.toLowerCase() === input.email) {
       throw ServiceError.validation("You cannot invite your own email address");
@@ -187,6 +189,7 @@ export class HouseholdService {
   ): Promise<HouseholdMemberView> {
     const { supabase, user } = authContext;
     const requesterMembership = await this.requireManagerMembership(supabase, householdId, user.id);
+    await assertHouseholdWritable(supabase, householdId);
     const targetMembership = await this.getMemberById(supabase, householdId, memberId);
 
     if (!targetMembership) {

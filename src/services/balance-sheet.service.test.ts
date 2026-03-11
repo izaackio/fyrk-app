@@ -167,6 +167,7 @@ function buildAuthContext(supabase: SupabaseClient, userId: string): AuthContext
       base_currency: "SEK",
       onboarding_completed: true,
     },
+    demoContext: null,
   };
 }
 

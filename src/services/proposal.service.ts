@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { AuthContext } from "@/lib/auth/middleware";
+import { assertHouseholdWritable } from "@/lib/demo";
 import type {
   CreateProposalInput,
   ProposalCommentInput,
@@ -283,6 +284,7 @@ export function applyProposalTransition(
 
 export class ProposalService {
   async create(authContext: AuthContext, input: CreateProposalInput): Promise<ProposalView> {
+    await assertHouseholdWritable(authContext.supabase, input.householdId);
     const membership = await this.requireHouseholdMembership(
       authContext.supabase,
       input.householdId,
@@ -400,6 +402,7 @@ export class ProposalService {
     if (!existing || existing.deleted_at) {
       throw new ServiceError("NOT_FOUND", "Proposal was not found");
     }
+    await assertHouseholdWritable(authContext.supabase, existing.household_id);
 
     const membership = await this.requireHouseholdMembership(
       authContext.supabase,
@@ -474,6 +477,7 @@ export class ProposalService {
     if (!existing || existing.deleted_at) {
       throw new ServiceError("NOT_FOUND", "Proposal was not found");
     }
+    await assertHouseholdWritable(authContext.supabase, existing.household_id);
 
     const membership = await this.requireHouseholdMembership(
       authContext.supabase,
@@ -560,6 +564,7 @@ export class ProposalService {
     if (!proposal || proposal.deleted_at) {
       throw new ServiceError("NOT_FOUND", "Proposal was not found");
     }
+    await assertHouseholdWritable(authContext.supabase, proposal.household_id);
 
     const membership = await this.requireHouseholdMembership(
       authContext.supabase,

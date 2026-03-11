@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { enforceRateLimit } from "../lib/auth/rate-limit";
+import { parseDemoContextCookie } from "../lib/demo";
+import { enforceRateLimit, resetRateLimitStore } from "../lib/auth/rate-limit";
 import {
   accountTransactionsQuerySchema,
   createAccountSchema,
@@ -11,6 +12,7 @@ import { authEmailRequestSchema } from "../lib/validations/auth";
 import { importConfirmBodySchema, importCsvFormSchema } from "../lib/validations/import";
 import {
   createHouseholdSchema,
+  initializeDemoHouseholdSchema,
   updateHouseholdMemberSchema,
 } from "../lib/validations/household";
 import {
@@ -34,6 +36,7 @@ import {
   updateTimelineEntrySchema,
 } from "../lib/validations/timeline";
 import { ServiceError } from "./errors";
+import { errorResponse, successResponse } from "./http";
 
 function buildRequest(ip: string): Request {
   return new Request("http://localhost/api/test", {
@@ -55,6 +58,14 @@ test("household create schema enforces and normalizes base currency", () => {
   });
 
   assert.equal(parsed.baseCurrency, "SEK");
+});
+
+test("demo household schema only accepts supported variants", () => {
+  const valid = initializeDemoHouseholdSchema.safeParse({ variant: "friendly_family" });
+  const invalid = initializeDemoHouseholdSchema.safeParse({ variant: "unknown" });
+
+  assert.equal(valid.success, true);
+  assert.equal(invalid.success, false);
 });
 
 test("member update schema only accepts one mutation shape", () => {
@@ -206,6 +217,7 @@ test("proposal schemas parse list filters and validate reject/comment payloads",
 });
 
 test("auth bucket rate limiting blocks request 11 within the same window", () => {
+  resetRateLimitStore();
   const request = buildRequest("203.0.113.42");
 
   for (let index = 0; index < 10; index += 1) {
@@ -217,4 +229,61 @@ test("auth bucket rate limiting blocks request 11 within the same window", () =>
     (error: unknown) =>
       error instanceof ServiceError && error.code === "RATE_LIMITED" && error.status === 429,
   );
+});
+
+test("demo bucket rate limiting blocks request 7 within the same window", () => {
+  resetRateLimitStore();
+  const request = buildRequest("203.0.113.43");
+
+  for (let index = 0; index < 6; index += 1) {
+    enforceRateLimit(request, "demo");
+  }
+
+  assert.throws(
+    () => enforceRateLimit(request, "demo"),
+    (error: unknown) =>
+      error instanceof ServiceError && error.code === "RATE_LIMITED" && error.status === 429,
+  );
+});
+
+test("demo context cookies reject invalid payloads", () => {
+  const valid = parseDemoContextCookie(
+    "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6:standard",
+  );
+  const invalid = parseDemoContextCookie("not-a-cookie");
+
+  assert.deepEqual(valid, {
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+    variant: "standard",
+  });
+  assert.equal(invalid, null);
+});
+
+test("api success responses include hardened security headers", async () => {
+  const response = successResponse({ ok: true });
+
+  assert.equal(response.headers.get("Cache-Control"), "private, no-store, max-age=0");
+  assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
+  assert.equal(response.headers.get("X-Frame-Options"), "DENY");
+  assert.equal(response.headers.get("Content-Security-Policy"), "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
+});
+
+test("api error responses preserve envelope shape and add retry hints", async () => {
+  const response = errorResponse(
+    new ServiceError("RATE_LIMITED", "Rate limit exceeded", {
+      retryAfterMs: 2_500,
+    }),
+  );
+  const payload = await response.json();
+
+  assert.deepEqual(payload, {
+    error: {
+      code: "RATE_LIMITED",
+      message: "Rate limit exceeded",
+      details: {
+        retryAfterMs: 2_500,
+      },
+    },
+  });
+  assert.equal(response.headers.get("Retry-After"), "3");
 });

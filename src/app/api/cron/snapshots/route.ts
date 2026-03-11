@@ -1,3 +1,4 @@
+import { enforceRateLimit } from "@/lib/auth/rate-limit";
 import { snapshotDateQuerySchema } from "@/lib/validations/balance-sheet";
 import { ServiceError } from "@/services/errors";
 import { errorResponse, parseWithSchema, successResponse } from "@/services/http";
@@ -22,6 +23,7 @@ function assertCronAuthorized(request: Request): void {
 
 async function handleSnapshotRequest(request: Request): Promise<Response> {
   try {
+    enforceRateLimit(request, "cron");
     assertCronAuthorized(request);
     const requestUrl = new URL(request.url);
     const query = parseWithSchema(
