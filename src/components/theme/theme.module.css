@@ -471,7 +471,7 @@
 
 .topbarHeading {
   display: grid;
-  gap: 2px;
+  gap: 4px;
 }
 
 .topbarTitle {
@@ -484,6 +484,13 @@
   color: var(--co-text-secondary);
   font-size: var(--text-sm);
   margin: 0;
+}
+
+.topbarStatusRow {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .topbarControls {
@@ -507,6 +514,18 @@
 
 .searchControl {
   min-width: 210px;
+}
+
+.selectorStack {
+  display: grid;
+  gap: 4px;
+  min-width: min(340px, 100%);
+}
+
+.selectorHint {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  margin: 0;
 }
 
 .toggleButton {
@@ -563,6 +582,71 @@
 .sectionDescription {
   color: var(--co-text-secondary);
   margin: 0;
+}
+
+.statusPill {
+  align-items: center;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+}
+
+.statusPillNeutral {
+  background: var(--co-bg-hover);
+  color: var(--co-text-secondary);
+}
+
+.statusPillPositive {
+  background: var(--co-status-up-bg);
+  color: var(--co-status-up);
+}
+
+.statusPillWarning {
+  background: var(--co-status-down-bg);
+  color: var(--co-status-down);
+}
+
+.statusPillDemo {
+  background: var(--co-info-bg);
+  color: var(--co-brand-primary);
+}
+
+.noticeCard {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--co-bg-surface) 90%, var(--co-info-bg) 10%), var(--co-bg-surface)),
+    var(--co-bg-surface);
+}
+
+.noticeCardWarning {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--co-bg-surface) 88%, var(--co-status-down-bg) 12%), var(--co-bg-surface)),
+    var(--co-bg-surface);
+}
+
+.noticeCardInfo {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--co-bg-surface) 88%, var(--co-info-bg) 12%), var(--co-bg-surface)),
+    var(--co-bg-surface);
+}
+
+.noticeStack {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.noticeBody {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.noticeActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }
 
 .dashboardGrid {
@@ -688,6 +772,19 @@
   gap: var(--space-lg);
 }
 
+.onboardingLayout {
+  align-items: start;
+  display: grid;
+  gap: var(--space-lg);
+  grid-template-columns: minmax(0, 1.75fr) minmax(280px, 0.95fr);
+}
+
+.onboardingMain,
+.onboardingAside {
+  display: grid;
+  gap: var(--space-lg);
+}
+
 .wizardSteps {
   display: grid;
   gap: var(--space-sm);
@@ -709,6 +806,17 @@
   color: var(--co-brand-primary);
 }
 
+.wizardStepComplete {
+  background: var(--co-status-up-bg);
+  border-color: color-mix(in srgb, var(--co-status-up) 45%, var(--co-border));
+  color: var(--co-status-up);
+}
+
+.wizardStepPending {
+  background: var(--co-bg-surface);
+  color: var(--co-text-secondary);
+}
+
 .wizardStepLabel {
   font-size: var(--text-xs);
   text-transform: uppercase;
@@ -719,11 +827,40 @@
   font-weight: 600;
 }
 
+.wizardStepStatus {
+  font-size: var(--text-xs);
+}
+
 .wizardActions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
   justify-content: space-between;
+}
+
+.choiceGrid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choiceCard {
+  background: var(--co-bg-subtle);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+}
+
+.choiceTitle {
+  font-size: var(--text-lg);
+  margin: 0;
+}
+
+.choiceBody {
+  color: var(--co-text-secondary);
+  margin: 0;
 }
 
 .wizardMeta {
@@ -837,6 +974,10 @@
   .topbar {
     padding: var(--space-md) var(--space-lg);
   }
+
+  .onboardingLayout {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 767px) {
@@ -867,11 +1008,17 @@
   }
 
   .topbarControls {
+    align-items: stretch;
     width: 100%;
   }
 
-  .topbarControls > * {
+  .topbarControls > :not(.selectorStack) {
     flex: 1;
+  }
+
+  .selectorStack {
+    min-width: 100%;
+    width: 100%;
   }
 
   .pageBody {
@@ -885,6 +1032,15 @@
 
   .wizardSteps {
     grid-template-columns: 1fr;
+  }
+
+  .choiceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .noticeActions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .mobileNav {

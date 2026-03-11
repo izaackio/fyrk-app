@@ -1,4 +1,12 @@
-export type HouseholdRole = "owner" | "admin" | "member";
+export type HouseholdRole = "owner" | "admin" | "member" | "viewer";
+export type DemoVariant = "standard" | "fire" | "fam_family" | "friendly_family";
+
+export interface SessionDemoContext {
+  householdId: string;
+  householdName: string;
+  variant: DemoVariant;
+  readOnly: true;
+}
 
 export interface ApiEnvelope<T> {
   data: T;
@@ -21,11 +29,14 @@ export interface HouseholdSummary {
   name: string;
   role: HouseholdRole;
   memberCount: number;
+  isDemo?: boolean;
+  demoVariant?: DemoVariant | null;
 }
 
 export interface SessionResponseData {
   user: SessionUser;
   households: HouseholdSummary[];
+  demoContext: SessionDemoContext | null;
 }
 
 export interface CreateHouseholdRequest {
@@ -58,4 +69,14 @@ export interface Invitation {
   invitationId: string;
   email: string;
   status: "invited";
+}
+
+export interface DemoInitialization {
+  id: string;
+  name: string;
+  isDemo: true;
+  demoVariant: DemoVariant;
+  memberCount: number;
+  accountCount: number;
+  timelineEntries: number;
 }

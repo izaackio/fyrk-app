@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import styles from "../../components/theme/theme.module.css";
@@ -5,6 +6,13 @@ import styles from "../../components/theme/theme.module.css";
 interface AuthLayoutProps {
   children: ReactNode;
 }
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (

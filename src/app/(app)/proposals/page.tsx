@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { ProposalExperience } from "../../../components/proposals/ProposalExperience";
 import styles from "../../../components/theme/theme.module.css";
+import { RouteState } from "../../../components/ui/RouteState";
 
 export default function ProposalsPage() {
   return (
@@ -13,7 +14,15 @@ export default function ProposalsPage() {
           approval or rejection transitions.
         </p>
       </header>
-      <Suspense fallback={<p className={styles.sectionDescription}>Loading proposal workspace...</p>}>
+      <Suspense
+        fallback={
+          <RouteState
+            busy
+            description="Loading the proposal workspace, status filters, and selected discussion thread."
+            title="Loading proposals"
+          />
+        }
+      >
         <ProposalExperience />
       </Suspense>
     </section>

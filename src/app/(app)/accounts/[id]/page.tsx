@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { AccountDetailView } from "../../../../components/accounts/AccountDetailView";
 import styles from "../../../../components/theme/theme.module.css";
+import { RouteState } from "../../../../components/ui/RouteState";
 
 interface AccountDetailPageProps {
   params: {
@@ -18,7 +19,15 @@ export default function AccountDetailPage({ params }: AccountDetailPageProps) {
           Holdings and transaction history from provider-reported account data.
         </p>
       </header>
-      <Suspense fallback={<p className={styles.sectionDescription}>Loading account view…</p>}>
+      <Suspense
+        fallback={
+          <RouteState
+            busy
+            description="Loading account metadata, holdings, and transaction history."
+            title="Loading account view"
+          />
+        }
+      >
         <AccountDetailView accountId={params.id} />
       </Suspense>
     </section>

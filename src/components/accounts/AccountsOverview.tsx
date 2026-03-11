@@ -83,8 +83,8 @@ export function AccountsOverview() {
     <section className={themeStyles.pageSection}>
       <Card className={styles.infoCard} title="Account Data Handling">
         <p className={styles.stateMessage}>
-          Values shown in Sprint 2 are displayed exactly as reported by providers or CSV
-          files. This view does not run live repricing.
+          Values shown here are displayed exactly as reported by providers or CSV files.
+          This view does not run live repricing.
         </p>
         <div className={styles.inlineActions}>
           <Link className={[themeStyles.button, themeStyles.buttonPrimary].join(" ")} href="/accounts/new">
