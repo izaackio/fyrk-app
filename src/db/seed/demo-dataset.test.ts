@@ -17,6 +17,7 @@ function fingerprintDataset(): string {
     timelineEntries: dataset.timelineEntries,
     lifeEvents: dataset.lifeEvents,
     fitnessScores: dataset.fitnessScores,
+    weeklyNarratives: dataset.weeklyNarratives,
     quarterlyReviews: dataset.quarterlyReviews,
     expectedByVariant: dataset.expectedByVariant,
     totals: dataset.totals,
@@ -60,6 +61,7 @@ test("demo dataset meets variant and derived-record requirements", () => {
     assert.ok(byVariant[variant].accountSnapshots > 0);
     assert.ok(byVariant[variant].householdSnapshots > 0);
     assert.ok(byVariant[variant].fitnessScores > 0);
+    assert.ok(byVariant[variant].weeklyNarratives > 0);
   }
 
   const accountSnapshotCounts = new Map<string, number>();
@@ -85,6 +87,28 @@ test("demo dataset meets variant and derived-record requirements", () => {
     assert.equal(householdSnapshotCounts.get(household.id), 24);
     assert.equal(fitnessCounts.get(household.id), 12);
   }
+
+  const weeklyNarrativeCounts = new Map<string, number>();
+  for (const row of dataset.weeklyNarratives) {
+    weeklyNarrativeCounts.set(
+      row.household_id,
+      (weeklyNarrativeCounts.get(row.household_id) ?? 0) + 1,
+    );
+    assert.equal(row.source, "fallback");
+    assert.ok(row.narrative.length > 0);
+    assert.ok(row.highlights.length >= 2);
+  }
+
+  for (const household of dataset.households) {
+    assert.equal(weeklyNarrativeCounts.get(household.id), 1);
+  }
+
+  for (const review of dataset.quarterlyReviews) {
+    assert.ok(review.recommendations.length >= 1);
+    assert.equal(typeof review.recommendations[0]?.priority, "string");
+    assert.equal(typeof review.recommendations[0]?.actionType, "string");
+    assert.equal(typeof review.recommendations[0]?.description, "string");
+  }
 });
 
 test("demo dataset matches launch baseline exact counts", () => {
@@ -100,6 +124,7 @@ test("demo dataset matches launch baseline exact counts", () => {
     accountSnapshots: 192,
     householdSnapshots: 24,
     fitnessScores: 12,
+    weeklyNarratives: 1,
     quarterlyReviews: 4,
   });
 
@@ -113,6 +138,7 @@ test("demo dataset matches launch baseline exact counts", () => {
     accountSnapshots: 144,
     householdSnapshots: 24,
     fitnessScores: 12,
+    weeklyNarratives: 1,
     quarterlyReviews: 4,
   });
 
@@ -126,6 +152,7 @@ test("demo dataset matches launch baseline exact counts", () => {
     accountSnapshots: 288,
     householdSnapshots: 48,
     fitnessScores: 24,
+    weeklyNarratives: 2,
     quarterlyReviews: 8,
   });
 
@@ -139,6 +166,7 @@ test("demo dataset matches launch baseline exact counts", () => {
     accountSnapshots: 288,
     householdSnapshots: 24,
     fitnessScores: 12,
+    weeklyNarratives: 1,
     quarterlyReviews: 4,
   });
 
@@ -152,6 +180,7 @@ test("demo dataset matches launch baseline exact counts", () => {
     accountSnapshots: 912,
     householdSnapshots: 120,
     fitnessScores: 60,
+    weeklyNarratives: 5,
     quarterlyReviews: 20,
   });
 });

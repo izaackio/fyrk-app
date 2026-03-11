@@ -4,6 +4,7 @@ import {
   type OpenAIChatCompletionOptions,
   type OpenAIChatMessage,
 } from "@/lib/ai/client";
+import { buildDeterministicQuarterlyReview } from "@/lib/ai/deterministic-artifacts";
 import {
   buildQuarterlyReviewUserPrompt,
   QUARTERLY_REVIEW_SYSTEM,
@@ -37,80 +38,10 @@ export interface GeneratedQuarterlyReview {
 const AI_RETRIES = 2;
 const DEFAULT_RETRY_DELAY_MS = 1_000;
 
-const defaultFallbackOpportunity: QuarterlyReviewRecommendation = {
-  opportunityId: "fallback-quarterly-governance-checkin",
-  priority: "medium",
-  title: "Run a quarterly governance check-in",
-  description:
-    "Review household objectives, ownership of pending actions, and the next-quarter plan in one shared meeting.",
-  estimatedImpactPerYear: null,
-  estimatedImpactSummary: "Improves execution consistency and decision quality.",
-  fitnessComponent: "governance",
-  actionType: "discuss",
-};
-
 function sleep(milliseconds: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
   });
-}
-
-function normalizeDataQualityNotes(notes: string[]): string[] {
-  const output: string[] = [];
-
-  for (const note of notes) {
-    const normalized = note.trim();
-    if (!normalized || output.includes(normalized)) {
-      continue;
-    }
-
-    output.push(normalized);
-    if (output.length >= 8) {
-      break;
-    }
-  }
-
-  return output;
-}
-
-function buildFallbackPerformanceExplanation(context: QuarterlyReviewPromptContext): string {
-  const change = context.performanceAttribution.netWorthChange;
-  const changeDirection = change > 0 ? "increased" : change < 0 ? "decreased" : "was stable";
-
-  if (context.performanceAttribution.netWorthChangePct === null) {
-    return `Net worth baseline for ${context.quarterLabel} is available, but comparable prior-quarter data is limited.`;
-  }
-
-  return `Net worth ${changeDirection} during ${context.quarterLabel}; attribution values are from deterministic backend calculations.`;
-}
-
-function mapFallbackRecommendation(
-  opportunity: QuarterlyReviewRecommendationOpportunityContext,
-): QuarterlyReviewRecommendation {
-  return {
-    opportunityId: opportunity.id,
-    priority: opportunity.priority,
-    title: opportunity.title,
-    description: opportunity.deterministicRationale,
-    estimatedImpactPerYear: opportunity.estimatedImpactPerYear,
-    estimatedImpactSummary:
-      opportunity.estimatedImpactPerYear === null
-        ? "Impact estimate requires additional data quality before quantification."
-        : "Estimated annual impact is provided from deterministic backend context.",
-    fitnessComponent: opportunity.fitnessComponent,
-    actionType: opportunity.actionType,
-  };
-}
-
-function buildFallbackRecommendations(
-  opportunities: QuarterlyReviewRecommendationOpportunityContext[],
-): QuarterlyReviewRecommendation[] {
-  const normalized = opportunities.map(mapFallbackRecommendation).slice(0, 5);
-  if (normalized.length > 0) {
-    return normalized;
-  }
-
-  return [defaultFallbackOpportunity];
 }
 
 function buildRecommendationMap(
@@ -149,26 +80,6 @@ function buildRecommendationsFromAiOutput(
       fitnessComponent: opportunity.fitnessComponent,
       actionType: opportunity.actionType,
     };
-  });
-}
-
-function buildDataOnlyFallback(context: QuarterlyReviewPromptContext): QuarterlyReviewOutput {
-  return quarterlyReviewOutputSchema.parse({
-    narrative: `Quarterly review for ${context.quarterLabel} is shown in data-only mode because AI narrative generation is temporarily unavailable.`,
-    performanceAttribution: {
-      marketReturns: context.performanceAttribution.marketReturns,
-      netSavings: context.performanceAttribution.netSavings,
-      debtReduction: context.performanceAttribution.debtReduction,
-      feesDrag: context.performanceAttribution.feesDrag,
-      explanation: buildFallbackPerformanceExplanation(context),
-    },
-    recommendations: buildFallbackRecommendations(context.recommendationOpportunities),
-    upcomingEvents: context.upcomingEvents,
-    quarterSummary:
-      "Deterministic quarterly metrics and pre-ranked opportunities are available while narrative generation is unavailable.",
-    nextQuarterFocus:
-      "Prioritize high-impact deterministic opportunities first, then run a household governance check-in before quarter close.",
-    dataQualityNotes: normalizeDataQualityNotes(context.dataQualityNotes),
   });
 }
 
@@ -221,7 +132,7 @@ async function generateWithOpenAi(
     upcomingEvents: context.upcomingEvents,
     quarterSummary: aiOutput.quarterSummary,
     nextQuarterFocus: aiOutput.nextQuarterFocus,
-    dataQualityNotes: normalizeDataQualityNotes(context.dataQualityNotes),
+    dataQualityNotes: buildDeterministicQuarterlyReview(context).dataQualityNotes,
   });
 }
 
@@ -247,7 +158,7 @@ export async function generateQuarterlyReview(
   }
 
   return {
-    review: buildDataOnlyFallback(context),
+    review: buildDeterministicQuarterlyReview(context),
     source: "fallback",
   };
 }

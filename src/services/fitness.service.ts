@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { generateFitnessExplanation } from "@/lib/ai/fitness-explanation";
+import { buildDeterministicFitnessExplanation } from "@/lib/ai/deterministic-artifacts";
 import type { AuthContext } from "@/lib/auth/middleware";
 import {
   calculateFitnessScore,
@@ -72,6 +73,11 @@ interface FitnessResponseView {
   history: FitnessHistoryView[];
 }
 
+interface BalanceSheetProvider {
+  getBalanceSheet: typeof balanceSheetService.getBalanceSheet;
+  getHistory: typeof balanceSheetService.getHistory;
+}
+
 function toIsoDate(input?: string | Date): string {
   if (!input) {
     return new Date().toISOString().slice(0, 10);
@@ -115,6 +121,11 @@ const wrapperTaxWeight: Record<string, number> = {
 };
 
 export class FitnessService {
+  constructor(
+    private readonly balanceSheetProvider: BalanceSheetProvider = balanceSheetService,
+    private readonly explainFitness: typeof generateFitnessExplanation = generateFitnessExplanation,
+  ) {}
+
   async getFitness(authContext: AuthContext, householdId: string): Promise<FitnessResponseView> {
     await this.requireHouseholdMembership(authContext.supabase, householdId, authContext.user.id);
     const demoAccess = isActiveDemoContext(authContext, householdId);
@@ -126,6 +137,13 @@ export class FitnessService {
     if ((!currentRow || currentRow.calculated_at !== today) && !demoAccess) {
       currentRow = await this.calculateAndPersist(authContext, householdId, rows);
       rows = await this.listRecentScores(authContext.supabase, householdId, 36);
+    }
+
+    if (!currentRow && demoAccess) {
+      currentRow = await this.buildCurrentRow(authContext, householdId, rows, {
+        allowAi: false,
+      });
+      rows = [currentRow, ...rows];
     }
 
     if (!currentRow) {
@@ -143,8 +161,47 @@ export class FitnessService {
     householdId: string,
     existingRows: FitnessScoreRow[],
   ): Promise<FitnessScoreRow> {
-    const balanceSheet = await balanceSheetService.getBalanceSheet(authContext, householdId);
-    const history = await balanceSheetService.getHistory(authContext, {
+    const preparedRow = await this.buildCurrentRow(authContext, householdId, existingRows, {
+      allowAi: true,
+    });
+
+    const { data, error } = await authContext.supabase
+      .from("fitness_scores")
+      .insert({
+        household_id: householdId,
+        total_score: preparedRow.total_score,
+        buffer_score: preparedRow.buffer_score,
+        growth_score: preparedRow.growth_score,
+        protection_score: preparedRow.protection_score,
+        efficiency_score: preparedRow.efficiency_score,
+        trajectory_score: preparedRow.trajectory_score,
+        component_details: preparedRow.component_details,
+        explanation: preparedRow.explanation,
+        suggested_actions: preparedRow.suggested_actions,
+        calculated_at: preparedRow.calculated_at,
+      })
+      .select(
+        "id, household_id, total_score, buffer_score, growth_score, protection_score, efficiency_score, trajectory_score, component_details, explanation, suggested_actions, calculated_at, created_at",
+      )
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data as FitnessScoreRow;
+  }
+
+  private async buildCurrentRow(
+    authContext: AuthContext,
+    householdId: string,
+    existingRows: FitnessScoreRow[],
+    options: {
+      allowAi: boolean;
+    },
+  ): Promise<FitnessScoreRow> {
+    const balanceSheet = await this.balanceSheetProvider.getBalanceSheet(authContext, householdId);
+    const history = await this.balanceSheetProvider.getHistory(authContext, {
       householdId,
       period: "12m",
     });
@@ -200,49 +257,47 @@ export class FitnessService {
       calculatedAt: toIsoDate(),
     });
 
-    const generatedExplanation = await generateFitnessExplanation(
-      {
-        totalScore: fitness.totalScore,
-        bufferScore: fitness.bufferScore,
-        growthScore: fitness.growthScore,
-        protectionScore: fitness.protectionScore,
-        efficiencyScore: fitness.efficiencyScore,
-        trajectoryScore: fitness.trajectoryScore,
-        trend: fitness.trend,
-        calculatedAt: fitness.calculatedAt,
-        componentDetails: fitness.componentDetails,
-      },
-      {
-        fallbackExplanation: fitness.explanation,
-        fallbackActions: fitness.suggestedActions,
-      },
-    );
+    const context = {
+      totalScore: fitness.totalScore,
+      bufferScore: fitness.bufferScore,
+      growthScore: fitness.growthScore,
+      protectionScore: fitness.protectionScore,
+      efficiencyScore: fitness.efficiencyScore,
+      trajectoryScore: fitness.trajectoryScore,
+      trend: fitness.trend,
+      calculatedAt: fitness.calculatedAt,
+      componentDetails: fitness.componentDetails,
+    };
+    const fallbackInput = {
+      totalScore: fitness.totalScore,
+      fallbackExplanation: fitness.explanation,
+      fallbackActions: fitness.suggestedActions,
+    };
+    const generatedExplanation = options.allowAi
+      ? await this.explainFitness(context, {
+          fallbackExplanation: fallbackInput.fallbackExplanation,
+          fallbackActions: fallbackInput.fallbackActions,
+        })
+      : {
+          ...buildDeterministicFitnessExplanation(fallbackInput),
+          source: "fallback" as const,
+        };
 
-    const { data, error } = await authContext.supabase
-      .from("fitness_scores")
-      .insert({
-        household_id: householdId,
-        total_score: fitness.totalScore,
-        buffer_score: fitness.bufferScore,
-        growth_score: fitness.growthScore,
-        protection_score: fitness.protectionScore,
-        efficiency_score: fitness.efficiencyScore,
-        trajectory_score: fitness.trajectoryScore,
-        component_details: this.attachAiMetadata(fitness.componentDetails, generatedExplanation.source),
-        explanation: generatedExplanation.explanation,
-        suggested_actions: generatedExplanation.suggestedActions,
-        calculated_at: fitness.calculatedAt,
-      })
-      .select(
-        "id, household_id, total_score, buffer_score, growth_score, protection_score, efficiency_score, trajectory_score, component_details, explanation, suggested_actions, calculated_at, created_at",
-      )
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    return data as FitnessScoreRow;
+    return {
+      id: `ephemeral-fitness-${householdId}-${fitness.calculatedAt}`,
+      household_id: householdId,
+      total_score: fitness.totalScore,
+      buffer_score: fitness.bufferScore,
+      growth_score: fitness.growthScore,
+      protection_score: fitness.protectionScore,
+      efficiency_score: fitness.efficiencyScore,
+      trajectory_score: fitness.trajectoryScore,
+      component_details: this.attachAiMetadata(fitness.componentDetails, generatedExplanation.source),
+      explanation: generatedExplanation.explanation,
+      suggested_actions: generatedExplanation.suggestedActions,
+      calculated_at: fitness.calculatedAt,
+      created_at: new Date(`${fitness.calculatedAt}T08:00:00.000Z`).toISOString(),
+    };
   }
 
   private async listRecentScores(

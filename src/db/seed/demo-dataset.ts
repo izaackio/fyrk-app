@@ -1,5 +1,16 @@
 import { createHash } from "node:crypto";
 
+import {
+  buildDeterministicFitnessExplanation,
+  buildDeterministicQuarterlyReview,
+  buildDeterministicWeeklyNarrative,
+  buildWeeklyNarrativeContextHash,
+} from "@/lib/ai/deterministic-artifacts";
+import type { WeeklyNarrativeContext } from "@/lib/ai/context";
+import type { QuarterlyReviewPromptContext } from "@/lib/ai/prompts/quarterly-review";
+import type { FitnessSuggestedAction } from "@/lib/calculations/fitness";
+import { buildDeterministicNetWorthChangePayload } from "@/lib/calculations/net-worth";
+
 export const demoVariants = ["standard", "fire", "fam_family", "friendly_family"] as const;
 export type DemoVariant = (typeof demoVariants)[number];
 
@@ -338,6 +349,19 @@ export interface DemoFitnessScoreRow {
   created_at: string;
 }
 
+export interface DemoWeeklyNarrativeCacheRow {
+  id: string;
+  household_id: string;
+  as_of_week: string;
+  context_hash: string;
+  narrative: string;
+  highlights: Array<Record<string, string>>;
+  source: "ai" | "fallback";
+  generated_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DemoQuarterlyReviewRow {
   id: string;
   household_id: string;
@@ -374,6 +398,7 @@ export interface DemoVariantSummary {
   accountSnapshots: number;
   householdSnapshots: number;
   fitnessScores: number;
+  weeklyNarratives: number;
   quarterlyReviews: number;
 }
 
@@ -393,6 +418,7 @@ export interface DemoSeedDataset {
   lifeEvents: DemoLifeEventRow[];
   playbookActions: DemoPlaybookActionRow[];
   fitnessScores: DemoFitnessScoreRow[];
+  weeklyNarratives: DemoWeeklyNarrativeCacheRow[];
   quarterlyReviews: DemoQuarterlyReviewRow[];
   expectedByVariant: Record<DemoVariant, DemoVariantSummary>;
   totals: DemoVariantSummary;
@@ -2103,6 +2129,7 @@ function createSummary(): DemoVariantSummary {
     accountSnapshots: 0,
     householdSnapshots: 0,
     fitnessScores: 0,
+    weeklyNarratives: 0,
     quarterlyReviews: 0,
   };
 }
@@ -2197,7 +2224,7 @@ function weakestFitnessComponents(scores: {
     .map((entry) => entry.component);
 }
 
-function createSuggestedAction(component: FitnessComponent, variant: DemoVariant): Record<string, string> {
+function createSuggestedAction(component: FitnessComponent, variant: DemoVariant): FitnessSuggestedAction {
   switch (component) {
     case "buffer":
       return {
@@ -2303,6 +2330,264 @@ function nearestFitnessScore(scores: DemoFitnessScoreRow[], date: string): numbe
   }
 
   return scores[0]?.total_score ?? 0;
+}
+
+function roundPct(value: number): number {
+  return Number(value.toFixed(1));
+}
+
+function startOfIsoWeek(date: string): string {
+  const target = parseIsoDate(date);
+  const day = target.getUTCDay();
+  const offset = (day + 6) % 7;
+  target.setUTCDate(target.getUTCDate() - offset);
+  return toIsoDate(target);
+}
+
+function formatMinorAmount(minorUnits: number): string {
+  const sign = minorUnits < 0 ? "-" : "";
+  const whole = Math.trunc(Math.abs(minorUnits) / 100);
+  return `${sign}${whole.toString().replace(/\B(?=(\d{3})+(?!\d))/gu, " ")}`;
+}
+
+function summarizeSeedTransaction(row: DemoTransactionRow): string {
+  return `${row.type.replace(/_/gu, " ")} ${formatMinorAmount(Math.abs(row.amount))} ${row.currency} on ${row.transaction_date}`;
+}
+
+function scoreTrend(current: number, previous: number | null): "improving" | "stable" | "declining" {
+  if (previous === null) {
+    return "stable";
+  }
+
+  if (current > previous) {
+    return "improving";
+  }
+
+  if (current < previous) {
+    return "declining";
+  }
+
+  return "stable";
+}
+
+function buildSeedReviewOpportunities(metrics: {
+  feesDragAmount: number;
+  netSavingsAmount: number;
+  marketReturnsAmount: number;
+  debtReductionAmount: number;
+}): QuarterlyReviewPromptContext["recommendationOpportunities"] {
+  const opportunities: QuarterlyReviewPromptContext["recommendationOpportunities"] = [];
+
+  if (metrics.feesDragAmount > 0) {
+    opportunities.push({
+      id: "efficiency-fee-drag",
+      priority: metrics.feesDragAmount > 200_000 ? "high" : "medium",
+      title: "Review fees and wrapper costs",
+      deterministicRationale:
+        "Recurring fees are fully deterministic in this review context, which makes cost reduction the cleanest near-term efficiency lever.",
+      estimatedImpactPerYear: moneyRound(metrics.feesDragAmount * 4),
+      fitnessComponent: "efficiency",
+      actionType: "proposal",
+    });
+  }
+
+  if (metrics.netSavingsAmount < 0) {
+    opportunities.push({
+      id: "buffer-net-savings",
+      priority: "high",
+      title: "Stabilize household net savings",
+      deterministicRationale:
+        "Quarterly outflows exceeded inflows, so restoring cash-flow discipline improves both resilience and execution capacity.",
+      estimatedImpactPerYear: Math.abs(metrics.netSavingsAmount),
+      fitnessComponent: "buffer",
+      actionType: "monitor",
+    });
+  }
+
+  if (metrics.marketReturnsAmount < 0) {
+    opportunities.push({
+      id: "growth-risk-review",
+      priority: "medium",
+      title: "Reassess concentration and downside risk",
+      deterministicRationale:
+        "Negative market contribution suggests reviewing concentration, diversification, and risk tolerance before adding new exposure.",
+      estimatedImpactPerYear: null,
+      fitnessComponent: "growth",
+      actionType: "research",
+    });
+  }
+
+  if (metrics.debtReductionAmount > 0) {
+    opportunities.push({
+      id: "trajectory-debt-pace",
+      priority: "low",
+      title: "Protect debt payoff momentum",
+      deterministicRationale:
+        "Debt reduction is already contributing positively, so maintaining amortization cadence supports trajectory without adding new complexity.",
+      estimatedImpactPerYear: metrics.debtReductionAmount,
+      fitnessComponent: "trajectory",
+      actionType: "monitor",
+    });
+  }
+
+  return opportunities.slice(0, 5);
+}
+
+function buildSeedWeeklyNarrativeContext(input: {
+  household: DemoHouseholdRow;
+  members: DemoHouseholdMemberRow[];
+  profiles: DemoProfileRow[];
+  accounts: DemoAccountRow[];
+  snapshots: DemoHouseholdSnapshotRow[];
+  transactions: DemoTransactionRow[];
+}): WeeklyNarrativeContext {
+  const latestSnapshot = input.snapshots[input.snapshots.length - 1] ?? null;
+  const asOfDate = latestSnapshot?.snapshot_date ?? SNAPSHOT_END_DATE;
+  const asOfWeek = startOfIsoWeek(asOfDate);
+  const previousSnapshot =
+    [...input.snapshots].reverse().find((row) => row.snapshot_date < asOfWeek) ?? null;
+  const memberProfiles = new Map(input.profiles.map((row) => [row.id, row]));
+  const weeklyTransactions = input.transactions.filter(
+    (row) => row.transaction_date >= asOfWeek && row.transaction_date <= asOfDate,
+  );
+
+  const calculations = buildDeterministicNetWorthChangePayload({
+    periodStart: asOfWeek,
+    periodEnd: asOfDate,
+    current: {
+      date: latestSnapshot?.snapshot_date ?? asOfDate,
+      netWorth: latestSnapshot?.total_net_worth ?? 0,
+      assets: latestSnapshot?.total_assets ?? 0,
+      liabilities: latestSnapshot?.total_liabilities ?? 0,
+      currency: latestSnapshot?.currency ?? input.household.base_currency,
+    },
+    previous: previousSnapshot
+      ? {
+          date: previousSnapshot.snapshot_date,
+          netWorth: previousSnapshot.total_net_worth,
+          assets: previousSnapshot.total_assets,
+          liabilities: previousSnapshot.total_liabilities,
+          currency: previousSnapshot.currency,
+        }
+      : null,
+    calculatedAt: toIsoTimestamp(addDays(parseIsoDate(asOfDate), 1), 8),
+  });
+
+  const byType: Record<string, number> = {};
+  for (const account of input.accounts) {
+    byType[account.account_type] = (byType[account.account_type] ?? 0) + 1;
+  }
+
+  return {
+    asOfWeek,
+    household: {
+      id: input.household.id,
+      name: input.household.name,
+      baseCurrency: input.household.base_currency,
+      memberCount: input.members.length,
+      members: input.members.map((member) => ({
+        displayName:
+          memberProfiles.get(member.user_id)?.display_name ??
+          memberProfiles.get(member.user_id)?.email ??
+          "Demo household member",
+        role: member.role,
+      })),
+    },
+    financials: {
+      totalNetWorth: calculations.currentNetWorth,
+      totalAssets: latestSnapshot?.total_assets ?? 0,
+      totalLiabilities: latestSnapshot?.total_liabilities ?? 0,
+      currency: latestSnapshot?.currency ?? input.household.base_currency,
+    },
+    recentChanges: {
+      periodStart: calculations.periodStart,
+      periodEnd: calculations.periodEnd,
+      asOfDate: calculations.asOfDate,
+      previousNetWorth: calculations.previousNetWorth,
+      netWorthChange: calculations.netWorthChange,
+      netWorthChangePct: calculations.netWorthChangePct,
+      newTransactions: weeklyTransactions.length,
+      significantEvents: [...weeklyTransactions]
+        .sort((left, right) => Math.abs(right.amount) - Math.abs(left.amount))
+        .slice(0, 3)
+        .map(summarizeSeedTransaction),
+    },
+    calculations: {
+      netWorthChange: calculations,
+    },
+    accounts: {
+      totalCount: input.accounts.length,
+      byType,
+      sample: input.accounts.slice(0, 5).map((account) => ({
+        name: account.name,
+        accountType: account.account_type,
+        wrapperType: account.wrapper_type,
+        provider: account.provider_name,
+        currency: account.currency,
+      })),
+    },
+  };
+}
+
+function buildSeedQuarterlyReviewContext(input: {
+  household: DemoHouseholdRow;
+  quarterLabel: string;
+  periodEnd: string;
+  metrics: {
+    netWorthStart: number;
+    netWorthEnd: number;
+    netWorthChange: number;
+    marketReturnsAmount: number;
+    netSavingsAmount: number;
+    debtReductionAmount: number;
+    feesDragAmount: number;
+  };
+  fitnessScore: number;
+  previousFitnessScore: number | null;
+  components: {
+    buffer: number;
+    growth: number;
+    protection: number;
+    efficiency: number;
+    trajectory: number;
+  };
+  upcomingEvents: DemoLifeEventRow[];
+}): QuarterlyReviewPromptContext {
+  const currentScore = input.fitnessScore;
+  const previousScore = input.previousFitnessScore;
+
+  return {
+    householdName: input.household.name,
+    quarterLabel: input.quarterLabel,
+    generatedAt: toIsoTimestamp(addDays(parseIsoDate(input.periodEnd), 7), 9),
+    currency: input.household.base_currency,
+    performanceAttribution: {
+      marketReturns: input.metrics.marketReturnsAmount,
+      netSavings: input.metrics.netSavingsAmount,
+      debtReduction: input.metrics.debtReductionAmount,
+      feesDrag: input.metrics.feesDragAmount,
+      netWorthStart: input.metrics.netWorthStart,
+      netWorthEnd: input.metrics.netWorthEnd,
+      netWorthChange: input.metrics.netWorthChange,
+      netWorthChangePct:
+        input.metrics.netWorthStart === 0
+          ? null
+          : roundPct((input.metrics.netWorthChange / input.metrics.netWorthStart) * 100),
+    },
+    fitness: {
+      currentScore,
+      previousScore,
+      trend: scoreTrend(currentScore, previousScore),
+      componentScores: input.components,
+    },
+    recommendationOpportunities: buildSeedReviewOpportunities(input.metrics),
+    upcomingEvents: input.upcomingEvents.slice(0, 2).map((event) => ({
+      title: event.title,
+      date: event.target_date,
+      preparationNeeded: event.impact_summary,
+    })),
+    dataQualityNotes: ["Demo mode uses monthly seeded snapshots for quarterly attribution baselines."],
+  };
 }
 
 function ensureDateSeriesAvailable(series: string[]): string {
@@ -3051,6 +3336,12 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
       const totalScore = clampInt(plan.fitnessBase + trend + noise, 430, 900);
       const components = fitComponents(totalScore, `fitness-components:${householdId}:${calculatedAt}`);
       const weakComponents = weakestFitnessComponents(components);
+      const suggestedActions = weakComponents.map((component) => createSuggestedAction(component, plan.variant));
+      const explanation = buildDeterministicFitnessExplanation({
+        totalScore,
+        fallbackExplanation: `Seeded ${plan.variant.replace("_", " ")} household fitness score with stable upward trajectory.`,
+        fallbackActions: suggestedActions,
+      });
 
       const row: DemoFitnessScoreRow = {
         id: deterministicUuid(`fitness:${householdId}:${calculatedAt}`),
@@ -3070,8 +3361,8 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
             fitnessExplanationSource: "fallback",
           },
         },
-        explanation: `Seeded ${plan.variant.replace("_", " ")} household fitness score with stable upward trajectory.`,
-        suggested_actions: weakComponents.map((component) => createSuggestedAction(component, plan.variant)),
+        explanation: explanation.explanation,
+        suggested_actions: explanation.suggestedActions,
         calculated_at: calculatedAt,
         created_at: toIsoTimestamp(parseIsoDate(calculatedAt), 7),
       };
@@ -3081,6 +3372,46 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
     }
 
     fitnessByHousehold.set(householdId, rows);
+  }
+
+  const weeklyNarratives: DemoWeeklyNarrativeCacheRow[] = [];
+
+  for (const household of households) {
+    const context = buildSeedWeeklyNarrativeContext({
+      household,
+      members: householdMembers.filter((member) => member.household_id === household.id),
+      profiles: profiles.filter((profile) =>
+        householdMembers.some(
+          (member) => member.household_id === household.id && member.user_id === profile.id,
+        ),
+      ),
+      accounts: accounts.filter((account) => account.household_id === household.id && account.is_active),
+      snapshots: householdSnapshotByHousehold.get(household.id) ?? [],
+      transactions: transactions.filter((transaction) =>
+        accounts.some(
+          (account) =>
+            account.household_id === household.id && account.id === transaction.account_id,
+        ),
+      ),
+    });
+    const output = buildDeterministicWeeklyNarrative(context);
+    const generatedAt = toIsoTimestamp(addDays(parseIsoDate(context.recentChanges.asOfDate), 1), 8);
+
+    weeklyNarratives.push({
+      id: deterministicUuid(`weekly-narrative:${household.id}:${context.asOfWeek}`),
+      household_id: household.id,
+      as_of_week: context.asOfWeek,
+      context_hash: buildWeeklyNarrativeContextHash(context),
+      narrative: output.narrative,
+      highlights: output.highlights.map((highlight) => ({
+        type: highlight.type,
+        text: highlight.text,
+      })),
+      source: "fallback",
+      generated_at: generatedAt,
+      created_at: generatedAt,
+      updated_at: generatedAt,
+    });
   }
 
   const quarterlyReviews: DemoQuarterlyReviewRow[] = [];
@@ -3097,6 +3428,10 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
     if (!householdId) {
       throw new Error(`Missing household id for review plan ${plan.key}`);
     }
+    const household = households.find((candidate) => candidate.id === householdId);
+    if (!household) {
+      throw new Error(`Missing household row for review plan ${plan.key}`);
+    }
 
     const householdSnapshotRows = householdSnapshotByHousehold.get(householdId) ?? [];
     const householdFitnessRows = fitnessByHousehold.get(householdId) ?? [];
@@ -3111,16 +3446,35 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
       const debtReductionAmount = Math.max(0, moneyRound(netWorthChange * 0.12));
       const feesDragAmount = Math.max(0, moneyRound(Math.abs(netWorthChange) * 0.03));
       const fitnessScore = nearestFitnessScore(householdFitnessRows, quarter.end);
+      const previousFitnessScore = (() => {
+        const earlierScores = householdFitnessRows.filter((row) => row.calculated_at < quarter.end);
+        return earlierScores[earlierScores.length - 1]?.total_score ?? null;
+      })();
       const components = fitComponents(fitnessScore, `review-components:${householdId}:${quarter.label}`);
 
-      const eventRows = lifeEvents
-        .filter((event) => event.household_id === householdId && event.target_date > quarter.end)
-        .slice(0, 2)
-        .map((event) => ({
-          type: event.event_type,
-          title: event.title,
-          targetDate: event.target_date,
-        }));
+      const futureEvents = lifeEvents.filter(
+        (event) => event.household_id === householdId && event.target_date > quarter.end,
+      );
+      const reviewOutput = buildDeterministicQuarterlyReview(
+        buildSeedQuarterlyReviewContext({
+          household,
+          quarterLabel: quarter.label,
+          periodEnd: quarter.end,
+          metrics: {
+            netWorthStart,
+            netWorthEnd,
+            netWorthChange,
+            marketReturnsAmount,
+            netSavingsAmount,
+            debtReductionAmount,
+            feesDragAmount,
+          },
+          fitnessScore,
+          previousFitnessScore,
+          components,
+          upcomingEvents: futureEvents,
+        }),
+      );
 
       quarterlyReviews.push({
         id: deterministicUuid(`review:${householdId}:${quarter.label}`),
@@ -3135,21 +3489,14 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
         net_savings_amount: netSavingsAmount,
         debt_reduction_amount: debtReductionAmount,
         fees_drag_amount: feesDragAmount,
-        narrative: `Seeded quarterly review for ${plan.name} covering ${quarter.label} with realistic attribution splits.`,
-        recommendations: [
-          {
-            title: "Automate contribution cadence",
-            impact: "Improves consistency of net savings contributions",
-          },
-          {
-            title: "Tighten fee budget",
-            impact: "Reduces drag on compounded return",
-          },
-          {
-            title: "Review downside scenarios",
-            impact: "Strengthens resilience under market stress",
-          },
-        ],
+        narrative: reviewOutput.narrative,
+        recommendations: reviewOutput.recommendations.map((recommendation) => ({
+          priority: recommendation.priority,
+          actionType: recommendation.actionType,
+          title: recommendation.title,
+          description: recommendation.description,
+          estimatedImpact: recommendation.estimatedImpactSummary,
+        })),
         fitness_score: fitnessScore,
         fitness_components: {
           buffer: components.buffer,
@@ -3158,7 +3505,11 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
           efficiency: components.efficiency,
           trajectory: components.trajectory,
         },
-        upcoming_events: eventRows,
+        upcoming_events: reviewOutput.upcomingEvents.map((event) => ({
+          title: event.title,
+          date: event.date,
+          preparationNeeded: event.preparationNeeded,
+        })),
         status: "published",
         generated_at: toIsoTimestamp(addDays(parseIsoDate(quarter.end), 7), 9),
         published_at: toIsoTimestamp(addDays(parseIsoDate(quarter.end), 8), 9),
@@ -3264,6 +3615,15 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
     expectedByVariant[variant].fitnessScores += 1;
   }
 
+  for (const row of weeklyNarratives) {
+    const variant = variantByHouseholdId.get(row.household_id);
+    if (!variant) {
+      continue;
+    }
+
+    expectedByVariant[variant].weeklyNarratives += 1;
+  }
+
   for (const row of quarterlyReviews) {
     const variant = variantByHouseholdId.get(row.household_id);
     if (!variant) {
@@ -3284,6 +3644,7 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
     totals.accountSnapshots += summary.accountSnapshots;
     totals.householdSnapshots += summary.householdSnapshots;
     totals.fitnessScores += summary.fitnessScores;
+    totals.weeklyNarratives += summary.weeklyNarratives;
     totals.quarterlyReviews += summary.quarterlyReviews;
   }
 
@@ -3303,6 +3664,7 @@ export function buildDemoSeedDataset(): DemoSeedDataset {
     lifeEvents,
     playbookActions,
     fitnessScores,
+    weeklyNarratives,
     quarterlyReviews,
     expectedByVariant,
     totals,
