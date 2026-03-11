@@ -6,6 +6,7 @@ import {
   type OpenAIChatCompletionOptions,
   type OpenAIChatMessage,
 } from "@/lib/ai/client";
+import { buildDeterministicFitnessExplanation } from "@/lib/ai/deterministic-artifacts";
 import {
   buildFitnessExplanationUserPrompt,
   FITNESS_EXPLANATION_SYSTEM,
@@ -120,8 +121,11 @@ export async function generateFitnessExplanation(
   }
 
   return {
-    explanation: normalizeFallbackExplanation(options.fallbackExplanation, context.totalScore),
-    suggestedActions: normalizeFallbackActions(options.fallbackActions),
+    ...buildDeterministicFitnessExplanation({
+      totalScore: context.totalScore,
+      fallbackExplanation: normalizeFallbackExplanation(options.fallbackExplanation, context.totalScore),
+      fallbackActions: normalizeFallbackActions(options.fallbackActions),
+    }),
     source: "fallback",
   };
 }

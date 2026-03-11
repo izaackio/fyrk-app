@@ -90,6 +90,7 @@ function createEmptySummary(): DemoVariantSummary {
     accountSnapshots: 0,
     householdSnapshots: 0,
     fitnessScores: 0,
+    weeklyNarratives: 0,
     quarterlyReviews: 0,
   };
 }
@@ -123,6 +124,7 @@ function printSummary(
         `accountSnapshots=${row.accountSnapshots}`,
         `householdSnapshots=${row.householdSnapshots}`,
         `fitness=${row.fitnessScores}`,
+        `narratives=${row.weeklyNarratives}`,
         `reviews=${row.quarterlyReviews}`,
       ].join(" | "),
     );
@@ -140,6 +142,7 @@ function printSummary(
       `accountSnapshots=${totals.accountSnapshots}`,
       `householdSnapshots=${totals.householdSnapshots}`,
       `fitness=${totals.fitnessScores}`,
+      `narratives=${totals.weeklyNarratives}`,
       `reviews=${totals.quarterlyReviews}`,
     ].join(" | "),
   );
@@ -159,6 +162,7 @@ function sumSummary(summary: Record<DemoVariant, DemoVariantSummary>): DemoVaria
     totals.accountSnapshots += row.accountSnapshots;
     totals.householdSnapshots += row.householdSnapshots;
     totals.fitnessScores += row.fitnessScores;
+    totals.weeklyNarratives += row.weeklyNarratives;
     totals.quarterlyReviews += row.quarterlyReviews;
   }
 
@@ -179,6 +183,7 @@ function assertMatchesExpected(
     "accountSnapshots",
     "householdSnapshots",
     "fitnessScores",
+    "weeklyNarratives",
     "quarterlyReviews",
   ];
 
@@ -715,6 +720,32 @@ async function insertDemoData(sql: DbClient, dataset: DemoSeedDataset): Promise<
       `;
     }
 
+    for (const batch of toChunks(dataset.weeklyNarratives, insertChunkSize)) {
+      await tx`
+        insert into public.weekly_narrative_cache ${tx(batch, [
+          "id",
+          "household_id",
+          "as_of_week",
+          "context_hash",
+          "narrative",
+          "highlights",
+          "source",
+          "generated_at",
+          "created_at",
+          "updated_at",
+        ])}
+        on conflict (household_id, as_of_week) do update
+        set
+          context_hash = excluded.context_hash,
+          narrative = excluded.narrative,
+          highlights = excluded.highlights,
+          source = excluded.source,
+          generated_at = excluded.generated_at,
+          created_at = excluded.created_at,
+          updated_at = excluded.updated_at
+      `;
+    }
+
     for (const batch of toChunks(dataset.quarterlyReviews, insertChunkSize)) {
       await tx`
         insert into public.quarterly_reviews ${tx(batch, [
@@ -875,6 +906,15 @@ async function loadActualSummary(
     group by h.demo_variant
   `;
   applyCountRows(summary, fitnessRows, "fitnessScores");
+
+  const narrativeRows = await sql<VariantCountRow[]>`
+    select h.demo_variant, count(n.id)::int as count
+    from public.weekly_narrative_cache n
+    join public.households h on h.id = n.household_id
+    where h.id = any(${householdArray}::uuid[])
+    group by h.demo_variant
+  `;
+  applyCountRows(summary, narrativeRows, "weeklyNarratives");
 
   const reviewRows = await sql<VariantCountRow[]>`
     select h.demo_variant, count(r.id)::int as count

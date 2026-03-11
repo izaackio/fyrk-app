@@ -870,9 +870,11 @@ export const loadWeeklyNetWorthDelta = async (
 
 interface AiNarrativeResponse {
   data?: {
+    fromCache?: unknown;
     generatedAt?: unknown;
     highlights?: unknown;
     narrative?: unknown;
+    source?: unknown;
   };
 }
 
@@ -1006,13 +1008,22 @@ export const loadWeeklyNarrative = async (
       typeof generatedAtRaw === "string" && generatedAtRaw
         ? generatedAtRaw
         : new Date().toISOString();
+    const source = payload.data?.source === "ai" ? "ai" : "fallback";
+    const fromCache = payload.data?.fromCache === true;
 
     return {
       generatedAt,
       highlights,
       narrative,
-      source: "ai",
-      sourceMessage: `Generated ${formatDateTime(generatedAt)} by AI narrative service.`,
+      source,
+      sourceMessage:
+        source === "ai"
+          ? fromCache
+            ? `Loaded ${formatDateTime(generatedAt)} from the cached AI narrative artifact.`
+            : `Generated ${formatDateTime(generatedAt)} by AI narrative service.`
+          : fromCache
+            ? `Loaded ${formatDateTime(generatedAt)} from the precomputed fallback narrative artifact.`
+            : `Generated ${formatDateTime(generatedAt)} from deterministic fallback data.`,
     };
   } catch {
     return buildFallbackNarrative(snapshot, weeklyDelta);
