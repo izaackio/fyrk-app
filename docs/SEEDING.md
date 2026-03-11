@@ -11,7 +11,7 @@ The seed includes:
 
 - Realistic account and holding distributions per variant
 - 24 months of deterministic transactions and timeline history
-- Pre-generated derived records: `account_snapshots`, `household_snapshots`, `fitness_scores`, `quarterly_reviews`
+- Pre-generated derived records: `account_snapshots`, `household_snapshots`, `fitness_scores`, `weekly_narrative_cache`, `quarterly_reviews`
 - Household-isolated references compatible with existing schema and RLS patterns
 
 ## Prerequisites
@@ -51,14 +51,14 @@ npm run test:db-seed
 
 Expected per-variant counts:
 
-- `standard`: households=1, accounts=8, holdings=17, transactions=412, timeline=22, lifeEvents=2, accountSnapshots=192, householdSnapshots=24, fitness=12, reviews=4
-- `fire`: households=1, accounts=6, holdings=25, transactions=340, timeline=18, lifeEvents=1, accountSnapshots=144, householdSnapshots=24, fitness=12, reviews=4
-- `fam_family`: households=2, accounts=12, holdings=40, transactions=592, timeline=28, lifeEvents=1, accountSnapshots=288, householdSnapshots=48, fitness=24, reviews=8
-- `friendly_family`: households=1, accounts=12, holdings=36, transactions=666, timeline=12, lifeEvents=0, accountSnapshots=288, householdSnapshots=24, fitness=12, reviews=4
+- `standard`: households=1, accounts=8, holdings=17, transactions=412, timeline=22, lifeEvents=2, accountSnapshots=192, householdSnapshots=24, fitness=12, narratives=1, reviews=4
+- `fire`: households=1, accounts=6, holdings=25, transactions=340, timeline=18, lifeEvents=1, accountSnapshots=144, householdSnapshots=24, fitness=12, narratives=1, reviews=4
+- `fam_family`: households=2, accounts=12, holdings=40, transactions=592, timeline=28, lifeEvents=1, accountSnapshots=288, householdSnapshots=48, fitness=24, narratives=2, reviews=8
+- `friendly_family`: households=1, accounts=12, holdings=36, transactions=666, timeline=12, lifeEvents=0, accountSnapshots=288, householdSnapshots=24, fitness=12, narratives=1, reviews=4
 
 Expected totals:
 
-- households=5, accounts=38, holdings=118, transactions=2010, timeline=80, lifeEvents=4, accountSnapshots=912, householdSnapshots=120, fitness=60, reviews=20
+- households=5, accounts=38, holdings=118, transactions=2010, timeline=80, lifeEvents=4, accountSnapshots=912, householdSnapshots=120, fitness=60, narratives=5, reviews=20
 
 If verification passes, the script ends with:
 
