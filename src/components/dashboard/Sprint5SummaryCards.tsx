@@ -16,7 +16,7 @@ const describeError = (error: unknown): string => {
     return error.message;
   }
 
-  return "We could not load Sprint 5 governance summaries.";
+  return "We could not load governance summaries.";
 };
 
 const reviewStatusTone = (status: QuarterlyReviewView["status"]): string => {
@@ -93,7 +93,7 @@ export function Sprint5SummaryCards() {
 
   if (householdError || !activeHouseholdId) {
     return (
-      <Card className={styles.stateCard} title="Sprint 5 governance summary unavailable">
+      <Card className={styles.stateCard} title="Governance summary unavailable">
         <p className={styles.errorText}>{householdError ?? "No household selected."}</p>
       </Card>
     );

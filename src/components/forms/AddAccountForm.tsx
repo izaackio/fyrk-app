@@ -16,6 +16,7 @@ import { useHouseholdContext } from "../accounts/useHouseholdContext";
 import styles from "../accounts/accounts.module.css";
 import { Button } from "../ui/Button";
 import { InputField } from "../ui/InputField";
+import { RouteState } from "../ui/RouteState";
 import { SelectField } from "../ui/SelectField";
 
 interface FormState {
@@ -143,11 +144,23 @@ export function AddAccountForm() {
   };
 
   if (householdLoading) {
-    return <p className={styles.stateMessage}>Loading household context…</p>;
+    return (
+      <RouteState
+        busy
+        description="Checking the selected household before account setup begins."
+        title="Loading household context"
+      />
+    );
   }
 
   if (householdError) {
-    return <p className={styles.errorText}>{householdError}</p>;
+    return (
+      <RouteState
+        description={householdError}
+        title="Account setup unavailable"
+        tone="warning"
+      />
+    );
   }
 
   return (
