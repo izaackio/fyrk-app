@@ -1,8 +1,35 @@
 import { requireAuth } from "@/lib/auth/middleware";
 import { enforceRateLimit } from "@/lib/auth/rate-limit";
-import { createLifeEventSchema } from "@/lib/validations/events";
+import {
+  createLifeEventSchema,
+  lifeEventListQuerySchema,
+} from "@/lib/validations/events";
 import { eventService } from "@/services/event.service";
-import { errorResponse, parseJsonBody, successResponse } from "@/services/http";
+import {
+  errorResponse,
+  parseJsonBody,
+  parseWithSchema,
+  successResponse,
+} from "@/services/http";
+
+export async function GET(request: Request): Promise<Response> {
+  try {
+    enforceRateLimit(request, "read");
+    const authContext = await requireAuth();
+    const requestUrl = new URL(request.url);
+    const query = parseWithSchema(
+      {
+        householdId: requestUrl.searchParams.get("householdId") ?? undefined,
+      },
+      lifeEventListQuerySchema,
+    );
+    const events = await eventService.list(authContext, query.householdId);
+
+    return successResponse(events);
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
 
 export async function POST(request: Request): Promise<Response> {
   try {

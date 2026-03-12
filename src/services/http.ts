@@ -20,7 +20,32 @@ export interface ApiErrorResponse {
   };
 }
 
-function applySecurityHeaders<T>(response: NextResponse<T>, error?: ServiceError): NextResponse<T> {
+function createRequestId(): string {
+  return globalThis.crypto?.randomUUID?.() ?? `fyrk-${Date.now()}`;
+}
+
+function logUnexpectedApiError(error: ServiceError, requestId: string): void {
+  if (error.status < 500) {
+    return;
+  }
+
+  console.error("[api_error]", {
+    code: error.code,
+    details: error.details ?? null,
+    message: error.message,
+    requestId,
+  });
+}
+
+function applySecurityHeaders<T>(
+  response: NextResponse<T>,
+  options?: {
+    error?: ServiceError;
+    requestId?: string;
+  },
+): NextResponse<T> {
+  const requestId = options?.requestId ?? createRequestId();
+
   response.headers.set("Cache-Control", "private, no-store, max-age=0");
   response.headers.set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
   response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
@@ -30,15 +55,18 @@ function applySecurityHeaders<T>(response: NextResponse<T>, error?: ServiceError
   response.headers.set("Vary", "Cookie");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Request-Id", requestId);
   response.headers.set("X-Robots-Tag", "noindex, nofollow");
 
   if (process.env.NODE_ENV === "production") {
     response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   }
 
-  if (error?.code === "RATE_LIMITED") {
+  if (options?.error?.code === "RATE_LIMITED") {
     const retryAfterMs =
-      typeof error.details?.retryAfterMs === "number" ? error.details.retryAfterMs : null;
+      typeof options.error.details?.retryAfterMs === "number"
+        ? options.error.details.retryAfterMs
+        : null;
 
     if (retryAfterMs !== null) {
       response.headers.set("Retry-After", String(Math.max(1, Math.ceil(retryAfterMs / 1000))));
@@ -93,6 +121,9 @@ export function successResponseWithMeta<T, M>(
 
 export function errorResponse(error: unknown): NextResponse<ApiErrorResponse> {
   const normalized = toServiceError(error);
+  const requestId = createRequestId();
+
+  logUnexpectedApiError(normalized, requestId);
 
   return applySecurityHeaders(
     NextResponse.json(
@@ -105,6 +136,9 @@ export function errorResponse(error: unknown): NextResponse<ApiErrorResponse> {
       },
       { status: normalized.status },
     ),
-    normalized,
+    {
+      error: normalized,
+      requestId,
+    },
   );
 }

@@ -29,6 +29,18 @@ export const lifeEventPathParamsSchema = z
   })
   .strict();
 
+export const lifeEventListQuerySchema = z
+  .object({
+    householdId: uuidSchema,
+  })
+  .strict();
+
+export const lifeEventDetailQuerySchema = z
+  .object({
+    householdId: uuidSchema.optional(),
+  })
+  .strict();
+
 export const playbookActionPathParamsSchema = z
   .object({
     id: uuidSchema,
@@ -47,8 +59,10 @@ export const createLifeEventSchema = z
 
 export const updatePlaybookActionSchema = z
   .object({
+    householdId: uuidSchema.optional(),
     status: z.enum(playbookActionStatuses).optional(),
-    assignedTo: uuidSchema.nullable().optional(),
+    assignedTo: z.string().trim().min(1).max(160).nullable().optional(),
+    assignedToLabel: z.string().trim().min(1).max(160).nullable().optional(),
     completionNotes: z.string().trim().min(1).max(4000).nullable().optional(),
   })
   .strict()

@@ -427,15 +427,21 @@ Get available life event types.
       "description": "Plan your first home purchase with a complete financial playbook",
       "category": "housing",
       "requiredInputs": [
-        { "key": "budget", "label": "Budget (SEK)", "type": "currency" },
-        { "key": "city", "label": "City", "type": "select", "options": ["Stockholm", "Gothenburg", "Malmö", "Other"] },
-        { "key": "targetDate", "label": "Target date", "type": "date" }
+        { "key": "budget", "label": "Budget (SEK)", "type": "currency", "required": true, "hint": "Enter total purchase budget in SEK.", "options": [] },
+        { "key": "city", "label": "City", "type": "select", "required": true, "hint": "Used to tailor regional assumptions.", "options": ["Stockholm", "Gothenburg", "Malmo", "Other"] },
+        { "key": "targetDate", "label": "Target date", "type": "date", "required": true, "hint": "Expected move-in or purchase date.", "options": [] }
       ],
       "available": true
     }
   ]
 }
 ```
+
+### GET `/api/events?householdId=uuid`
+List all life events for a household.
+
+### GET `/api/events/:id?householdId=uuid`
+Get one life event playbook.
 
 ### POST `/api/events`
 Trigger a life event and generate playbook.
@@ -453,12 +459,21 @@ Trigger a life event and generate playbook.
   }
 }
 
-// Response 201 (playbook generated async — may take 5-15 seconds)
+// Response 201
 {
   "data": {
+    "createdAt": "2026-02-20T12:00:00Z",
+    "householdId": "uuid",
     "id": "uuid",
     "eventType": "buying_apartment",
+    "title": "Buying our first apartment",
     "status": "active",
+    "targetDate": "2026-09-01",
+    "inputs": {
+      "budget": 350000000,
+      "city": "Stockholm",
+      "targetDate": "2026-09-01"
+    },
     "playbook": {
       "actions": [
         {
@@ -468,11 +483,19 @@ Trigger a life event and generate playbook.
           "category": "financial",
           "priority": "critical",
           "assignedTo": null,
+          "assignedToLabel": null,
           "status": "pending",
+          "dueDate": null,
           "estimatedImpactDescription": "Determines your realistic price range"
         }
       ],
       "totalActions": 12
+    },
+    "progress": {
+      "completed": 0,
+      "skipped": 0,
+      "total": 12,
+      "pct": 0
     },
     "impactSummary": "Based on a 3.5M SEK apartment purchase...",
     "impactData": {
@@ -480,13 +503,27 @@ Trigger a life event and generate playbook.
       "monthlyMortgageCost": 1200000,
       "netWorthImpactPct": -15.2,
       "fitnessScoreImpact": -45
-    }
+    },
+    "updatedAt": "2026-02-20T12:00:00Z"
   }
 }
 ```
 
 ### PATCH `/api/events/:id/actions/:actionId`
 Update a playbook action (assign, complete, skip).
+
+```json
+// Request
+{
+  "householdId": "uuid",
+  "assignedTo": "partner-member",
+  "assignedToLabel": "Partner",
+  "status": "completed"
+}
+
+// Response 200
+{ "data": { "...same LifeEvent shape as POST /api/events response..." } }
+```
 
 ---
 

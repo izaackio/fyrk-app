@@ -17,6 +17,8 @@ import {
 } from "../lib/validations/household";
 import {
   createLifeEventSchema,
+  lifeEventDetailQuerySchema,
+  lifeEventListQuerySchema,
   updatePlaybookActionSchema,
 } from "../lib/validations/events";
 import { fitnessQuerySchema } from "../lib/validations/fitness";
@@ -144,7 +146,7 @@ test("timeline update schema requires at least one field", () => {
   assert.equal(invalid.success, false);
 });
 
-test("life event schemas validate create and action update payloads", () => {
+test("life event schemas validate create, query, and action update payloads", () => {
   const createParsed = createLifeEventSchema.parse({
     householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
     eventType: "buying_apartment",
@@ -154,13 +156,24 @@ test("life event schemas validate create and action update payloads", () => {
       targetDate: "2026-09-01",
     },
   });
+  const listQueryParsed = lifeEventListQuerySchema.parse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+  });
+  const detailQueryParsed = lifeEventDetailQuerySchema.parse({
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
+  });
   const updateValid = updatePlaybookActionSchema.safeParse({
+    assignedTo: "partner-member",
+    assignedToLabel: "Partner",
+    householdId: "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6",
     status: "completed",
     completionNotes: "Done",
   });
   const updateInvalid = updatePlaybookActionSchema.safeParse({});
 
   assert.equal(createParsed.eventType, "buying_apartment");
+  assert.equal(listQueryParsed.householdId, "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6");
+  assert.equal(detailQueryParsed.householdId, "f8ac6abb-bfdb-4f65-8e26-cfb6770f4ea6");
   assert.equal(updateValid.success, true);
   assert.equal(updateInvalid.success, false);
 });
@@ -265,6 +278,7 @@ test("api success responses include hardened security headers", async () => {
   assert.equal(response.headers.get("Cache-Control"), "private, no-store, max-age=0");
   assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
   assert.equal(response.headers.get("X-Frame-Options"), "DENY");
+  assert.equal(typeof response.headers.get("X-Request-Id"), "string");
   assert.equal(response.headers.get("Content-Security-Policy"), "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
 });
 
@@ -286,4 +300,5 @@ test("api error responses preserve envelope shape and add retry hints", async ()
     },
   });
   assert.equal(response.headers.get("Retry-After"), "3");
+  assert.equal(typeof response.headers.get("X-Request-Id"), "string");
 });
