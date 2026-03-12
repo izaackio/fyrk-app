@@ -62,7 +62,7 @@ class MockQuery implements PromiseLike<QueryResult> {
   order(field: string, options: { ascending: boolean }): this {
     this.orderBy = {
       field,
-      ascending: options.ascending,
+      ascending: options.ascending
     };
     return this;
   }
@@ -76,13 +76,13 @@ class MockQuery implements PromiseLike<QueryResult> {
     const rows = this.materialize();
     return {
       data: rows[0] ?? null,
-      error: null,
+      error: null
     };
   }
 
   then<TResult1 = QueryResult, TResult2 = never>(
     onfulfilled?: ((value: QueryResult) => TResult1 | PromiseLike<TResult1>) | null,
-    onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
+    onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
   ): Promise<TResult1 | TResult2> {
     return Promise.resolve(this.execute()).then(onfulfilled, onrejected);
   }
@@ -93,13 +93,13 @@ class MockQuery implements PromiseLike<QueryResult> {
       return {
         count: rows.length,
         data: null,
-        error: null,
+        error: null
       };
     }
 
     return {
       data: rows,
-      error: null,
+      error: null
     };
   }
 
@@ -115,7 +115,7 @@ class MockQuery implements PromiseLike<QueryResult> {
       const field = this.orderBy.field;
       output.sort(
         (left, right) =>
-          String(left[field] ?? "").localeCompare(String(right[field] ?? "")) * direction,
+          String(left[field] ?? "").localeCompare(String(right[field] ?? "")) * direction
       );
     }
 
@@ -129,7 +129,7 @@ class MockQuery implements PromiseLike<QueryResult> {
 
 function createMockSupabase(tables: TableData): SupabaseClient {
   return {
-    from: (table: string) => new MockQuery(tables[table] ?? []),
+    from: (table: string) => new MockQuery(tables[table] ?? [])
   } as unknown as SupabaseClient;
 }
 
@@ -141,23 +141,23 @@ function buildAuthContext(supabase: SupabaseClient, householdId: string, demo = 
     session: {} as Session,
     user: {
       id: userId,
-      email: "demo-viewer@example.com",
+      email: "demo-viewer@example.com"
     } as User,
     profile: {
       id: userId,
       email: "demo-viewer@example.com",
       display_name: "Demo Viewer",
       base_currency: "SEK",
-      onboarding_completed: true,
+      onboarding_completed: true
     },
     demoContext: demo
       ? {
           householdId,
           householdName: "Demo household",
           variant: "standard",
-          readOnly: true,
+          readOnly: true
         }
-      : null,
+      : null
   };
 }
 
@@ -171,16 +171,16 @@ function buildBaseTables(householdId: string): TableData {
         household_id: householdId,
         user_id: userId,
         role: "owner",
-        status: "active",
-      },
+        status: "active"
+      }
     ],
     households: [
       {
         id: householdId,
         name: "Demo household",
         base_currency: "SEK",
-        deleted_at: null,
-      },
+        deleted_at: null
+      }
     ],
     accounts: [
       {
@@ -192,8 +192,8 @@ function buildBaseTables(householdId: string): TableData {
         name: "ISK",
         currency: "SEK",
         is_active: true,
-        deleted_at: null,
-      },
+        deleted_at: null
+      }
     ],
     household_snapshots: [
       {
@@ -202,7 +202,7 @@ function buildBaseTables(householdId: string): TableData {
         total_net_worth: 1_250_000,
         total_assets: 1_800_000,
         total_liabilities: 550_000,
-        currency: "SEK",
+        currency: "SEK"
       },
       {
         household_id: householdId,
@@ -210,8 +210,8 @@ function buildBaseTables(householdId: string): TableData {
         total_net_worth: 1_180_000,
         total_assets: 1_720_000,
         total_liabilities: 540_000,
-        currency: "SEK",
-      },
+        currency: "SEK"
+      }
     ],
     transactions: [
       {
@@ -222,9 +222,9 @@ function buildBaseTables(householdId: string): TableData {
         currency: "SEK",
         transaction_date: "2026-02-26",
         description: "Monthly contribution",
-        deleted_at: null,
-      },
-    ],
+        deleted_at: null
+      }
+    ]
   };
 }
 
@@ -237,25 +237,26 @@ test("generateWeeklyNarrative loads the latest precomputed demo artifact when th
       household_id: householdId,
       as_of_week: "2026-02-23",
       context_hash: "seeded-context",
-      narrative: "Precomputed demo narrative.",
+      narrative:
+        "Demo Viewer, your household net worth increased by 700 SEK (0.2%) to 12 507 SEK. The largest recorded move was a monthly transfer into savings. We recorded two new transactions during the week. A short review of the latest transfer at the next check-in would keep the picture current.",
       highlights: [
         { type: "positive", text: "Net worth held above the previous monthly baseline." },
-        { type: "action", text: "Review the latest transfer before the next checkpoint." },
+        { type: "action", text: "Review the latest transfer before the next checkpoint." }
       ],
       source: "fallback",
-      generated_at: "2026-03-01T08:00:00.000Z",
-    },
+      generated_at: "2026-03-01T08:00:00.000Z"
+    }
   ];
 
   const result = await generateWeeklyNarrative(
     buildAuthContext(createMockSupabase(tables), householdId),
-    householdId,
+    householdId
   );
 
   assert.equal(result.fromCache, true);
   assert.equal(result.source, "fallback");
   assert.equal(result.asOfWeek, "2026-02-23");
-  assert.equal(result.narrative, "Precomputed demo narrative.");
+  assert.equal(result.narrative.includes("your household net worth increased"), true);
   assert.equal(result.highlights.length, 2);
 });
 
@@ -265,11 +266,11 @@ test("generateWeeklyNarrative falls back deterministically for demo households w
 
   const result = await generateWeeklyNarrative(
     buildAuthContext(createMockSupabase(tables), householdId),
-    householdId,
+    householdId
   );
 
   assert.equal(result.fromCache, false);
   assert.equal(result.source, "fallback");
-  assert.equal(result.narrative.includes("Your household net worth"), true);
+  assert.equal(result.narrative.includes("your household net worth"), true);
   assert.equal(result.highlights.length >= 2, true);
 });

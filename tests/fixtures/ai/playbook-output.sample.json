@@ -1,0 +1,39 @@
+{
+  "actions": [
+    {
+      "title": "Confirm purchase budget boundaries",
+      "description": "Document the spending range, buffer floor, and decision owners before property viewings begin.",
+      "category": "financial",
+      "priority": "critical",
+      "estimatedImpactDescription": "Keeps the plan aligned with household capacity."
+    },
+    {
+      "title": "Review lender documentation",
+      "description": "Collect the income records and lender documents needed to keep financing discussions efficient.",
+      "category": "administrative",
+      "priority": "high",
+      "estimatedImpactDescription": "Reduces friction during financing decisions."
+    },
+    {
+      "title": "Check ownership agreement needs",
+      "description": "List the legal questions to settle before signing so both household members understand decision rules.",
+      "category": "legal",
+      "priority": "high",
+      "estimatedImpactDescription": "Creates clearer decision-making before commitment."
+    },
+    {
+      "title": "Update home insurance checklist",
+      "description": "Review which insurance changes should be in place before move-in and mortgage activation.",
+      "category": "insurance",
+      "priority": "medium",
+      "estimatedImpactDescription": "Keeps protection aligned with the move."
+    },
+    {
+      "title": "Plan tax and cash timing",
+      "description": "Map the expected tax and transaction timing so household liquidity stays orderly through closing.",
+      "category": "tax",
+      "priority": "medium",
+      "estimatedImpactDescription": "Supports a smoother cash-flow path around closing."
+    }
+  ]
+}
