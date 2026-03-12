@@ -22,9 +22,9 @@ export async function PATCH(request: Request, context: EventActionRouteContext):
     const authContext = await requireAuth();
     const params = await parseRouteParams(context.params, playbookActionPathParamsSchema);
     const payload = await parseJsonBody(request, updatePlaybookActionSchema);
-    const action = await eventService.updateAction(authContext, params.id, params.actionId, payload);
+    const event = await eventService.updateAction(authContext, params.id, params.actionId, payload);
 
-    return successResponse(action);
+    return successResponse(event);
   } catch (error) {
     return errorResponse(error);
   }
