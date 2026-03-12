@@ -9,9 +9,9 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 - `Blocked`: cannot proceed due to dependency or external constraint
 
 ## Current Snapshot
-- Last updated: 2026-03-11
+- Last updated: 2026-03-12
 - Baseline branch: `main`
-- Latest merged commit on `main`: `41f86c6`
+- Latest merged commit on `main`: `c149eb1`
 - Product phase: Prototype build-out
 
 | Sprint | Scope | Status | Notes |
@@ -22,9 +22,9 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 | Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; backend financial-logic follow-up also merged; integration lane not run |
 | Sprint 4 | Timeline + life event + fitness | Completed | DB, backend/AI-services, frontend, and integration lanes merged to `main` |
 | Sprint 5 | Quarterly review + governance | Completed | DB, backend, AI, frontend, and integration lanes merged to `main` |
-| Sprint 6 | Demo data + polish + launch prep | In Progress | Data seed and backend hardening are merged to `main`; AI/frontend lanes and release validation are complete on `codex/s6-integration-release` pending merge |
-| Sprint 6.5 | Design system hardening + UX QA | Not Started | Planned quality bridge between Sprint 6 delivery and Sprint 7 excellence pass |
-| Sprint 7 | Brand excellence + interaction quality | Not Started | Final premium UI/UX hardening benchmarked to top-tier product quality |
+| Sprint 6 | Demo data + polish + launch prep | Completed | Data seed, backend hardening, AI precompute, frontend polish, and release validation lanes are all merged to `main` |
+| Sprint 6.5 | Design system hardening + UX QA | Not Started | Planned quality bridge sprint; no dedicated Sprint 6.5 merge train has landed on `main` |
+| Sprint 7 | Brand excellence + interaction quality | In Progress | Frontend brand, backend regression, and AI quality lanes are merged; DB stability and integration/signoff remain pending |
 
 ## Sprint-by-Sprint Progress
 
@@ -202,62 +202,83 @@ Sprint 5 agent status snapshot:
 Sprint 5 achieved outcome:
 - Fyrk now supports household review generation and governance workflows end-to-end: reviews can be generated and read, proposals can be created and discussed, approvals/rejections are tracked, and governance events are written back into the household timeline with auditability.
 
-### Sprint 6 (In Progress)
+### Sprint 6 (Completed)
 Objective: deliver demo-mode readiness, onboarding polish, and launch-baseline product hardening.
 
 Delivered on `main`:
 - Deterministic demo household dataset builder and seed runner
 - Demo dataset tests to verify repeatability and exact record counts
 - Seeding documentation and package scripts for reset/seed flows
-- Demo-mode initialization and GDPR/data-handling backend hardening
-
-Delivered on release candidate branch `codex/s6-integration-release`:
-- Deterministic precomputed AI artifacts and fallback generation for demo weekly narrative, quarterly review, and fitness explanations
-- Onboarding, route-state, and shell polish for public, auth, and app surfaces
-- Release validation pass covering real-data and demo-data regression paths
+- Demo household initialization and demo cookie/context handling via [route.ts](/Users/isacandersson/Documents/projects/fyrk_app/src/app/api/households/demo/route.ts)
+- GDPR data export and account deletion endpoints via [route.ts](/Users/isacandersson/Documents/projects/fyrk_app/src/app/api/user/data-export/route.ts) and [route.ts](/Users/isacandersson/Documents/projects/fyrk_app/src/app/api/user/account/route.ts)
+- Deterministic AI artifact builders and demo-safe fallback behavior via [deterministic-artifacts.ts](/Users/isacandersson/Documents/projects/fyrk_app/src/lib/ai/deterministic-artifacts.ts)
+- Onboarding, app-shell, route-state, and household/demo selector polish
+- Release validation summary merged through the Sprint 6 integration lane
 
 Merged PR track summary:
 - Data/DB seed track merged (`codex/s6-data-seed`, PR #32)
 - Backend hardening track merged (`codex/s6-backend-hardening`, PR #34)
-- AI precompute track integrated on release branch (`origin/codex/s6-ai-precompute`)
-- Frontend polish track integrated on release branch (`origin/codex/s6-frontend-polish`)
+- AI precompute track merged (`codex/s6-ai-precompute`, PR #35)
+- Frontend polish track merged (`codex/s6-frontend-polish`, PR #36)
+- Integration/release track merged (`codex/s6-integration-release`, PR #37)
 
 Sprint 6 integration/release summary (2026-03-11):
 - Branch: `codex/s6-integration-release`
-- Integrated lane commits: `bc07abd` (AI precompute), `a690596` (frontend polish)
 - Regression pack executed: `npm run lint`, `npm run type-check`, `npm test`, `npm run build`
 - Live demo reseed executed against configured development database via `npm run db:seed:demo`
 - Production smoke executed against `next start` on `127.0.0.1:4010`
 - Smoke result: `/`, `/login`, `/signup`, `/onboarding`, `/dashboard`, `/accounts/new`, `/household`, and `/settings` returned `200`; unknown route returned `404`
 - Demo seed verification result: reset + insert completed, and deterministic counts matched for households, accounts, holdings, transactions, timeline entries, life events, account snapshots, household snapshots, fitness scores, weekly narratives, and quarterly reviews
 - GDPR/demo endpoint result: unauthenticated `GET /api/user/data-export`, `DELETE /api/user/account`, and `POST /api/households/demo` returned controlled `401 AUTH_REQUIRED` envelopes with hardened headers
-- Result: local release candidate is green and production-deployable; no fix-forward code patches were required beyond integrating the pending Sprint 6 lanes
-- Remaining release gate: push the branch and confirm remote GitHub Actions checks, since this RC validation was performed locally
+- Result: release candidate validation was merged to `main`; PR #37 records local validation and GitHub Actions CI passing for the validation branch
 
 Sprint 6 agent status snapshot:
 - Data/DB seed agent: Completed and merged (PR #32)
 - Backend hardening agent: Completed and merged (PR #34)
-- AI precompute agent: Completed on release branch; pending merge to `main`
-- Frontend polish agent: Completed on release branch; pending merge to `main`
-- Integration/release agent: Completed on release branch
+- AI precompute agent: Completed and merged (PR #35)
+- Frontend polish agent: Completed and merged (PR #36)
+- Integration/release agent: Completed and merged (PR #37)
 
-Sprint 6 achieved outcome so far:
-- Fyrk now has a complete Sprint 6 release candidate that combines deterministic demo data, runtime demo mode, GDPR account controls, AI fallback stability, and onboarding polish with a passing regression pack.
+Sprint 6 achieved outcome:
+- Fyrk now has a merged demo-ready prototype baseline with deterministic sample data, runtime demo activation, GDPR controls, AI fallback resilience, polished onboarding, and release validation captured on `main`.
 
-## Current Active Sprint (Sprint 6)
-Objective: finish demo-mode readiness, onboarding polish, and launch-baseline product hardening.
+### Sprint 7 (In Progress)
+Objective: drive brand excellence and interaction-quality hardening across authenticated product surfaces.
+
+Delivered on `main` so far:
+- Branded authenticated household and settings surfaces
+- Centralized theme tokens and normalized shared interaction states
+- Stronger balance sheet, timeline, and fitness visual treatments
+- Restored life-events API list/detail coverage and frontend-compatible event payloads
+- Backend request IDs, structured 5xx logging, and event API regression coverage
+- AI tone quality tightening and fallback consistency improvements for narrative, quarterly review, and fitness explanation generation
+
+Merged PR track summary:
+- Backend regression track merged (`codex/s7-backend-regression`, PR #38)
+- Frontend brand track merged (`codex/s7-frontend-brand`, PR #39)
+- AI quality track merged (`codex/s7-ai-quality`, PR #40)
+
+Sprint 7 agent status snapshot:
+- Backend regression agent: Completed and merged (PR #38)
+- Frontend brand agent: Completed and merged (PR #39)
+- AI quality agent: Completed and merged (PR #40)
+- DB stability agent: Not started on `main`
+- Integration/signoff agent: Not started on `main`
+
+Sprint 7 achieved outcome so far:
+- Brand hardening is underway on `main`, and both the backend contract and AI tone layer have been tightened to support the upgraded UI. Final DB stability review and integration signoff are still pending.
+
+## Current Active Sprint (Sprint 7)
+Objective: finish the remaining quality-signoff work for the brand and interaction hardening pass.
 
 Planned delivery:
-- Seed 4 high-quality demo household variants with realistic data and derived artifacts
-- Add demo-mode initialization and GDPR/data-handling endpoints
-- Polish onboarding, empty/loading/error states, and public-to-product transitions
-- Strengthen launch-quality reliability, security, accessibility, and performance
-- Prepare a demo-ready release baseline before Sprint 6.5/7 quality hardening
+- AI tone and output-quality alignment follow-up only if new gaps are found in review
+- DB stability lane for critical reliability or performance findings only
+- Integration/signoff lane covering accessibility, performance, and cross-surface regression QA
+- Final brand-quality pass across authenticated product surfaces
 
-Upcoming quality runway after Sprint 5:
-- Sprint 6: demo data, onboarding polish, launch baseline
-- Sprint 6.5: focused design-system consistency, interaction QA, and accessibility/performance regression hardening
-- Sprint 7: benchmark-grade brand and interaction excellence pass
+Roadmap note:
+- Sprint 6.5 remains planned as a quality bridge in the roadmap, but no dedicated Sprint 6.5 implementation track has landed on `main`
 
 ## Sprint 3 Deep-Dive Section (Archived Plan)
 
