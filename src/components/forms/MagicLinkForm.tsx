@@ -100,17 +100,13 @@ export function MagicLinkForm({ mode }: MagicLinkFormProps) {
       </form>
 
       {notice ? (
-        <p
-          className={[styles.chip, styles.chipPositive].join(" ")}
-          role="status"
-          style={{ marginTop: "16px" }}
-        >
+        <p className={[styles.authNotice, styles.chip, styles.chipPositive].join(" ")} role="status">
           {notice}
         </p>
       ) : null}
 
       {notice ? (
-        <div style={{ marginTop: "16px" }}>
+        <div className={styles.authNotice}>
           <Link className={styles.link} href={copy.nextHref}>
             {copy.nextLabel}
           </Link>

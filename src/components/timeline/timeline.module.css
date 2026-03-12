@@ -78,10 +78,34 @@
   padding: 0;
 }
 
+.timelineDivider,
+.todayMarker {
+  align-items: center;
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: auto 1fr;
+}
+
+.timelineDividerLabel,
+.todayLabel {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.timelineDividerRule,
+.todayRule {
+  border-top: 1px solid color-mix(in srgb, var(--co-border) 84%, transparent);
+  display: block;
+  width: 100%;
+}
+
 .timelineItem {
   display: grid;
   gap: var(--space-sm);
-  grid-template-columns: 16px minmax(0, 1fr);
+  grid-template-columns: 24px minmax(0, 1fr);
 }
 
 .timelineRail {
@@ -92,11 +116,21 @@
 }
 
 .timelineRail::after {
-  background: var(--co-border);
+  background: color-mix(in srgb, var(--co-info) 34%, var(--co-border));
   content: "";
-  inset: 20px auto -12px 7px;
+  inset: 24px auto -14px 11px;
   position: absolute;
   width: 2px;
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+
+.timelineRailFuture::after {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--co-info) 40%, transparent) 0 6px,
+      transparent 6px 11px
+    );
 }
 
 .timelineItem:last-child .timelineRail::after {
@@ -104,23 +138,42 @@
 }
 
 .timelineDot {
-  background: var(--co-brand-primary);
+  align-items: center;
   border: 2px solid var(--co-bg-surface);
   border-radius: 999px;
   box-shadow: 0 0 0 1px var(--co-border);
-  height: 14px;
-  margin-top: 8px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 700;
+  height: 18px;
+  justify-content: center;
+  margin-top: 6px;
   position: relative;
-  width: 14px;
+  width: 18px;
   z-index: 2;
 }
 
+.timelineDotAuto {
+  height: 10px;
+  margin-top: 11px;
+  width: 10px;
+}
+
+.timelineDotHuman {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--co-border) 80%, transparent);
+}
+
+.timelineDotMilestone {
+  box-shadow: 0 0 0 1px var(--co-border), 0 0 0 4px color-mix(in srgb, var(--co-status-up) 18%, transparent);
+}
+
 .dotlife_event {
-  background: var(--co-info);
+  background: var(--co-brand-primary);
 }
 
 .dotdecision {
-  background: #8e6b4a;
+  background: var(--co-chart-5);
 }
 
 .dotmilestone {
@@ -128,15 +181,15 @@
 }
 
 .dotreview {
-  background: #6f6cc8;
+  background: var(--co-chart-4);
 }
 
 .dotsystem {
-  background: var(--co-text-muted);
+  background: var(--co-info);
 }
 
 .dotnote {
-  background: #b47c41;
+  background: var(--co-chart-3);
 }
 
 .timelineCard {
@@ -146,6 +199,24 @@
   display: grid;
   gap: var(--space-sm);
   padding: 14px;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-emphasis);
+}
+
+.timelineItem:hover .timelineCard {
+  border-color: color-mix(in srgb, var(--co-brand-primary) 34%, var(--co-border));
+  box-shadow: var(--co-shadow-soft);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.timelineItem:hover .timelineRail::after {
+  background: color-mix(in srgb, var(--co-info) 68%, var(--co-brand-primary));
+}
+
+.timelineCardFuture {
+  background: color-mix(in srgb, var(--co-bg-subtle) 92%, var(--co-bg-surface));
 }
 
 .cardHeader {
@@ -191,6 +262,7 @@
 
 .entryDescription {
   color: var(--co-text-secondary);
+  font-family: var(--font-narrative);
   margin: 0;
 }
 
@@ -211,6 +283,33 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+[data-density="terminal"] .timelineItem {
+  gap: var(--space-xs);
+  grid-template-columns: 20px minmax(0, 1fr);
+}
+
+[data-density="terminal"] .timelineCard {
+  gap: var(--space-xs);
+  padding: 12px;
+}
+
+[data-density="terminal"] .entryTitle {
+  font-size: var(--text-base);
+}
+
+[data-density="terminal"] .entryDescription {
+  display: -webkit-box;
+  font-size: var(--text-sm);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+[data-density="terminal"] .entryMeta,
+[data-density="terminal"] .entryDate {
+  font-size: var(--text-xs);
 }
 
 @media (max-width: 1120px) {

@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 import styles from "../theme/theme.module.css";
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -16,6 +16,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary: styles.buttonPrimary ?? "",
   secondary: styles.buttonSecondary ?? "",
   ghost: styles.buttonGhost ?? "",
+  danger: styles.buttonDanger ?? "",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
