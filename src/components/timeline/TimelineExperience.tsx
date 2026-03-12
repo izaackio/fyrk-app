@@ -54,6 +54,15 @@ const createCategoryLabel = (category: TimelineCategory): string => {
   return found?.label ?? category;
 };
 
+const ENTRY_GLYPHS: Record<TimelineEntryType, string> = {
+  decision: "↗",
+  life_event: "◎",
+  milestone: "✦",
+  note: "✎",
+  review: "☰",
+  system: "·",
+};
+
 const describeError = (error: unknown): string => {
   if (error instanceof ApiClientError) {
     return error.message;
@@ -196,6 +205,14 @@ export function TimelineExperience() {
       includeFuture ? entries : entries.filter((entry) => !entry.isFuture),
     [entries, includeFuture],
   );
+  const futureEntries = useMemo(
+    () => visibleEntries.filter((entry) => entry.isFuture),
+    [visibleEntries],
+  );
+  const pastEntries = useMemo(
+    () => visibleEntries.filter((entry) => !entry.isFuture),
+    [visibleEntries],
+  );
 
   const handleManualSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -286,6 +303,71 @@ export function TimelineExperience() {
       </Card>
     );
   }
+
+  const renderEntry = (entry: TimelineEntry, future = false) => (
+    <li className={styles.timelineItem} key={entry.id}>
+      <div className={[styles.timelineRail, future ? styles.timelineRailFuture : ""].join(" ")}>
+        <span
+          className={[
+            styles.timelineDot,
+            entry.entryType === "system" ? styles.timelineDotAuto : styles.timelineDotHuman,
+            entry.entryType === "milestone" ? styles.timelineDotMilestone : "",
+            styles[`dot${entry.entryType}`],
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {entry.entryType === "system" ? null : ENTRY_GLYPHS[entry.entryType]}
+        </span>
+      </div>
+
+      <article className={[styles.timelineCard, future ? styles.timelineCardFuture : ""].join(" ")}>
+        <header className={styles.cardHeader}>
+          <div className={styles.cardHeading}>
+            <p className={styles.entryDate}>{formatDate(entry.entryDate)}</p>
+            <h3 className={styles.entryTitle}>{entry.title}</h3>
+          </div>
+
+          <div className={styles.badges}>
+            <span className={[themeStyles.chip, themeStyles.chipMuted].join(" ")}>
+              {createTypeLabel(entry.entryType)}
+            </span>
+            <span className={styles.categoryBadge}>{createCategoryLabel(entry.category)}</span>
+          </div>
+        </header>
+
+        {entry.description ? <p className={styles.entryDescription}>{entry.description}</p> : null}
+
+        <footer className={styles.cardFooter}>
+          <span className={styles.entryMeta}>Logged by {entry.createdBy.displayName}</span>
+
+          <div className={styles.cardActions}>
+            {entry.linkedEvent ? (
+              <Link
+                className={[themeStyles.button, themeStyles.buttonGhost, themeStyles.buttonSm].join(" ")}
+                href={`/events/${entry.linkedEvent.id}`}
+              >
+                Open playbook
+              </Link>
+            ) : null}
+
+            {isManualEntry(entry) ? (
+              <button
+                className={[themeStyles.button, themeStyles.buttonSecondary, themeStyles.buttonSm].join(" ")}
+                disabled={deletingEntryId === entry.id}
+                onClick={() => {
+                  void handleDelete(entry.id);
+                }}
+                type="button"
+              >
+                {deletingEntryId === entry.id ? "Removing..." : "Remove"}
+              </button>
+            ) : null}
+          </div>
+        </footer>
+      </article>
+    </li>
+  );
 
   return (
     <section className={styles.stack}>
@@ -525,61 +607,18 @@ export function TimelineExperience() {
 
       {!loading && visibleEntries.length > 0 ? (
         <ol className={styles.timelineList}>
-          {visibleEntries.map((entry) => (
-            <li className={styles.timelineItem} key={entry.id}>
-              <div className={styles.timelineRail}>
-                <span className={[styles.timelineDot, styles[`dot${entry.entryType}`]].join(" ")} />
-              </div>
-
-              <article className={styles.timelineCard}>
-                <header className={styles.cardHeader}>
-                  <div className={styles.cardHeading}>
-                    <p className={styles.entryDate}>{formatDate(entry.entryDate)}</p>
-                    <h3 className={styles.entryTitle}>{entry.title}</h3>
-                  </div>
-
-                  <div className={styles.badges}>
-                    <span className={[themeStyles.chip, themeStyles.chipMuted].join(" ")}>
-                      {createTypeLabel(entry.entryType)}
-                    </span>
-                    <span className={styles.categoryBadge}>{createCategoryLabel(entry.category)}</span>
-                  </div>
-                </header>
-
-                {entry.description ? (
-                  <p className={styles.entryDescription}>{entry.description}</p>
-                ) : null}
-
-                <footer className={styles.cardFooter}>
-                  <span className={styles.entryMeta}>Logged by {entry.createdBy.displayName}</span>
-
-                  <div className={styles.cardActions}>
-                    {entry.linkedEvent ? (
-                      <Link
-                        className={[themeStyles.button, themeStyles.buttonGhost, themeStyles.buttonSm].join(" ")}
-                        href={`/events/${entry.linkedEvent.id}`}
-                      >
-                        Open playbook
-                      </Link>
-                    ) : null}
-
-                    {isManualEntry(entry) ? (
-                      <button
-                        className={[themeStyles.button, themeStyles.buttonSecondary, themeStyles.buttonSm].join(" ")}
-                        disabled={deletingEntryId === entry.id}
-                        onClick={() => {
-                          void handleDelete(entry.id);
-                        }}
-                        type="button"
-                      >
-                        {deletingEntryId === entry.id ? "Removing..." : "Remove"}
-                      </button>
-                    ) : null}
-                  </div>
-                </footer>
-              </article>
+          {futureEntries.length > 0 ? (
+            <li className={styles.timelineDivider}>
+              <span className={styles.timelineDividerLabel}>Future</span>
+              <span aria-hidden className={styles.timelineDividerRule} />
             </li>
-          ))}
+          ) : null}
+          {futureEntries.map((entry) => renderEntry(entry, true))}
+          <li className={styles.todayMarker}>
+            <span className={styles.todayLabel}>Today</span>
+            <span aria-hidden className={styles.todayRule} />
+          </li>
+          {pastEntries.map((entry) => renderEntry(entry))}
         </ol>
       ) : null}
     </section>

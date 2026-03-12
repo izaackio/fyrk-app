@@ -283,6 +283,7 @@ export function AppShell({ children }: AppShellProps) {
   const sessionContextValue = {
     activeHousehold,
     activeHouseholdId,
+    density,
     demoContext: session?.demoContext ?? null,
     demoError,
     demoLoading,
@@ -297,9 +298,12 @@ export function AppShell({ children }: AppShellProps) {
       setDemoError(null);
       setActiveHouseholdId(householdId);
     },
+    setDensity,
+    setTheme,
     session,
     sessionError,
     startDemo,
+    theme,
   };
 
   return (

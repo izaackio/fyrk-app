@@ -197,6 +197,170 @@
   padding: 0;
 }
 
+.allocationLayout {
+  align-items: center;
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+}
+
+.allocationChartWrap {
+  display: grid;
+  gap: var(--space-sm);
+  justify-items: center;
+}
+
+.allocationFigure {
+  display: grid;
+  min-height: 240px;
+  place-items: center;
+  position: relative;
+  width: 240px;
+}
+
+.allocationSvg {
+  height: 240px;
+  overflow: visible;
+  transform: rotate(-90deg);
+  width: 240px;
+}
+
+.allocationTrackRing {
+  fill: none;
+  stroke: color-mix(in srgb, var(--co-bg-hover) 85%, var(--co-border));
+  stroke-width: 18;
+}
+
+.allocationSegment {
+  fill: none;
+  stroke: var(--segment-color);
+  stroke-linecap: round;
+  stroke-width: 18;
+  transition:
+    opacity var(--motion-chart) var(--ease-standard),
+    stroke-width var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-emphasis);
+  transform-origin: 50% 50%;
+}
+
+.allocationSegmentDimmed {
+  opacity: 0.35;
+}
+
+.allocationSegmentActive {
+  stroke-width: 20;
+  transform: scale(1.03);
+}
+
+.allocationCenter {
+  align-items: center;
+  background: var(--co-bg-surface);
+  border: 1px solid var(--co-border);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%);
+  display: grid;
+  gap: 4px;
+  inset: 34px;
+  padding: var(--space-md);
+  position: absolute;
+  text-align: center;
+}
+
+.allocationCenterLabel {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.allocationCenterValue {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.allocationCenterMeta {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+}
+
+.allocationLegend {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.allocationLegendItem {
+  background: var(--co-bg-subtle);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-emphasis);
+}
+
+.allocationLegendItem:hover {
+  background: color-mix(in srgb, var(--co-bg-hover) 94%, var(--co-bg-surface));
+  border-color: var(--co-border-strong);
+  transform: translateY(-1px);
+}
+
+.allocationLegendActive {
+  border-color: color-mix(in srgb, var(--segment-color) 42%, var(--co-border));
+  background: color-mix(in srgb, var(--segment-color) 10%, var(--co-bg-surface));
+}
+
+.legendHead {
+  align-items: baseline;
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.legendLabel {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+}
+
+.legendSwatch {
+  background: var(--segment-color);
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--segment-color) 16%, transparent);
+  display: inline-flex;
+  height: 10px;
+  width: 10px;
+}
+
+.legendValue {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+  text-align: right;
+}
+
+.legendBarTrack {
+  background: var(--co-bg-hover);
+  border-radius: 999px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.legendBarFill {
+  background: var(--segment-color);
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+  width: var(--segment-pct);
+}
+
 .allocationRow {
   display: grid;
   gap: 6px;
@@ -307,9 +471,40 @@
   margin: 0;
 }
 
+[data-density="terminal"] .heroValue,
+[data-density="terminal"] .metricValue,
+[data-density="terminal"] .allocationCenterValue,
+[data-density="terminal"] .qualityValue,
+[data-density="terminal"] .mixValue {
+  font-family: var(--font-mono);
+}
+
+[data-density="terminal"] .allocationLayout {
+  align-items: start;
+  grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+}
+
+[data-density="terminal"] .allocationFigure,
+[data-density="terminal"] .allocationSvg {
+  height: 200px;
+  min-height: 200px;
+  width: 200px;
+}
+
+[data-density="terminal"] .allocationCenter {
+  inset: 26px;
+}
+
+[data-density="terminal"] .legendValue,
+[data-density="terminal"] .metricMeta,
+[data-density="terminal"] .subtleMeta {
+  font-size: var(--text-xs);
+}
+
 @media (max-width: 1023px) {
   .metricGrid,
-  .splitGrid {
+  .splitGrid,
+  .allocationLayout {
     grid-template-columns: 1fr;
   }
 

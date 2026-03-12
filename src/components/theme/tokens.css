@@ -1,0 +1,98 @@
+:root {
+  --co-bg-app: #fdfdfc;
+  --co-bg-surface: #ffffff;
+  --co-bg-hover: #f4f3f0;
+  --co-bg-subtle: #f8f7f5;
+
+  --co-text-primary: #1a1a1a;
+  --co-text-secondary: #5e6266;
+  --co-text-muted: #a4a7ab;
+
+  --co-brand-primary: #2a3b4c;
+  --co-brand-light: #3a5068;
+  --co-status-up: #4a7c59;
+  --co-status-up-bg: #edf5f0;
+  --co-status-down: #cc5a50;
+  --co-status-down-bg: #fdf0ef;
+  --co-info: #6b8e9b;
+  --co-info-bg: #eff4f6;
+
+  --co-chart-1: #2a3b4c;
+  --co-chart-2: #6b8e9b;
+  --co-chart-3: #d4b872;
+  --co-chart-4: #5c4d5c;
+  --co-chart-5: #c4a882;
+  --co-chart-6: #3d8b8b;
+
+  --co-border: #eaeaea;
+  --co-border-strong: #d4d4d4;
+  --co-shadow-soft: 0 4px 20px rgb(0 0 0 / 3%);
+  --co-shadow-strong: 0 16px 40px rgb(26 24 21 / 8%);
+
+  --co-focus-ring: #6b8e9b;
+  --co-focus-ring-offset: 2px;
+
+  --font-narrative:
+    "Playfair Display", ui-serif, georgia, "Times New Roman", serif;
+  --font-data: "Inter", "Avenir Next", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Source Code Pro", ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  --radius-sm: 4px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  --touch-target-min: 44px;
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --motion-chart: 500ms;
+  --motion-sweep: 1000ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+  --co-bg-app: #1a1815;
+  --co-bg-surface: #242220;
+  --co-bg-hover: #2e2b28;
+  --co-bg-subtle: #1f1d1b;
+
+  --co-text-primary: #f0ede8;
+  --co-text-secondary: #9a9590;
+  --co-text-muted: #6b6560;
+
+  --co-brand-primary: #7ba3bc;
+  --co-brand-light: #92b8ce;
+  --co-status-up: #6aaf7b;
+  --co-status-up-bg: #1e2a22;
+  --co-status-down: #e07a70;
+  --co-status-down-bg: #2a1f1e;
+  --co-info: #8aafbc;
+  --co-info-bg: #1e2628;
+
+  --co-border: #3a3632;
+  --co-border-strong: #4a4540;
+  --co-shadow-soft: 0 4px 20px rgb(0 0 0 / 15%);
+  --co-shadow-strong: 0 20px 48px rgb(0 0 0 / 24%);
+
+  --co-focus-ring: #8aafbc;
+}

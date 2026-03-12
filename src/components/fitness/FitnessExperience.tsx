@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { formatDate, formatNumber } from "../accounts/formatters";
 import { useHouseholdContext } from "../accounts/useHouseholdContext";
@@ -60,6 +60,8 @@ const describeError = (error: unknown): string => {
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
 
+const GAUGE_PATH = "M24 110 A70 70 0 0 1 164 110";
+
 const buildLinePath = (points: FitnessHistoryPoint[]): string => {
   if (points.length === 0) {
     return "";
@@ -80,10 +82,6 @@ const buildLinePath = (points: FitnessHistoryPoint[]): string => {
     })
     .join(" ");
 };
-
-const getGaugeStyle = (score: number): CSSProperties => ({
-  "--gauge-value": `${clamp((score / 1000) * 100, 0, 100)}%`,
-}) as CSSProperties;
 
 export function FitnessExperience() {
   const {
@@ -163,6 +161,20 @@ export function FitnessExperience() {
       },
     ];
   }, [fitness]);
+  const scoreProgress = clamp(((fitness?.current.totalScore ?? 0) / 1000) * 100, 0, 100);
+  const scoreDelta = useMemo(() => {
+    if (!fitness || fitness.history.length < 2) {
+      return null;
+    }
+
+    const latestPoint = fitness.history[fitness.history.length - 1];
+    const previousPoint = fitness.history[fitness.history.length - 2];
+    if (!latestPoint || !previousPoint) {
+      return null;
+    }
+
+    return latestPoint.score - previousPoint.score;
+  }, [fitness]);
 
   if (householdLoading) {
     return (
@@ -233,11 +245,47 @@ export function FitnessExperience() {
       <Card className={styles.heroCard}>
         <div className={styles.heroGrid}>
           <div className={styles.gaugeWrap}>
-            <div className={styles.gauge} style={getGaugeStyle(fitness.current.totalScore)}>
+            <div className={styles.gauge}>
+              <svg
+                aria-hidden
+                className={styles.gaugeSvg}
+                preserveAspectRatio="xMidYMid meet"
+                viewBox="0 0 188 124"
+              >
+                <defs>
+                  <linearGradient id="fitnessGaugeGradient" x1="0%" x2="100%" y1="0%" y2="0%">
+                    <stop offset="0%" stopColor="var(--co-status-down)" />
+                    <stop offset="34%" stopColor="var(--co-chart-3)" />
+                    <stop offset="67%" stopColor="var(--co-info)" />
+                    <stop offset="100%" stopColor="var(--co-status-up)" />
+                  </linearGradient>
+                </defs>
+                <path className={styles.gaugeTrack} d={GAUGE_PATH} pathLength={100} />
+                <path
+                  className={styles.gaugeProgress}
+                  d={GAUGE_PATH}
+                  pathLength={100}
+                  strokeDasharray={`${scoreProgress} 100`}
+                />
+              </svg>
               <div className={styles.gaugeInner}>
                 <span className={styles.scoreLabel}>Financial Fitness</span>
                 <strong className={styles.scoreValue}>{formatNumber(fitness.current.totalScore, 0)}</strong>
                 <span className={styles.scoreScale}>of 1000</span>
+                {scoreDelta !== null ? (
+                  <span
+                    className={[
+                      styles.scoreTrend,
+                      scoreDelta > 0
+                        ? styles.scoreTrendPositive
+                        : scoreDelta < 0
+                          ? styles.scoreTrendNegative
+                          : styles.scoreTrendNeutral,
+                    ].join(" ")}
+                  >
+                    {scoreDelta > 0 ? "↑" : scoreDelta < 0 ? "↓" : "•"} {Math.abs(scoreDelta)} from the last reading
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
