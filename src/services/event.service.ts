@@ -1165,18 +1165,18 @@ export class EventService {
         {
           category: "financial",
           description:
-            "Estimate safe borrowing capacity from income, debt ratio, and cash buffer.",
-          estimatedImpactDescription: "Defines your realistic purchase range.",
+            "Confirm a comfortable borrowing range with lender inputs, income records, and buffer policy.",
+          estimatedImpactDescription: "Keeps the home search aligned with household capacity.",
           priority: "critical",
-          title: "Calculate maximum mortgage capacity",
+          title: "Review mortgage planning range",
         },
         {
           category: "financial",
           description:
-            "Set and track monthly transfers to meet the minimum 15% down-payment.",
+            "Define the savings target and transfer cadence needed before bidding begins.",
           estimatedImpactDescription: "Improves purchase readiness and execution confidence.",
           priority: "critical",
-          title: "Lock a down-payment savings target",
+          title: "Set a down-payment savings plan",
         },
         {
           category: "legal",
@@ -1233,8 +1233,8 @@ export class EventService {
       {
         category: "insurance",
         description:
-          "Confirm insurance scope and beneficiary setup for event-related changes.",
-        estimatedImpactDescription: "Improves resilience to unforeseen setbacks.",
+          "Confirm insurance scope and beneficiary setup for the household changes ahead.",
+        estimatedImpactDescription: "Keeps protection aligned with the household plan.",
         priority: "medium",
         title: "Review insurance and risk coverage",
       },

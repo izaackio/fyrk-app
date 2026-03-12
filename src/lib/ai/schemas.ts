@@ -1,26 +1,37 @@
 import { z } from "zod";
 
+import { warmAuthorityTextSchema } from "@/lib/ai/quality";
 import { playbookActionCategories, playbookActionPriorities } from "@/lib/validations/events";
 
 const uuidSchema = z.string().uuid();
 
 export const weeklyNarrativeRequestSchema = z
   .object({
-    householdId: uuidSchema,
+    householdId: uuidSchema
   })
   .strict();
 
 export const weeklyNarrativeHighlightSchema = z
   .object({
     type: z.enum(["positive", "neutral", "negative", "action"]),
-    text: z.string().trim().min(1).max(280),
+    text: warmAuthorityTextSchema({
+      maxLength: 280,
+      maxSentences: 1,
+      maxWords: 24,
+      minSentences: 1
+    })
   })
   .strict();
 
 export const weeklyNarrativeOutputSchema = z
   .object({
-    narrative: z.string().trim().min(1).max(1600),
-    highlights: z.array(weeklyNarrativeHighlightSchema).min(1).max(6),
+    narrative: warmAuthorityTextSchema({
+      maxLength: 1200,
+      maxSentences: 5,
+      maxWords: 120,
+      minSentences: 3
+    }),
+    highlights: z.array(weeklyNarrativeHighlightSchema).min(1).max(6)
   })
   .strict();
 
@@ -28,17 +39,33 @@ export const weeklyNarrativeCacheHighlightsSchema = z.array(weeklyNarrativeHighl
 
 export const playbookActionAiSchema = z
   .object({
-    title: z.string().trim().min(1).max(140),
-    description: z.string().trim().min(1).max(500),
+    title: warmAuthorityTextSchema({
+      maxLength: 140,
+      maxSentences: 1,
+      maxWords: 12,
+      minSentences: 1
+    }),
+    description: warmAuthorityTextSchema({
+      maxLength: 500,
+      maxSentences: 3,
+      maxWords: 70,
+      minSentences: 1
+    }),
     category: z.enum(playbookActionCategories),
     priority: z.enum(playbookActionPriorities),
-    estimatedImpactDescription: z.string().trim().min(1).max(240),
+    estimatedImpactDescription: warmAuthorityTextSchema({
+      disallowDigits: true,
+      maxLength: 240,
+      maxSentences: 2,
+      maxWords: 26,
+      minSentences: 1
+    })
   })
   .strict();
 
 export const playbookAiOutputSchema = z
   .object({
-    actions: z.array(playbookActionAiSchema).min(5).max(15),
+    actions: z.array(playbookActionAiSchema).min(5).max(15)
   })
   .strict();
 
@@ -47,7 +74,7 @@ const fitnessActionComponents = [
   "growth",
   "protection",
   "efficiency",
-  "trajectory",
+  "trajectory"
 ] as const;
 
 const quarterlyReviewFitnessComponents = [
@@ -56,7 +83,7 @@ const quarterlyReviewFitnessComponents = [
   "protection",
   "efficiency",
   "trajectory",
-  "governance",
+  "governance"
 ] as const;
 
 const quarterlyReviewActionTypes = ["proposal", "research", "monitor", "discuss"] as const;
@@ -66,14 +93,14 @@ export const fitnessActionAiSchema = z
     component: z.enum(fitnessActionComponents),
     title: z.string().trim().min(1).max(120),
     impact: z.string().trim().min(1).max(80),
-    description: z.string().trim().min(1).max(360),
+    description: z.string().trim().min(1).max(360)
   })
   .strict();
 
 export const fitnessExplanationAiOutputSchema = z
   .object({
     explanation: z.string().trim().min(1).max(1800),
-    suggestedActions: z.array(fitnessActionAiSchema).max(5),
+    suggestedActions: z.array(fitnessActionAiSchema).max(5)
   })
   .strict()
   .superRefine((value, context) => {
@@ -87,7 +114,7 @@ export const fitnessExplanationAiOutputSchema = z
 
       context.addIssue({
         code: "custom",
-        message: `Duplicate component in suggestedActions: ${action.component}`,
+        message: `Duplicate component in suggestedActions: ${action.component}`
       });
     }
   });
@@ -95,19 +122,55 @@ export const fitnessExplanationAiOutputSchema = z
 export const quarterlyReviewRecommendationAiSchema = z
   .object({
     opportunityId: z.string().trim().min(1).max(80),
-    title: z.string().trim().min(1).max(140),
-    description: z.string().trim().min(1).max(700),
-    estimatedImpactSummary: z.string().trim().min(1).max(240),
+    title: warmAuthorityTextSchema({
+      maxLength: 140,
+      maxSentences: 1,
+      maxWords: 12,
+      minSentences: 1
+    }),
+    description: warmAuthorityTextSchema({
+      maxLength: 700,
+      maxSentences: 3,
+      maxWords: 90,
+      minSentences: 1
+    }),
+    estimatedImpactSummary: warmAuthorityTextSchema({
+      disallowDigits: true,
+      maxLength: 240,
+      maxSentences: 2,
+      maxWords: 26,
+      minSentences: 1
+    })
   })
   .strict();
 
 export const quarterlyReviewAiOutputSchema = z
   .object({
-    narrative: z.string().trim().min(1).max(2600),
-    performanceExplanation: z.string().trim().min(1).max(1200),
+    narrative: warmAuthorityTextSchema({
+      maxLength: 2600,
+      maxSentences: 4,
+      maxWords: 160,
+      minSentences: 2
+    }),
+    performanceExplanation: warmAuthorityTextSchema({
+      maxLength: 1200,
+      maxSentences: 3,
+      maxWords: 100,
+      minSentences: 1
+    }),
     recommendations: z.array(quarterlyReviewRecommendationAiSchema).min(1).max(8),
-    quarterSummary: z.string().trim().min(1).max(1200),
-    nextQuarterFocus: z.string().trim().min(1).max(700),
+    quarterSummary: warmAuthorityTextSchema({
+      maxLength: 1200,
+      maxSentences: 2,
+      maxWords: 45,
+      minSentences: 1
+    }),
+    nextQuarterFocus: warmAuthorityTextSchema({
+      maxLength: 700,
+      maxSentences: 2,
+      maxWords: 40,
+      minSentences: 1
+    })
   })
   .strict()
   .superRefine((value, context) => {
@@ -121,7 +184,7 @@ export const quarterlyReviewAiOutputSchema = z
 
       context.addIssue({
         code: "custom",
-        message: `Duplicate opportunityId in recommendations: ${recommendation.opportunityId}`,
+        message: `Duplicate opportunityId in recommendations: ${recommendation.opportunityId}`
       });
     }
   });
@@ -132,7 +195,12 @@ export const quarterlyReviewPerformanceAttributionSchema = z
     netSavings: z.number().int(),
     debtReduction: z.number().int(),
     feesDrag: z.number().int(),
-    explanation: z.string().trim().min(1).max(1200),
+    explanation: warmAuthorityTextSchema({
+      maxLength: 1200,
+      maxSentences: 3,
+      maxWords: 100,
+      minSentences: 1
+    })
   })
   .strict();
 
@@ -140,39 +208,89 @@ export const quarterlyReviewRecommendationSchema = z
   .object({
     opportunityId: z.string().trim().min(1).max(80),
     priority: z.enum(playbookActionPriorities),
-    title: z.string().trim().min(1).max(140),
-    description: z.string().trim().min(1).max(700),
+    title: warmAuthorityTextSchema({
+      maxLength: 140,
+      maxSentences: 1,
+      maxWords: 12,
+      minSentences: 1
+    }),
+    description: warmAuthorityTextSchema({
+      maxLength: 700,
+      maxSentences: 3,
+      maxWords: 90,
+      minSentences: 1
+    }),
     estimatedImpactPerYear: z.number().int().nullable(),
-    estimatedImpactSummary: z.string().trim().min(1).max(240),
+    estimatedImpactSummary: warmAuthorityTextSchema({
+      disallowDigits: true,
+      maxLength: 240,
+      maxSentences: 2,
+      maxWords: 26,
+      minSentences: 1
+    }),
     fitnessComponent: z.enum(quarterlyReviewFitnessComponents),
-    actionType: z.enum(quarterlyReviewActionTypes),
+    actionType: z.enum(quarterlyReviewActionTypes)
   })
   .strict();
 
 export const quarterlyReviewUpcomingEventSchema = z
   .object({
-    title: z.string().trim().min(1).max(140),
+    title: warmAuthorityTextSchema({
+      maxLength: 140,
+      maxSentences: 1,
+      maxWords: 12,
+      minSentences: 1
+    }),
     date: z.string().trim().min(1).max(40),
-    preparationNeeded: z.string().trim().min(1).max(320),
+    preparationNeeded: warmAuthorityTextSchema({
+      maxLength: 320,
+      maxSentences: 2,
+      maxWords: 40,
+      minSentences: 1
+    })
   })
   .strict();
 
 export const quarterlyReviewOutputSchema = z
   .object({
-    narrative: z.string().trim().min(1).max(2600),
+    narrative: warmAuthorityTextSchema({
+      maxLength: 2600,
+      maxSentences: 4,
+      maxWords: 160,
+      minSentences: 2
+    }),
     performanceAttribution: quarterlyReviewPerformanceAttributionSchema,
     recommendations: z.array(quarterlyReviewRecommendationSchema).min(1).max(8),
     upcomingEvents: z.array(quarterlyReviewUpcomingEventSchema).max(12),
-    quarterSummary: z.string().trim().min(1).max(1200),
-    nextQuarterFocus: z.string().trim().min(1).max(700),
-    dataQualityNotes: z.array(z.string().trim().min(1).max(240)).max(8),
+    quarterSummary: warmAuthorityTextSchema({
+      maxLength: 1200,
+      maxSentences: 2,
+      maxWords: 45,
+      minSentences: 1
+    }),
+    nextQuarterFocus: warmAuthorityTextSchema({
+      maxLength: 700,
+      maxSentences: 2,
+      maxWords: 40,
+      minSentences: 1
+    }),
+    dataQualityNotes: z
+      .array(
+        warmAuthorityTextSchema({
+          maxLength: 240,
+          maxSentences: 1,
+          maxWords: 32,
+          minSentences: 1
+        })
+      )
+      .max(8)
   })
   .strict();
 
 const proposalImpactAllocationChangeSchema = z
   .object({
     from: z.number(),
-    to: z.number(),
+    to: z.number()
   })
   .strict();
 
@@ -182,7 +300,7 @@ export const proposalImpactDeterministicContextSchema = z
     fitnessImpact: z.string().trim().min(1).max(180),
     keyTradeoffs: z.array(z.string().trim().min(1).max(240)).max(8),
     riskFlags: z.array(z.string().trim().min(1).max(240)).max(8),
-    assumptions: z.array(z.string().trim().min(1).max(240)).max(8),
+    assumptions: z.array(z.string().trim().min(1).max(240)).max(8)
   })
   .strict();
 
@@ -192,7 +310,7 @@ export const proposalImpactAiOutputSchema = z
     householdImpact: z.string().trim().min(1).max(900),
     riskAssessment: z.string().trim().min(1).max(900),
     approvalConsiderations: z.array(z.string().trim().min(1).max(220)).min(1).max(6),
-    discussionPrompts: z.array(z.string().trim().min(1).max(220)).min(1).max(6),
+    discussionPrompts: z.array(z.string().trim().min(1).max(220)).min(1).max(6)
   })
   .strict();
 
@@ -203,7 +321,7 @@ export const proposalImpactOutputSchema = z
     riskAssessment: z.string().trim().min(1).max(900),
     approvalConsiderations: z.array(z.string().trim().min(1).max(220)).min(1).max(6),
     discussionPrompts: z.array(z.string().trim().min(1).max(220)).min(1).max(6),
-    deterministicImpact: proposalImpactDeterministicContextSchema,
+    deterministicImpact: proposalImpactDeterministicContextSchema
   })
   .strict();
 
@@ -231,6 +349,8 @@ export type QuarterlyReviewPerformanceAttribution = z.infer<
 export type QuarterlyReviewRecommendation = z.infer<typeof quarterlyReviewRecommendationSchema>;
 export type QuarterlyReviewUpcomingEvent = z.infer<typeof quarterlyReviewUpcomingEventSchema>;
 export type QuarterlyReviewOutput = z.infer<typeof quarterlyReviewOutputSchema>;
-export type ProposalImpactDeterministicContext = z.infer<typeof proposalImpactDeterministicContextSchema>;
+export type ProposalImpactDeterministicContext = z.infer<
+  typeof proposalImpactDeterministicContextSchema
+>;
 export type ProposalImpactAiOutput = z.infer<typeof proposalImpactAiOutputSchema>;
 export type ProposalImpactOutput = z.infer<typeof proposalImpactOutputSchema>;
