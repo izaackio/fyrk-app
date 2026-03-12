@@ -145,13 +145,13 @@ export function Topbar({
         </div>
 
         <button
-          aria-label="Toggle density mode"
+          aria-label="Toggle information density"
           aria-pressed={density === "terminal"}
           className={styles.toggleButton}
           onClick={onToggleDensity}
           type="button"
         >
-          {density === "terminal" ? "Terminal" : "Narrative"}
+          {density === "terminal" ? "Compact" : "Comfort"}
         </button>
         <button
           aria-label="Toggle light and dark theme"

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 import { LandingPage } from "@/components/marketing/LandingPage";
 
-const title = "Fyrk Pre-launch | Calm household money planning for couples";
+const title = "Fyrk | Shared household money planning for couples";
 const description =
-  "Fyrk is in pre-launch. Join the waitlist for a calmer way to track household finances, align priorities, and plan decisions together.";
+  "Fyrk helps couples plan money together with a shared household view, clearer weekly context, and calmer decision support.";
 
 export const metadata: Metadata = {
   title,
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "Fyrk",
     "household finance app",
     "couples money planning",
-    "pre-launch waitlist",
+    "shared household planning",
     "Swedish households",
   ],
   alternates: {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Fyrk pre-launch preview",
+        alt: "Fyrk household planning preview",
       },
     ],
   },

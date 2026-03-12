@@ -53,14 +53,14 @@ export default function OpenGraphImage() {
               FYRK
             </span>
             <span style={{ color: "#5e6266", fontSize: 20 }}>
-              Calm household planning with shared clarity
+              Shared household planning with calmer weekly clarity
             </span>
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 22, maxWidth: 860 }}>
           <span style={{ color: "#2a3b4c", fontSize: 18, letterSpacing: 2, textTransform: "uppercase" }}>
-            Pre-launch for Swedish households
+            Private early access for Swedish households
           </span>
           <div
             style={{
@@ -70,10 +70,10 @@ export default function OpenGraphImage() {
               lineHeight: 1.04,
             }}
           >
-            Household money planning that feels calm, clear, and shared.
+            Household money planning that feels calm, clear, and workable for both partners.
           </div>
           <div style={{ color: "#5e6266", display: "flex", fontSize: 26, lineHeight: 1.35 }}>
-            Weekly progress, collaborative decisions, and launch-ready demo workflows in one warm authority shell.
+            Shared balances, weekly context, and upcoming decisions in one place.
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export default function OpenGraphImage() {
             gap: 18,
           }}
         >
-          {["Shared overview", "Guided demo", "Narrative weekly updates"].map((label) => (
+          {["Shared overview", "Weekly context", "Major decisions"].map((label) => (
             <div
               key={label}
               style={{

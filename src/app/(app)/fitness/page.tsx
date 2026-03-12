@@ -7,8 +7,7 @@ export default function FitnessPage() {
       <header className={styles.sectionHeading}>
         <h2 className={styles.sectionTitle}>Financial Fitness</h2>
         <p className={styles.sectionDescription}>
-          Review total score, component performance, trend history, and highest-impact next
-          actions.
+          See the household score, what is helping, and what to improve next.
         </p>
       </header>
       <FitnessExperience />
