@@ -1,84 +1,84 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
-import Script from "next/script";
+import { IBM_Plex_Mono, Newsreader, Public_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 
 import "./globals.css";
 
-const dataFont = Inter({
+const dataFont = Public_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-data",
-  display: "swap",
+  display: "swap"
 });
 
-const narrativeFont = Playfair_Display({
+const narrativeFont = Newsreader({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-narrative",
-  display: "swap",
+  display: "swap"
 });
 
-const monoFont = JetBrains_Mono({
+const monoFont = IBM_Plex_Mono({
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-mono",
-  display: "swap",
+  display: "swap"
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.fyrk.app"),
-  applicationName: "Fyrk",
   title: {
-    default: "Fyrk",
-    template: "%s | Fyrk",
+    default: "Fyrk | Household Finance Operating System",
+    template: "%s | Fyrk"
   },
-  description: "Fyrk helps households plan finances with calm, shared clarity.",
+  description:
+    "Premium household finance operating system for couples and families who want calm, shared clarity around net worth, planning, and life decisions.",
+  applicationName: "Fyrk",
   keywords: [
     "household finance",
-    "couples money planning",
-    "financial planning for households",
-    "shared net worth",
-    "Fyrk",
+    "shared finances",
+    "net worth tracking",
+    "financial planning",
+    "family office",
+    "couples money management",
+    "household operating system"
   ],
-  authors: [{ name: "Fyrk" }],
-  creator: "Fyrk",
-  publisher: "Fyrk",
   category: "finance",
   alternates: {
-    canonical: "/",
+    canonical: "/"
   },
   formatDetection: {
-    address: false,
-    email: false,
     telephone: false,
+    address: false,
+    email: false
+  },
+  robots: {
+    index: true,
+    follow: true
   },
   openGraph: {
+    title: "Fyrk | Household Finance Operating System",
+    description:
+      "Calm, premium financial clarity for modern households. Track progress, review decisions, and manage shared money with confidence.",
     siteName: "Fyrk",
     type: "website",
-    url: "/",
-    title: "Fyrk",
-    description: "Fyrk helps households plan finances with calm, shared clarity.",
-    images: [
-      {
-        url: "/opengraph-image",
-        width: 1200,
-        height: 630,
-        alt: "Fyrk household planning preview",
-      },
-    ],
+    locale: "en_US",
+    url: "/"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Fyrk",
-    description: "Fyrk helps households plan finances with calm, shared clarity.",
-    images: ["/twitter-image"],
-  },
+    title: "Fyrk | Household Finance Operating System",
+    description:
+      "A premium operating system for shared household finances, built for calm clarity and long-term trust."
+  }
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fdfdfc" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1815" },
-  ],
   colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f1ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#171411" }
+  ]
 };
 
 type RootLayoutProps = Readonly<{
@@ -90,12 +90,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <body className={`${dataFont.variable} ${narrativeFont.variable} ${monoFont.variable}`}>
         {children}
-        <Script id="vercel-analytics" src="/_vercel/insights/script.js" strategy="afterInteractive" />
-        <Script
-          id="vercel-speed-insights"
-          src="/_vercel/speed-insights/script.js"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );
