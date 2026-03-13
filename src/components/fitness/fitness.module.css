@@ -33,25 +33,25 @@
 
 .gauge {
   display: grid;
-  height: 164px;
+  height: 152px;
   place-items: center;
   position: relative;
-  width: 188px;
+  width: 176px;
 }
 
 .gaugeSvg {
-  height: 124px;
+  height: 116px;
   inset: 0;
   overflow: visible;
   position: absolute;
-  width: 188px;
+  width: 176px;
 }
 
 .gaugeTrack,
 .gaugeProgress {
   fill: none;
   stroke-linecap: round;
-  stroke-width: 14;
+  stroke-width: 12;
 }
 
 .gaugeTrack {
@@ -72,11 +72,11 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  height: 108px;
+  height: 98px;
   justify-content: center;
-  margin-top: 42px;
+  margin-top: 38px;
   padding: 0 18px;
-  width: 148px;
+  width: 138px;
 }
 
 .scoreLabel {
@@ -87,7 +87,7 @@
 }
 
 .scoreValue {
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-size: clamp(1.5rem, 3vw, 2rem);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -149,7 +149,7 @@
   border-radius: var(--radius-sm);
   display: grid;
   gap: var(--space-sm);
-  padding: 12px;
+  padding: 10px;
 }
 
 .componentHeader {
@@ -207,7 +207,7 @@
   stroke: var(--co-brand-primary);
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 3;
+  stroke-width: 2.5;
 }
 
 .historyList {
@@ -235,7 +235,7 @@
   border-radius: var(--radius-sm);
   display: grid;
   gap: 6px;
-  padding: 10px;
+  padding: 9px 10px;
 }
 
 .actionHeader {
@@ -262,20 +262,20 @@
 }
 
 [data-density="terminal"] .gauge {
-  height: 150px;
-  width: 172px;
+  height: 140px;
+  width: 160px;
 }
 
 [data-density="terminal"] .gaugeSvg {
-  height: 116px;
-  width: 172px;
+  height: 108px;
+  width: 160px;
 }
 
 [data-density="terminal"] .gaugeInner {
   border-radius: 18px;
-  height: 98px;
-  margin-top: 38px;
-  width: 136px;
+  height: 90px;
+  margin-top: 34px;
+  width: 126px;
 }
 
 [data-density="terminal"] .scoreValue {

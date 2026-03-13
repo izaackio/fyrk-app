@@ -7,7 +7,7 @@ export default function SettingsPage() {
       <header className={styles.sectionHeading}>
         <h2 className={styles.sectionTitle}>Settings</h2>
         <p className={styles.sectionDescription}>
-          Control shell preferences, session context, and privacy actions from one branded workspace.
+          Control display, privacy, and export settings in one place.
         </p>
       </header>
       <SettingsExperience />

@@ -7,51 +7,53 @@ import { WaitlistForm } from "@/components/marketing/WaitlistForm";
 
 import styles from "./landing.module.css";
 
-const pillars = [
+const productPillars = [
   {
-    title: "One shared financial picture",
+    title: "One household view",
     description:
-      "Bring household accounts and long-term plans into one calm overview built for conversations, not spreadsheets.",
+      "Bring accounts, obligations, and long-term plans into one view that both partners can actually use.",
   },
   {
-    title: "Clear weekly progress",
+    title: "Weekly context, not just numbers",
     description:
-      "Translate account movement into plain-language updates so both partners can understand what changed and why.",
+      "Translate changes into plain language so the important movement is obvious before anyone opens a spreadsheet.",
   },
   {
-    title: "Decision-ready guidance",
+    title: "Decision support for real life",
     description:
-      "Prepare for major life events with practical next steps, aligned priorities, and less financial guesswork.",
-  },
-  {
-    title: "Built for trust",
-    description:
-      "Privacy-first architecture and household permissions keep sensitive data safe while collaboration stays simple.",
+      "Plan for moves, children, career changes, or big purchases with clearer tradeoffs and next steps.",
   },
 ] as const;
 
-const launchSignals = [
+const partnerProfiles = [
   {
-    label: "Pilot cohort",
-    value: "Q2 2026",
-    note: "Small-group onboarding",
+    title: "For the partner who likes precision",
+    description:
+      "Scan balances, proposals, and review material quickly without losing the details that matter.",
   },
   {
-    label: "Launch market",
-    value: "Sweden",
-    note: "Households first",
-  },
-  {
-    label: "Experience",
-    value: "Narrative",
-    note: "Calm by default",
+    title: "For the partner who wants reassurance",
+    description:
+      "Understand whether the household is on track without turning every check-in into a technical exercise.",
   },
 ] as const;
 
-const onboardingSteps = [
-  "Join the waitlist with your context and priorities.",
-  "Receive staged onboarding updates during the pre-launch window.",
-  "Get invited to early access or private demo rounds as capacity opens.",
+const earlyAccessNotes = [
+  {
+    title: "Tell us your situation",
+    description:
+      "Share what kind of planning help your household is looking for so we can prioritize relevant onboarding.",
+  },
+  {
+    title: "We match invites deliberately",
+    description:
+      "Early access is rolling out in small groups so the product and onboarding stay high-touch.",
+  },
+  {
+    title: "Start with your own rhythm",
+    description:
+      "Once invited, you can begin with a real household setup or a guided demo before connecting anything.",
+  },
 ] as const;
 
 export function LandingPage() {
@@ -61,73 +63,96 @@ export function LandingPage() {
       <div className={styles.shell}>
         <header className={styles.header}>
           <p className={styles.wordmark}>FYRK</p>
-          <p className={styles.headerMeta}>Warm Authority | Pre-launch</p>
+          <div className={styles.headerActions}>
+            <Link className={styles.headerLink} href="/login">
+              Sign in
+            </Link>
+            <a
+              className={styles.headerCta}
+              href="#waitlist"
+              onClick={() => {
+                trackLandingEvent("cta_waitlist_click", { placement: "header" });
+              }}
+            >
+              Join early access
+            </a>
+          </div>
         </header>
 
         <section className={`${styles.panel} ${styles.hero}`} aria-labelledby="landing-title">
           <div className={styles.heroGrid}>
             <div className={styles.heroContent}>
-              <span className={styles.prelaunchBadge}>Pre-launch</span>
+              <p className={styles.eyebrow}>Private early access for Swedish households</p>
               <h1 id="landing-title" className={styles.heroTitle}>
-                Household money planning that feels calm, clear, and shared.
+                Shared financial planning for couples who want more clarity and less spreadsheet stress.
               </h1>
               <p className={styles.heroLead}>
-                Fyrk helps couples track what matters, understand progress, and make financial decisions together.
-                The product is in active build, and this page is the early-access gateway.
+                Fyrk brings the full household picture, weekly context, and decision support into one calm place so both partners can understand what matters and decide faster together.
               </p>
 
               <div className={styles.ctaRow}>
+                <a
+                  href="#waitlist"
+                  className={styles.primaryCta}
+                  onClick={() => {
+                    trackLandingEvent("cta_waitlist_click", { placement: "hero" });
+                  }}
+                >
+                  Join early access
+                </a>
                 <Link
                   href="/signup"
-                  className={styles.primaryCta}
+                  className={styles.secondaryCta}
                   onClick={() => {
                     trackLandingEvent("cta_signup_click", { placement: "hero" });
                   }}
                 >
-                  Continue to signup
+                  Create an account
                 </Link>
-                <a
-                  href="#waitlist"
-                  className={styles.secondaryCta}
-                  onClick={() => {
-                    trackLandingEvent("cta_demo_interest_click", { placement: "hero" });
-                  }}
-                >
-                  Request private demo access
-                </a>
               </div>
 
-              <p className={styles.disclaimer}>
-                Early-access communication only. No live banking or portfolio automation is available yet.
-              </p>
+              <ul className={styles.heroPoints}>
+                <li className={styles.heroPoint}>Whole-household balance sheet and weekly summaries</li>
+                <li className={styles.heroPoint}>Shared decision tracking for proposals and reviews</li>
+                <li className={styles.heroPoint}>Guided planning for major life events</li>
+              </ul>
             </div>
 
-            <aside className={styles.heroAside} aria-label="Launch signals">
-              <p className={styles.asideEyebrow}>Launch signals</p>
-              <dl className={styles.signalGrid}>
-                {launchSignals.map((signal) => {
-                  return (
-                    <div key={signal.label} className={styles.signalCard}>
-                      <dt className={styles.signalLabel}>{signal.label}</dt>
-                      <dd className={styles.signalValue}>{signal.value}</dd>
-                      <p className={styles.signalNote}>{signal.note}</p>
-                    </div>
-                  );
-                })}
-              </dl>
+            <aside className={styles.heroAside}>
+              <div className={styles.editorialCard}>
+                <p className={styles.editorialEyebrow}>Built for two different comfort levels</p>
+                <h2 className={styles.editorialTitle}>
+                  One product for the person who wants the details and the person who mostly wants to know if everything is okay.
+                </h2>
+                <p className={styles.editorialText}>
+                  Fyrk is designed to keep shared planning legible, calm, and useful for both people in the household.
+                </p>
+
+                <div className={styles.partnerGrid}>
+                  {partnerProfiles.map((profile) => (
+                    <article className={styles.partnerCard} key={profile.title}>
+                      <h3 className={styles.partnerTitle}>{profile.title}</h3>
+                      <p className={styles.partnerText}>{profile.description}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
             </aside>
           </div>
         </section>
 
-        <section className={styles.panel} aria-labelledby="what-is-fyrk-title">
-          <h2 id="what-is-fyrk-title" className={styles.sectionTitle}>
-            What is Fyrk?
-          </h2>
-          <p className={styles.sectionLead}>
-            A household-first planning experience that combines narrative clarity with financial precision.
-          </p>
+        <section className={styles.panel} aria-labelledby="what-changes-title">
+          <div className={styles.sectionHeader}>
+            <p className={styles.sectionEyebrow}>What changes</p>
+            <h2 id="what-changes-title" className={styles.sectionTitle}>
+              A calmer way to handle the conversations that usually get postponed.
+            </h2>
+            <p className={styles.sectionLead}>
+              The goal is not more finance theater. It is fewer blind spots, clearer weekly context, and a shared understanding of what to do next.
+            </p>
+          </div>
           <ul className={styles.pillarGrid}>
-            {pillars.map((pillar) => {
+            {productPillars.map((pillar) => {
               return (
                 <li key={pillar.title} className={styles.pillarCard}>
                   <h3 className={styles.pillarTitle}>{pillar.title}</h3>
@@ -138,34 +163,34 @@ export function LandingPage() {
           </ul>
         </section>
 
-        <section className={styles.panel} aria-labelledby="onboarding-title">
-          <h2 id="onboarding-title" className={styles.sectionTitle}>
-            How pre-launch onboarding works
-          </h2>
-          <ol className={styles.stepList}>
-            {onboardingSteps.map((step) => {
-              return (
-                <li key={step} className={styles.stepItem}>
-                  {step}
-                </li>
-              );
-            })}
-          </ol>
-        </section>
-
         <section id="waitlist" className={`${styles.panel} ${styles.waitlistPanel}`} aria-labelledby="waitlist-title">
           <div className={styles.waitlistGrid}>
-            <div>
-              <h2 id="waitlist-title" className={styles.sectionTitle}>
-                Join the waitlist
-              </h2>
-              <p className={styles.sectionLead}>
-                Share your household context so we can prioritize relevant onboarding and demo invites.
-              </p>
+            <div className={styles.waitlistIntro}>
+              <div className={styles.sectionHeader}>
+                <p className={styles.sectionEyebrow}>Early access</p>
+                <h2 id="waitlist-title" className={styles.sectionTitle}>
+                  Join the waitlist
+                </h2>
+                <p className={styles.sectionLead}>
+                  Tell us a little about your household so we can prioritize the right onboarding and private demo invites as capacity opens.
+                </p>
+              </div>
+
+              <div className={styles.processGrid}>
+                {earlyAccessNotes.map((step) => {
+                  return (
+                    <article key={step.title} className={styles.stepItem}>
+                      <h3 className={styles.stepTitle}>{step.title}</h3>
+                      <p className={styles.stepDescription}>{step.description}</p>
+                    </article>
+                  );
+                })}
+              </div>
+
               <ul className={styles.waitlistPoints}>
-                <li className={styles.waitlistPoint}>Name and email for launch communication</li>
-                <li className={styles.waitlistPoint}>Optional context to shape cohort prioritization</li>
-                <li className={styles.waitlistPoint}>Clear feedback for submitted, duplicate, and error states</li>
+                <li className={styles.waitlistPoint}>Name and email for early-access updates</li>
+                <li className={styles.waitlistPoint}>Optional context to shape onboarding priority</li>
+                <li className={styles.waitlistPoint}>Straightforward feedback for submitted, duplicate, and error states</li>
               </ul>
             </div>
 

@@ -7,7 +7,7 @@ export default function BalanceSheetPage() {
       <header className={styles.sectionHeading}>
         <h2 className={styles.sectionTitle}>Balance Sheet</h2>
         <p className={styles.sectionDescription}>
-          Unified net worth, allocation views, and data quality across the household.
+          See assets, liabilities, and allocation in one household view.
         </p>
       </header>
       <BalanceSheetExperience />

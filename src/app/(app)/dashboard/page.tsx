@@ -6,9 +6,9 @@ export default function DashboardPage() {
   return (
     <section className={styles.pageSection}>
       <header className={styles.sectionHeading}>
-        <h2 className={styles.sectionTitle}>Good morning</h2>
+        <h2 className={styles.sectionTitle}>Overview</h2>
         <p className={styles.sectionDescription}>
-          Live household net worth and weekly insight narrative with graceful fallbacks.
+          A shared view of household progress, weekly context, and next actions.
         </p>
       </header>
       <DashboardInsights />

@@ -118,7 +118,7 @@
 .timelineRail::after {
   background: color-mix(in srgb, var(--co-info) 34%, var(--co-border));
   content: "";
-  inset: 24px auto -14px 11px;
+  inset: 22px auto -14px 9px;
   position: absolute;
   width: 2px;
   transition: background-color var(--motion-fast) var(--ease-standard);
@@ -144,20 +144,20 @@
   box-shadow: 0 0 0 1px var(--co-border);
   color: #fff;
   display: inline-flex;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  height: 18px;
+  height: 15px;
   justify-content: center;
-  margin-top: 6px;
+  margin-top: 5px;
   position: relative;
-  width: 18px;
+  width: 15px;
   z-index: 2;
 }
 
 .timelineDotAuto {
-  height: 10px;
-  margin-top: 11px;
-  width: 10px;
+  height: 8px;
+  margin-top: 9px;
+  width: 8px;
 }
 
 .timelineDotHuman {
@@ -165,7 +165,7 @@
 }
 
 .timelineDotMilestone {
-  box-shadow: 0 0 0 1px var(--co-border), 0 0 0 4px color-mix(in srgb, var(--co-status-up) 18%, transparent);
+  box-shadow: 0 0 0 1px var(--co-border), 0 0 0 3px color-mix(in srgb, var(--co-status-up) 14%, transparent);
 }
 
 .dotlife_event {
@@ -198,7 +198,7 @@
   border-radius: var(--radius-md);
   display: grid;
   gap: var(--space-sm);
-  padding: 14px;
+  padding: 13px;
   transition:
     border-color var(--motion-fast) var(--ease-standard),
     box-shadow var(--motion-fast) var(--ease-standard),
@@ -208,11 +208,11 @@
 .timelineItem:hover .timelineCard {
   border-color: color-mix(in srgb, var(--co-brand-primary) 34%, var(--co-border));
   box-shadow: var(--co-shadow-soft);
-  transform: translateY(-2px) scale(1.01);
+  transform: translateY(-1px);
 }
 
 .timelineItem:hover .timelineRail::after {
-  background: color-mix(in srgb, var(--co-info) 68%, var(--co-brand-primary));
+  background: color-mix(in srgb, var(--co-info) 46%, var(--co-border));
 }
 
 .timelineCardFuture {
@@ -239,7 +239,7 @@
 }
 
 .entryTitle {
-  font-size: var(--text-lg);
+  font-size: clamp(1rem, 1.7vw, 1.1rem);
   margin: 0;
 }
 

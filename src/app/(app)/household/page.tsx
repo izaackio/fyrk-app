@@ -7,7 +7,7 @@ export default function HouseholdPage() {
       <header className={styles.sectionHeading}>
         <h2 className={styles.sectionTitle}>Household</h2>
         <p className={styles.sectionDescription}>
-          Manage collaboration, roles, and partner invitations without leaving the authenticated shell.
+          Manage partner access, roles, and invitations in one place.
         </p>
       </header>
       <HouseholdWorkspace />
