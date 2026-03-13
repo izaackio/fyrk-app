@@ -3,43 +3,68 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import type { NavItem } from "./navigation";
+import { AppIcon } from "./icons";
+import { isActivePath, type NavSection, type ShellTone } from "./navigation";
 
-import styles from "../theme/theme.module.css";
+import styles from "./shell.module.css";
 
 interface SidebarNavProps {
-  items: NavItem[];
+  sections: NavSection[];
   onNavigate?: () => void;
 }
 
-const isActivePath = (pathname: string, href: string): boolean =>
-  pathname === href || pathname.startsWith(`${href}/`);
+const toneLabels: Record<ShellTone, string | null> = {
+  primary: null,
+  emerging: "Emerging",
+  support: null,
+  preview: "Preview",
+};
 
-export function SidebarNav({ items, onNavigate }: SidebarNavProps) {
+export function SidebarNav({ sections, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Primary">
-      <ul className={styles.navList}>
-        {items.map((item) => {
-          const active = isActivePath(pathname, item.href);
-          const className = [styles.navLink, active ? styles.navLinkActive : ""]
-            .filter(Boolean)
-            .join(" ");
-          const linkProps = onNavigate ? { onClick: onNavigate } : {};
+    <>
+      {sections.map((section) => (
+        <section className={styles.navSection} key={section.label}>
+          <header className={styles.navSectionHeader}>
+            <span className={styles.navSectionTitle}>{section.label}</span>
+            {section.helper ? <span className={styles.navSectionHelper}>{section.helper}</span> : null}
+          </header>
 
-          return (
-            <li key={item.href}>
-              <Link className={className} href={item.href} {...linkProps}>
-                <span aria-hidden className={styles.navIcon}>
-                  {item.icon}
-                </span>
-                <span>{item.label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+          <ul className={styles.navList}>
+            {section.items.map((item) => {
+              const active = isActivePath(pathname, item.href);
+              const toneLabel = toneLabels[item.tone];
+              const className = [styles.navLink, active ? styles.navLinkActive : ""]
+                .filter(Boolean)
+                .join(" ");
+              const linkProps = onNavigate ? { onClick: onNavigate } : {};
+
+              return (
+                <li key={item.href}>
+                  <Link className={className} href={item.href} {...linkProps}>
+                    <span aria-hidden className={styles.navIcon}>
+                      <AppIcon height={18} name={item.icon} width={18} />
+                    </span>
+                    <span className={styles.navCopy}>
+                      <span className={styles.navLabelRow}>
+                        <span className={styles.navLabel}>{item.label}</span>
+                        {toneLabel ? (
+                          <span className={styles.navTone} data-tone={item.tone}>
+                            {toneLabel}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className={styles.navDescription}>{item.description}</span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+    </>
   );
 }

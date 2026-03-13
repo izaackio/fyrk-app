@@ -1,30 +1,10 @@
-import { Suspense } from "react";
-
-import { ProposalExperience } from "../../../components/proposals/ProposalExperience";
-import styles from "../../../components/theme/theme.module.css";
-import { RouteState } from "../../../components/ui/RouteState";
+import { FeaturePlaceholder } from "../../../components/dashboard/FeaturePlaceholder";
 
 export default function ProposalsPage() {
   return (
-    <section className={styles.pageSection}>
-      <header className={styles.sectionHeading}>
-        <h2 className={styles.sectionTitle}>Proposals</h2>
-        <p className={styles.sectionDescription}>
-          Create household proposals, manage discussion, and resolve each decision with clear
-          approval or rejection transitions.
-        </p>
-      </header>
-      <Suspense
-        fallback={
-          <RouteState
-            busy
-            description="Loading the proposal workspace, status filters, and selected discussion thread."
-            title="Loading proposals"
-          />
-        }
-      >
-        <ProposalExperience />
-      </Suspense>
-    </section>
+    <FeaturePlaceholder
+      description="Proposals will hold shared decisions, discussion, and explicit household approval."
+      title="Proposals"
+    />
   );
 }
