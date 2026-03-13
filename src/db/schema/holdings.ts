@@ -1,5 +1,16 @@
 import { sql } from "drizzle-orm";
-import { check, date, index, integer, numeric, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  check,
+  date,
+  index,
+  integer,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 import { accounts } from "./accounts";
 import { instruments } from "./instruments";
@@ -26,6 +37,9 @@ export const holdings = pgTable(
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (table) => [
+    uniqueIndex("holdings_account_instrument_as_of_active_uniq")
+      .on(table.accountId, table.instrumentId, table.asOfDate)
+      .where(sql`${table.deletedAt} is null`),
     index("idx_holdings_account").on(table.accountId),
     index("idx_holdings_instrument").on(table.instrumentId),
     check("holdings_quantity_non_negative_check", sql`${table.quantity} >= 0`),

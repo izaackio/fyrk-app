@@ -44,6 +44,10 @@ function isSupabaseLikeError(error: unknown): error is {
   return typeof maybeError.message === "string";
 }
 
+export function isUniqueViolationError(error: unknown): boolean {
+  return isSupabaseLikeError(error) && error.code === "23505";
+}
+
 export function toServiceError(error: unknown): ServiceError {
   if (error instanceof ServiceError) {
     return error;
@@ -70,7 +74,7 @@ export function toServiceError(error: unknown): ServiceError {
       return new ServiceError("FORBIDDEN", "You are not allowed to perform this action");
     }
 
-    if (error.code === "23505") {
+    if (isUniqueViolationError(error)) {
       return ServiceError.validation("A record with the same unique value already exists");
     }
 

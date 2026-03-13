@@ -318,7 +318,9 @@ export function AppShell({ children }: AppShellProps) {
                 </span>
                 Fyrk
               </span>
-              <p className={styles.sidebarTitle}>Warm Authority · Launch baseline</p>
+              <p className={styles.sidebarTitle}>
+                {activeHousehold?.isDemo ? "Guided demo" : "Shared planning"}
+              </p>
             </div>
             <SidebarNav items={PRIMARY_NAV_ITEMS} />
             <div className={styles.navFooter}>
@@ -448,8 +450,8 @@ export function AppShell({ children }: AppShellProps) {
               {onboardingState === "not_started" && pathname !== "/onboarding" ? (
                 <Card
                   className={styles.noticeCard}
-                  title="Finish setup or launch a guided demo"
-                  description="Create your household for real data, or use a demo scenario to walk through the product before connecting anything."
+                  title="Finish setup or explore a guided demo"
+                  description="Create your household for real data, or use a demo scenario to get familiar with the product before connecting anything."
                 >
                   <div className={styles.noticeActions}>
                     <Link

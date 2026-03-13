@@ -8,6 +8,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -43,8 +44,14 @@ export const transactions = pgTable(
   },
   (table) => [
     index("idx_txn_account").on(table.accountId),
+    index("idx_txn_account_date_id_active")
+      .on(table.accountId, table.transactionDate.desc(), table.id.desc())
+      .where(sql`${table.deletedAt} is null`),
     index("idx_txn_date").on(table.transactionDate),
     index("idx_txn_instrument").on(table.instrumentId),
+    uniqueIndex("transactions_account_external_ref_active_uniq")
+      .on(table.accountId, table.externalRef)
+      .where(sql`${table.deletedAt} is null and ${table.externalRef} is not null`),
     check(
       "transactions_type_check",
       sql`${table.type} in ('buy', 'sell', 'dividend', 'deposit', 'withdrawal', 'fee', 'interest', 'transfer', 'tax')`,

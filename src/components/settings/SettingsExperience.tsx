@@ -84,8 +84,8 @@ export function SettingsExperience() {
 
   const preferenceSummary = useMemo(
     () =>
-      `${theme === "dark" ? "Warm dark" : "Warm light"} · ${
-        density === "terminal" ? "Terminal density" : "Narrative density"
+      `${theme === "dark" ? "Dark" : "Light"} · ${
+        density === "terminal" ? "Compact" : "Comfort"
       }`,
     [density, theme],
   );
@@ -148,20 +148,20 @@ export function SettingsExperience() {
   return (
     <section className={workspaceStyles.stack}>
       <RouteState
-        description="This route now mirrors the live shell controls and adds profile, privacy, and export actions in one place."
-        title="Personal operating preferences"
+        description="Display, privacy, and export controls for your workspace."
+        title="Preferences"
       >
         <p className={workspaceStyles.routeNarrative}>
-          Keep preferences explicit. Narrative mode should feel editorial and calm;
-          Terminal mode should stay compact without losing hierarchy or focus states.
+          Set the app up so it feels right for how you review money together.
+          Comfort adds breathing room. Compact keeps more information visible at once.
         </p>
       </RouteState>
 
       <div className={workspaceStyles.layoutGrid}>
         <Card
           className={workspaceStyles.preferenceCard}
-          title="Display preferences"
-          description="The same settings apply instantly to every authenticated surface."
+          title="Display"
+          description="These settings apply instantly across the authenticated app."
           actions={
             <span className={[styles.chip, styles.chipMuted].join(" ")}>{preferenceSummary}</span>
           }
@@ -170,19 +170,19 @@ export function SettingsExperience() {
             <div className={workspaceStyles.preferenceHeader}>
               <h3 className={workspaceStyles.preferenceTitle}>Theme</h3>
               <p className={workspaceStyles.preferenceText}>
-                Warm Authority stays warm in both light and dark modes.
+                Pick the contrast level that feels easiest to read for longer sessions.
               </p>
             </div>
             <div className={[styles.segmentedControl, styles.segmentedControlBlock].join(" ")}>
               {[
                 {
-                  hint: "Editorial daylight",
-                  label: "Warm light",
+                  hint: "Bright surfaces and soft contrast",
+                  label: "Light",
                   value: "light" as const,
                 },
                 {
-                  hint: "Warm charcoal",
-                  label: "Warm dark",
+                  hint: "Lower-glare surfaces for evening review",
+                  label: "Dark",
                   value: "dark" as const,
                 },
               ].map((option) => (
@@ -213,19 +213,19 @@ export function SettingsExperience() {
             <div className={workspaceStyles.preferenceHeader}>
               <h3 className={workspaceStyles.preferenceTitle}>Density</h3>
               <p className={workspaceStyles.preferenceText}>
-                Switch between narrative comfort and CFO-level information density.
+                Comfort gives cards more space. Compact keeps more rows and figures visible.
               </p>
             </div>
             <div className={[styles.segmentedControl, styles.segmentedControlBlock].join(" ")}>
               {[
                 {
-                  hint: "Serif narrative and generous spacing",
-                  label: "Narrative",
+                  hint: "More spacing and reading room",
+                  label: "Comfort",
                   value: "narrative" as const,
                 },
                 {
-                  hint: "Mono figures and compressed spacing",
-                  label: "Terminal",
+                  hint: "Tighter rows and denser tables",
+                  label: "Compact",
                   value: "terminal" as const,
                 },
               ].map((option) => (

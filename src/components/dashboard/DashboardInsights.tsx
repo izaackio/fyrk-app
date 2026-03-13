@@ -197,7 +197,7 @@ export function DashboardInsights() {
 
         <Card className={styles.narrativeCard}>
           <div className={styles.narrativeHeader}>
-            <h3 className={styles.narrativeTitle}>What Changed This Week</h3>
+            <h3 className={styles.narrativeTitle}>This week</h3>
             <span
               className={[
                 styles.sourceBadge,
@@ -208,7 +208,7 @@ export function DashboardInsights() {
                 .filter(Boolean)
                 .join(" ")}
             >
-              {weeklyNarrative.source === "ai" ? "AI" : "Fallback"}
+              {weeklyNarrative.source === "ai" ? "Generated" : "Rule-based"}
             </span>
           </div>
 

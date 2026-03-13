@@ -271,7 +271,7 @@ export function WaitlistForm() {
         const duplicate = inferDuplicateFromSuccessPayload(payload) ?? knownDuplicate;
 
         if (duplicate) {
-          const message = "This email is already on the waitlist. We will send launch updates here.";
+          const message = "This email is already on the waitlist. We will send early-access updates here.";
           setSubmissionState({ kind: "duplicate", message });
           trackLandingEvent("waitlist_submit_duplicate", {
             source: "success_payload_or_local_cache",
@@ -279,7 +279,7 @@ export function WaitlistForm() {
           return;
         }
 
-        const message = `Thanks ${firstName}, you are on the waitlist. We will share launch and onboarding updates by email.`;
+        const message = `Thanks ${firstName}, you are on the waitlist. We will share early-access and onboarding updates by email.`;
         setSubmissionState({ kind: "success", message });
         setValues({
           name: "",
@@ -295,7 +295,7 @@ export function WaitlistForm() {
       if (inferDuplicateFromErrorPayload(payload)) {
         rememberSubmittedEmail(normalizedEmail);
 
-        const message = "This email is already on the waitlist. We will send launch updates here.";
+        const message = "This email is already on the waitlist. We will send early-access updates here.";
         setSubmissionState({ kind: "duplicate", message });
         trackLandingEvent("waitlist_submit_duplicate", {
           source: "error_payload",
@@ -416,7 +416,7 @@ export function WaitlistForm() {
           placeholder="Example: We are planning a home purchase and want a shared monthly overview."
         />
         <p id={`${contextInputId}-hint`} className={styles.fieldHint}>
-          Helps us prioritize onboarding cohorts and private demo sessions.
+          Helps us prioritize onboarding and private demo invites.
         </p>
         {errors.householdContext ? (
           <p id={`${contextInputId}-error`} className={styles.inlineError} role="alert">
@@ -426,11 +426,11 @@ export function WaitlistForm() {
       </div>
 
       <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
-        {isSubmitting ? "Joining waitlist..." : "Join waitlist"}
+        {isSubmitting ? "Joining early access..." : "Join early access"}
       </button>
 
       <p className={styles.privacyNote}>
-        By joining, you agree to receive launch updates from Fyrk. You can unsubscribe any time.
+        By joining, you agree to receive early-access updates from Fyrk. You can unsubscribe any time.
       </p>
 
       {submissionState.kind === "success" || submissionState.kind === "duplicate" || submissionState.kind === "error" ? (

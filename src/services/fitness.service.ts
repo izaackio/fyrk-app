@@ -10,7 +10,7 @@ import {
 import { resolveAssumptionSet } from "@/lib/calculations/assumptions";
 import { isActiveDemoContext } from "@/lib/demo";
 import { balanceSheetService } from "@/services/balance-sheet.service";
-import { ServiceError } from "@/services/errors";
+import { isUniqueViolationError, ServiceError } from "@/services/errors";
 import type { AccountVisibility, HouseholdMemberStatus, HouseholdRole } from "@/types/domain";
 
 interface HouseholdMemberRow {
@@ -186,6 +186,18 @@ export class FitnessService {
       .single();
 
     if (error) {
+      if (isUniqueViolationError(error)) {
+        const existing = await this.getScoreByDate(
+          authContext.supabase,
+          householdId,
+          preparedRow.calculated_at,
+        );
+
+        if (existing) {
+          return existing;
+        }
+      }
+
       throw error;
     }
 
@@ -320,6 +332,27 @@ export class FitnessService {
     }
 
     return (data ?? []) as FitnessScoreRow[];
+  }
+
+  private async getScoreByDate(
+    supabase: SupabaseClient,
+    householdId: string,
+    calculatedAt: string,
+  ): Promise<FitnessScoreRow | null> {
+    const { data, error } = await supabase
+      .from("fitness_scores")
+      .select(
+        "id, household_id, total_score, buffer_score, growth_score, protection_score, efficiency_score, trajectory_score, component_details, explanation, suggested_actions, calculated_at, created_at",
+      )
+      .eq("household_id", householdId)
+      .eq("calculated_at", calculatedAt)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    return (data as FitnessScoreRow | null) ?? null;
   }
 
   private mapCurrentScore(row: FitnessScoreRow): FitnessCurrentView {
