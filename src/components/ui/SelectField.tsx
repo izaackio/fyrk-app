@@ -12,6 +12,7 @@ interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   options: SelectOption[];
   hint?: string;
+  error?: string;
 }
 
 export function SelectField({
@@ -19,18 +20,27 @@ export function SelectField({
   label,
   options,
   hint,
+  error,
   className,
   ...props
 }: SelectFieldProps) {
   const hintId = hint ? `${id}-hint` : undefined;
-  const selectClasses = [styles.inputControl, className ?? ""].filter(Boolean).join(" ");
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  const selectClasses = [styles.selectControl, className ?? ""].filter(Boolean).join(" ");
 
   return (
     <div className={styles.inputStack}>
       <label className={styles.inputLabel} htmlFor={id}>
         {label}
       </label>
-      <select aria-describedby={hintId} className={selectClasses} id={id} {...props}>
+      <select
+        aria-describedby={describedBy}
+        aria-invalid={Boolean(error)}
+        className={selectClasses}
+        id={id}
+        {...props}
+      >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -40,6 +50,11 @@ export function SelectField({
       {hint ? (
         <span className={styles.inputHint} id={hintId}>
           {hint}
+        </span>
+      ) : null}
+      {error ? (
+        <span className={styles.inputError} id={errorId}>
+          {error}
         </span>
       ) : null}
     </div>

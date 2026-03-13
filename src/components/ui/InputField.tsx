@@ -14,7 +14,7 @@ export function InputField({ id, label, hint, error, ...props }: InputFieldProps
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
-  const inputClassName = [styles.inputControl, className ?? ""].filter(Boolean).join(" ");
+  const inputClasses = [styles.inputControl, className ?? ""].filter(Boolean).join(" ");
 
   return (
     <div className={styles.inputStack}>
@@ -24,7 +24,7 @@ export function InputField({ id, label, hint, error, ...props }: InputFieldProps
       <input
         aria-describedby={describedBy}
         aria-invalid={Boolean(error)}
-        className={inputClassName}
+        className={inputClasses}
         id={id}
         {...inputProps}
       />
