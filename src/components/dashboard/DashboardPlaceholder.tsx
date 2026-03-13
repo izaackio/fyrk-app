@@ -78,8 +78,8 @@ export function DashboardPlaceholder() {
         <h2 className={styles.narrativeTitle}>What Changed This Week</h2>
         <p className={styles.narrativeBody}>
           {householdName} ended the week stronger. Your long-term holdings offset
-          short-term volatility, and you now have a clear baseline for upcoming account
-          and import setup in Sprint 2.
+          short-term volatility, and you now have a clearer starting point for
+          upcoming account connections and imports.
         </p>
         <ul className={styles.list}>
           <li className={styles.listItem}>ISK portfolio trend remains positive.</li>
@@ -92,7 +92,7 @@ export function DashboardPlaceholder() {
         <Card className={styles.statusCard}>
           <span className={styles.statusLabel}>Active Life Events</span>
           <strong className={styles.statusValue}>1 active</strong>
-          <span className={styles.statusMeta}>Placeholder only in Sprint 1</span>
+          <span className={styles.statusMeta}>Playbooks will surface active moments here.</span>
         </Card>
         <Card className={styles.statusCard}>
           <span className={styles.statusLabel}>Pending Proposals</span>
@@ -102,7 +102,7 @@ export function DashboardPlaceholder() {
         <Card className={styles.statusCard}>
           <span className={styles.statusLabel}>Quarterly Review</span>
           <strong className={styles.statusValue}>Q1 in 18 days</strong>
-          <span className={styles.statusMeta}>Review module is placeholder</span>
+          <span className={styles.statusMeta}>Review reporting will surface here.</span>
         </Card>
       </div>
     </div>

@@ -1,16 +1,21 @@
-import { SettingsExperience } from "../../../components/settings/SettingsExperience";
+import { FeaturePlaceholder } from "../../../components/dashboard/FeaturePlaceholder";
 import styles from "../../../components/theme/theme.module.css";
+import { Card } from "../../../components/ui/Card";
 
 export default function SettingsPage() {
   return (
     <section className={styles.pageSection}>
-      <header className={styles.sectionHeading}>
-        <h2 className={styles.sectionTitle}>Settings</h2>
-        <p className={styles.sectionDescription}>
-          Control display, privacy, and export settings in one place.
-        </p>
-      </header>
-      <SettingsExperience />
+      <FeaturePlaceholder
+        description="Theme and density controls already work in the top bar; this page anchors broader profile and privacy settings."
+        title="Settings"
+      />
+      <Card className={styles.placeholder} title="Available now">
+        <ul className={styles.list}>
+          <li className={styles.listItem}>Warm light and dark theme control</li>
+          <li className={styles.listItem}>Narrative and CFO density modes</li>
+          <li className={styles.listItem}>Responsive shell preferences saved locally</li>
+        </ul>
+      </Card>
     </section>
   );
 }

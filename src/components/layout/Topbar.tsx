@@ -1,167 +1,237 @@
 "use client";
 
-import { useState } from "react";
+import type { HouseholdSummary } from "../api/contracts";
+import themeStyles from "../theme/theme.module.css";
+import { MenuIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
+import type { ShellPageMeta, ShellTone } from "./navigation";
 
-import { DEMO_VARIANT_OPTIONS, DEMO_VARIANT_LABELS } from "../api/demo-options";
-import type { DemoVariant, HouseholdSummary } from "../api/contracts";
-import styles from "../theme/theme.module.css";
+import styles from "./shell.module.css";
 
 interface TopbarProps {
-  title: string;
-  subtitle: string;
+  page: ShellPageMeta;
+  households: HouseholdSummary[];
   activeHousehold: HouseholdSummary | null;
-  realHouseholds: HouseholdSummary[];
-  hasRealHouseholds: boolean;
-  disabled?: boolean;
+  activeHouseholdId: string | undefined;
+  displayName: string;
+  baseCurrency: string;
+  density: "narrative" | "terminal";
+  theme: "light" | "dark";
+  needsOnboarding: boolean;
   sessionLoading: boolean;
   sessionError: string | null;
-  theme: "light" | "dark";
-  density: "narrative" | "terminal";
-  onSelectHousehold: (householdId: string) => void;
-  onStartDemo: (variant: DemoVariant) => Promise<unknown>;
+  onHouseholdChange: (householdId: string) => void;
+  onSetDensity: (density: "narrative" | "terminal") => void;
   onToggleTheme: () => void;
-  onToggleDensity: () => void;
   onOpenMenu: () => void;
 }
 
+const fallbackHouseholds: HouseholdSummary[] = [
+  {
+    id: "placeholder",
+    name: "Household setup",
+    role: "owner",
+    memberCount: 1,
+  },
+];
+
+const getRoleLabel = (role: HouseholdSummary["role"]): string => {
+  switch (role) {
+    case "owner":
+      return "Household owner";
+    case "admin":
+      return "Household admin";
+    case "member":
+      return "Household member";
+    default:
+      return "Household viewer";
+  }
+};
+
+const statusByState = (
+  needsOnboarding: boolean,
+  activeHousehold: HouseholdSummary | null,
+): { label: string; tone: ShellTone } => {
+  if (needsOnboarding) {
+    return {
+      label: "Setup in progress",
+      tone: "preview",
+    };
+  }
+
+  if (activeHousehold) {
+    return {
+      label: `${activeHousehold.memberCount} member${activeHousehold.memberCount === 1 ? "" : "s"} active`,
+      tone: "primary",
+    };
+  }
+
+  return {
+    label: "Ready for household setup",
+    tone: "support",
+  };
+};
+
 export function Topbar({
-  title,
-  subtitle,
+  page,
+  households,
   activeHousehold,
-  realHouseholds,
-  hasRealHouseholds,
-  disabled = false,
+  activeHouseholdId,
+  displayName,
+  baseCurrency,
+  density,
+  theme,
+  needsOnboarding,
   sessionLoading,
   sessionError,
-  theme,
-  density,
-  onSelectHousehold,
-  onStartDemo,
+  onHouseholdChange,
+  onSetDensity,
   onToggleTheme,
-  onToggleDensity,
   onOpenMenu,
 }: TopbarProps) {
-  const [pendingValue, setPendingValue] = useState<string | null>(null);
-  const selectorValue = activeHousehold?.isDemo
-    ? `demo:${activeHousehold.demoVariant ?? "standard"}`
-    : activeHousehold
-      ? `household:${activeHousehold.id}`
-      : "none";
-  const displayedSelectorValue = disabled && pendingValue ? pendingValue : selectorValue;
+  const householdOptions = households.length > 0 ? households : fallbackHouseholds;
+  const selectedHouseholdId = activeHouseholdId ?? householdOptions[0]?.id ?? "placeholder";
+  const workspaceStatus = statusByState(needsOnboarding, activeHousehold);
+  const initial = displayName.trim().charAt(0).toUpperCase() || "F";
+  const profileDetail = activeHousehold
+    ? activeHousehold.isDemo
+      ? `Demo workspace · ${baseCurrency}`
+      : `${getRoleLabel(activeHousehold.role)} · ${baseCurrency}`
+    : `Shared workspace · ${baseCurrency}`;
+  const statusLabel = sessionError
+    ? "Session retry needed"
+    : sessionLoading
+      ? "Refreshing session"
+      : activeHousehold?.isDemo
+        ? "Demo workspace"
+        : workspaceStatus.label;
+  const statusTone = sessionError
+    ? "preview"
+    : sessionLoading
+      ? "emerging"
+      : activeHousehold?.isDemo
+        ? "support"
+        : workspaceStatus.tone;
 
   return (
     <header className={styles.topbar}>
-      <div className={styles.topbarHeading}>
-        <h1 className={styles.topbarTitle}>{title}</h1>
-        <p className={styles.topbarSubtitle}>{subtitle}</p>
-        <div className={styles.topbarStatusRow}>
-          {activeHousehold?.isDemo ? (
-            <span className={[styles.statusPill, styles.statusPillDemo].join(" ")}>
-              Demo workspace · read-only
-            </span>
-          ) : activeHousehold ? (
-            <span className={[styles.statusPill, styles.statusPillPositive].join(" ")}>
-              Real household selected
-            </span>
-          ) : null}
-          {sessionLoading ? (
-            <span className={[styles.statusPill, styles.statusPillNeutral].join(" ")}>
-              Refreshing session
-            </span>
-          ) : null}
-          {sessionError ? (
-            <span className={[styles.statusPill, styles.statusPillWarning].join(" ")}>
-              Session retry needed
-            </span>
-          ) : null}
-        </div>
-      </div>
-
-      <div className={styles.topbarControls}>
+      <div className={styles.topbarHead}>
         <button
-          aria-label="Open menu"
-          className={styles.menuButton}
+          aria-label="Open navigation menu"
+          className={[styles.iconButton, styles.menuButton].join(" ")}
           onClick={onOpenMenu}
           type="button"
         >
-          ☰
+          <MenuIcon height={18} width={18} />
         </button>
 
-        <div className={styles.selectorStack}>
-          <label className={styles.srOnly} htmlFor="household-selector">
-            Household or demo selector
-          </label>
-          <select
-            className={styles.selectControl}
-            disabled={disabled}
-            id="household-selector"
-            onChange={(event) => {
-              const nextValue = event.target.value;
+        <div className={styles.pageIdentity}>
+          <div className={styles.pageEyebrowRow}>
+            <span className={styles.pageEyebrow}>{page.eyebrow}</span>
+            <span className={styles.pageStatus} data-tone={page.tone}>
+              {page.statusLabel}
+            </span>
+          </div>
+          <h1 className={styles.pageTitle}>{page.title}</h1>
+          <p className={styles.pageSummary}>{page.summary}</p>
+        </div>
+      </div>
 
-              if (nextValue.startsWith("household:")) {
-                setPendingValue(null);
-                onSelectHousehold(nextValue.slice("household:".length));
-                return;
-              }
-
-              if (nextValue.startsWith("demo:")) {
-                setPendingValue(nextValue);
-                void onStartDemo(nextValue.slice("demo:".length) as DemoVariant).catch(() => {
-                  setPendingValue(null);
-                });
-              }
-            }}
-            value={displayedSelectorValue}
-          >
-            {!activeHousehold ? (
-              <option disabled value="none">
-                Select a household or demo
-              </option>
-            ) : null}
-            {realHouseholds.length > 0 ? (
-              <optgroup label="Your households">
-                {realHouseholds.map((household) => (
-                  <option key={household.id} value={`household:${household.id}`}>
-                    {household.name}
-                  </option>
-                ))}
-              </optgroup>
-            ) : null}
-            <optgroup label="Demo scenarios">
-              {DEMO_VARIANT_OPTIONS.map((option) => (
-                <option key={option.value} value={`demo:${option.value}`}>
-                  {option.label}
-                </option>
-              ))}
-            </optgroup>
-          </select>
-          <p className={styles.selectorHint}>
-            {activeHousehold?.isDemo
-              ? `${DEMO_VARIANT_LABELS[activeHousehold.demoVariant ?? "standard"]} active`
-              : hasRealHouseholds
-                ? "Switch between your real household and guided demos."
-                : "Use a demo now, then create your own household when ready."}
-          </p>
+      <div className={styles.toolbar}>
+        <div className={styles.controlBlock}>
+          <span className={styles.controlLabel}>Search</span>
+          <div className={styles.searchField}>
+            <SearchIcon className={styles.searchIcon} height={18} width={18} />
+            <input
+              aria-label="Search Fyrk"
+              className={[themeStyles.searchControl, styles.searchInput].join(" ")}
+              placeholder={page.searchPlaceholder}
+              type="search"
+            />
+          </div>
         </div>
 
-        <button
-          aria-label="Toggle information density"
-          aria-pressed={density === "terminal"}
-          className={styles.toggleButton}
-          onClick={onToggleDensity}
-          type="button"
-        >
-          {density === "terminal" ? "Compact" : "Comfort"}
-        </button>
-        <button
-          aria-label="Toggle light and dark theme"
-          aria-pressed={theme === "dark"}
-          className={styles.toggleButton}
-          onClick={onToggleTheme}
-          type="button"
-        >
-          {theme === "dark" ? "Dark" : "Light"}
-        </button>
+        <div className={styles.controlBlock}>
+          <span className={styles.controlLabel}>Status</span>
+          <div className={styles.statusPill} data-tone={statusTone}>
+            <span aria-hidden className={styles.statusDot} />
+            <span>{statusLabel}</span>
+          </div>
+        </div>
+
+        <div className={styles.controlBlock}>
+          <label className={styles.controlLabel} htmlFor="household-selector">
+            Household
+          </label>
+          <select
+            className={[themeStyles.selectControl, styles.householdSelect].join(" ")}
+            disabled={households.length === 0}
+            id="household-selector"
+            onChange={(event) => onHouseholdChange(event.target.value)}
+            value={selectedHouseholdId}
+          >
+            {householdOptions.map((household) => (
+              <option key={household.id} value={household.id}>
+                {household.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.controlBlock}>
+          <span className={styles.controlLabel}>View mode</span>
+          <div className={styles.densityToggle}>
+            <button
+              aria-pressed={density === "narrative"}
+              className={[
+                styles.densityOption,
+                density === "narrative" ? styles.densityOptionActive : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={() => onSetDensity("narrative")}
+              type="button"
+            >
+              Narrative
+            </button>
+            <button
+              aria-pressed={density === "terminal"}
+              className={[
+                styles.densityOption,
+                density === "terminal" ? styles.densityOptionActive : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={() => onSetDensity("terminal")}
+              type="button"
+            >
+              CFO
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.controlBlock}>
+          <span className={styles.controlLabel}>Appearance</span>
+          <div className={styles.utilityRow}>
+            <button
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+              className={styles.iconButton}
+              onClick={onToggleTheme}
+              type="button"
+            >
+              {theme === "dark" ? <SunIcon height={18} width={18} /> : <MoonIcon height={18} width={18} />}
+            </button>
+
+            <div className={styles.profilePill}>
+              <span aria-hidden className={styles.avatar}>
+                {initial}
+              </span>
+              <span className={styles.profileMeta}>
+                <span className={styles.profileName}>{displayName}</span>
+                <span className={styles.profileDetail}>{profileDetail}</span>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
   );

@@ -4,12 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { getSession, initializeDemoHousehold } from "../api/mockClient";
-import type { DemoVariant, SessionResponseData } from "../api/contracts";
 import { DEMO_VARIANT_LABELS } from "../api/demo-options";
-import styles from "../theme/theme.module.css";
+import { getSession, initializeDemoHousehold } from "../api/mockClient";
+import type { DemoVariant, HouseholdSummary, SessionResponseData } from "../api/contracts";
+import themeStyles from "../theme/theme.module.css";
 import { Card } from "../ui/Card";
-import { MOBILE_NAV_ITEMS, PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "./navigation";
+import { AppIcon, FyrkMark } from "./icons";
+import {
+  MOBILE_NAV_ITEMS,
+  NAV_SECTIONS,
+  PREVIEW_NAV_SECTION,
+  getPageMeta,
+  isActivePath,
+} from "./navigation";
 import {
   HouseholdContext,
   type OnboardingState,
@@ -17,76 +24,28 @@ import {
 import { SidebarNav } from "./SidebarNav";
 import { Topbar } from "./Topbar";
 
-const THEME_STORAGE_KEY = "fyrk:sprint1:theme";
-const DENSITY_STORAGE_KEY = "fyrk:sprint1:density";
-const ACTIVE_HOUSEHOLD_STORAGE_KEY = "fyrk:sprint6:active-household";
+import styles from "./shell.module.css";
 
-const PAGE_META: Record<string, { title: string; subtitle: string }> = {
-  "/dashboard": {
-    title: "Dashboard",
-    subtitle: "Household overview, weekly progress, and calm next actions.",
-  },
-  "/onboarding": {
-    title: "Onboarding",
-    subtitle: "Choose demo or real setup, then finish with a clear next step.",
-  },
-  "/balance-sheet": {
-    title: "Balance Sheet",
-    subtitle: "Unified household net worth, allocation, and data quality.",
-  },
-  "/timeline": {
-    title: "Timeline",
-    subtitle: "Track household decisions, milestones, and follow-through over time.",
-  },
-  "/events": {
-    title: "Life Events",
-    subtitle: "Guided playbooks for major changes, assignments, and checklist progress.",
-  },
-  "/review": {
-    title: "Quarterly Review",
-    subtitle: "Review household progress, risks, and publication readiness.",
-  },
-  "/fitness": {
-    title: "Financial Fitness",
-    subtitle: "Score resilience, weakest areas, and the next best improvements.",
-  },
-  "/proposals": {
-    title: "Proposals",
-    subtitle: "Discuss decisions together and move them to approval with context.",
-  },
-  "/household": {
-    title: "Household",
-    subtitle: "Household members, invites, and collaboration settings.",
-  },
-  "/settings": {
-    title: "Settings",
-    subtitle: "Profile, privacy, and display preferences for the app shell.",
-  },
-};
+const THEME_STORAGE_KEY = "fyrk:shell:theme";
+const DENSITY_STORAGE_KEY = "fyrk:shell:density";
+const ACTIVE_HOUSEHOLD_STORAGE_KEY = "fyrk:shell:active-household";
 
 interface AppShellProps {
   children: ReactNode;
 }
 
-const derivePageMeta = (pathname: string): { title: string; subtitle: string } => {
-  const exactMatch = PAGE_META[pathname];
-  if (exactMatch) {
-    return exactMatch;
+const getRoleLabel = (role: HouseholdSummary["role"]): string => {
+  switch (role) {
+    case "owner":
+      return "Owner";
+    case "admin":
+      return "Admin";
+    case "member":
+      return "Member";
+    default:
+      return "Viewer";
   }
-
-  const partialMatch = Object.entries(PAGE_META).find(([path]) => pathname.startsWith(path));
-  if (partialMatch) {
-    return partialMatch[1];
-  }
-
-  return {
-    title: "Fyrk",
-    subtitle: "Digital family office for modern households.",
-  };
 };
-
-const isActivePath = (pathname: string, href: string): boolean =>
-  pathname === href || pathname.startsWith(`${href}/`);
 
 const describeSessionError = (error: unknown): string => {
   if (error instanceof Error && error.message) {
@@ -254,11 +213,22 @@ export function AppShell({ children }: AppShellProps) {
   const households = session?.households ?? [];
   const realHouseholds = households.filter((household) => !household.isDemo);
   const activeHousehold =
-    households.find((household) => household.id === activeHouseholdId) ?? null;
+    households.find((household) => household.id === activeHouseholdId) ?? households[0] ?? null;
   const onboardingState = deriveOnboardingState(session);
-  const pageMeta = useMemo(() => derivePageMeta(pathname), [pathname]);
+  const page = useMemo(() => getPageMeta(pathname), [pathname]);
+  const needsOnboarding = onboardingState === "not_started";
   const activeDemoVariant =
     activeHousehold?.isDemo && activeHousehold.demoVariant ? activeHousehold.demoVariant : null;
+  const householdHeadline = activeHousehold
+    ? activeHousehold.name
+    : needsOnboarding
+      ? "Finish household setup"
+      : "Create your household";
+  const householdMeta = activeDemoVariant
+    ? `${DEMO_VARIANT_LABELS[activeDemoVariant]} · read-only demo`
+    : activeHousehold
+      ? `${activeHousehold.memberCount} member${activeHousehold.memberCount === 1 ? "" : "s"} · ${getRoleLabel(activeHousehold.role)}`
+      : "Shared context appears here once the household is active.";
 
   const startDemo = async (variant: DemoVariant) => {
     setDemoLoading(true);
@@ -308,200 +278,155 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <HouseholdContext.Provider value={sessionContextValue}>
-      <div className={styles.themeRoot} data-density={density} data-theme={theme}>
-        <div className={styles.appShell}>
-          <aside className={styles.sidebar}>
-            <div className={styles.sidebarHeader}>
-              <span className={styles.logo}>
-                <span aria-hidden className={styles.logoGlyph}>
-                  F
-                </span>
-                Fyrk
-              </span>
-              <p className={styles.sidebarTitle}>
-                {activeHousehold?.isDemo ? "Guided demo" : "Shared planning"}
+      <div
+        className={[themeStyles.themeRoot, styles.shellRoot].join(" ")}
+        data-density={density}
+        data-theme={theme}
+      >
+        <div aria-hidden className={styles.shellBackdrop} />
+
+        <div className={styles.shellLayout}>
+          <aside className={styles.rail}>
+            <div className={styles.railBrand}>
+              <div className={styles.railBrandRow}>
+                <FyrkMark className={styles.railMark} />
+                <div className={styles.railBrandCopy}>
+                  <span className={styles.railWordmark}>Fyrk</span>
+                  <span className={styles.railTagline}>Household Finance OS</span>
+                </div>
+              </div>
+              <p className={styles.railNarrative}>
+                Start with the household brief, validate it in the balance sheet, and move
+                deeper only when the numbers call for it.
               </p>
             </div>
-            <SidebarNav items={PRIMARY_NAV_ITEMS} />
-            <div className={styles.navFooter}>
-              <SidebarNav items={SECONDARY_NAV_ITEMS} />
+
+            <div className={styles.railPrinciples}>
+              <span className={styles.railEyebrow}>Operating rhythm</span>
+              <h2 className={styles.railCardTitle}>Home and Balance Sheet are the daily anchors.</h2>
+              <p className={styles.railCardText}>
+                Narrative mode keeps interpretation close to the numbers. CFO mode compresses
+                the same shell for faster scanning and review.
+              </p>
+            </div>
+
+            <SidebarNav sections={NAV_SECTIONS} />
+
+            <div className={styles.previewPanel}>
+              <SidebarNav sections={[PREVIEW_NAV_SECTION]} />
+            </div>
+
+            <div className={styles.railContext}>
+              <span className={styles.railEyebrow}>Active household</span>
+              <h2 className={styles.railCardTitle}>{householdHeadline}</h2>
+              <p className={styles.railContextMeta}>{householdMeta}</p>
             </div>
           </aside>
 
           {drawerOpen ? (
             <>
               <button
-                aria-label="Close menu"
+                aria-label="Close navigation menu"
                 className={styles.overlay}
                 onClick={() => setDrawerOpen(false)}
                 type="button"
               />
               <aside className={styles.drawer}>
-                <div className={styles.sidebarHeader}>
-                  <span className={styles.logo}>
-                    <span aria-hidden className={styles.logoGlyph}>
-                      F
-                    </span>
-                    Fyrk
-                  </span>
-                  <p className={styles.sidebarTitle}>Navigation</p>
+                <div className={styles.drawerTop}>
+                  <div className={styles.railBrandRow}>
+                    <FyrkMark className={styles.railMark} />
+                    <div className={styles.railBrandCopy}>
+                      <span className={styles.railWordmark}>Fyrk</span>
+                      <span className={styles.railTagline}>Household Finance OS</span>
+                    </div>
+                  </div>
+                  <p className={styles.railCardText}>
+                    The mobile shell keeps the same IA: brief first, ledger second, planning
+                    third, previews clearly separated.
+                  </p>
                 </div>
                 <SidebarNav
-                  items={[...PRIMARY_NAV_ITEMS, ...SECONDARY_NAV_ITEMS]}
+                  sections={[...NAV_SECTIONS, PREVIEW_NAV_SECTION]}
                   onNavigate={() => setDrawerOpen(false)}
                 />
+                <div className={styles.railContext}>
+                  <span className={styles.railEyebrow}>Active household</span>
+                  <h2 className={styles.railCardTitle}>{householdHeadline}</h2>
+                  <p className={styles.railContextMeta}>{householdMeta}</p>
+                </div>
               </aside>
             </>
           ) : null}
 
-          <div className={styles.mainFrame}>
+          <div className={styles.main}>
             <Topbar
               activeHousehold={activeHousehold}
+              activeHouseholdId={activeHouseholdId ?? undefined}
+              baseCurrency={session?.user.baseCurrency ?? "SEK"}
               density={density}
-              disabled={sessionLoading || demoLoading}
-              hasRealHouseholds={realHouseholds.length > 0}
-              onOpenMenu={() => setDrawerOpen(true)}
-              onSelectHousehold={(householdId) => {
+              displayName={session?.user.displayName ?? "Fyrk User"}
+              households={households}
+              needsOnboarding={needsOnboarding}
+              onHouseholdChange={(householdId) => {
                 setDemoError(null);
                 setActiveHouseholdId(householdId);
               }}
-              onStartDemo={startDemo}
-              onToggleDensity={() =>
-                setDensity((current) =>
-                  current === "narrative" ? "terminal" : "narrative",
-                )
-              }
+              onOpenMenu={() => setDrawerOpen(true)}
+              onSetDensity={setDensity}
               onToggleTheme={() =>
-                setTheme((current) => (current === "light" ? "dark" : "light"))
+                setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"))
               }
-              realHouseholds={realHouseholds}
+              page={page}
               sessionError={sessionError}
-              sessionLoading={sessionLoading}
-              subtitle={pageMeta.subtitle}
+              sessionLoading={sessionLoading || demoLoading}
               theme={theme}
-              title={pageMeta.title}
             />
 
-            <main className={styles.pageBody}>
-              {sessionError && !session ? (
+            <main className={styles.pageCanvas}>
+              {needsOnboarding && pathname !== "/onboarding" ? (
                 <Card
-                  className={styles.noticeCard}
-                  title="App shell unavailable"
-                  description={sessionError}
                   actions={
-                    <button
-                      className={[styles.button, styles.buttonSecondary].join(" ")}
-                      onClick={() => {
-                        void loadSession();
-                      }}
-                      type="button"
-                    >
-                      Retry session
-                    </button>
+                    <div className={styles.setupActions}>
+                      <Link
+                        className={[themeStyles.button, themeStyles.buttonPrimary].join(" ")}
+                        href="/onboarding"
+                      >
+                        Continue setup
+                      </Link>
+                    </div>
                   }
+                  className={styles.setupBanner}
+                  description="Create the shared household to unlock collaborative context, member roles, and a properly personalized workspace."
+                  eyebrow="Activation"
+                  title="Finish household setup"
                 >
-                  <p className={styles.noticeBody}>
-                    The shell could not confirm your session, so household-scoped routes are
-                    paused until the retry succeeds.
+                  <p className={styles.railCardText}>
+                    Once setup is complete, Home and Balance Sheet shift from a personal view
+                    into a shared household operating system.
                   </p>
                 </Card>
               ) : null}
 
-              {activeDemoVariant ? (
-                <Card
-                  className={styles.noticeCard}
-                  title={`Demo workspace active · ${DEMO_VARIANT_LABELS[activeDemoVariant]}`}
-                  description="Demo households are read-only. You can explore the product safely, then switch back to your own data at any time."
-                >
-                  <div className={styles.noticeStack}>
-                    <p className={styles.noticeBody}>
-                      Current household: <strong>{activeHousehold?.name}</strong>
-                    </p>
-                    <div className={styles.noticeActions}>
-                      {realHouseholds[0] ? (
-                        <button
-                          className={[styles.button, styles.buttonPrimary].join(" ")}
-                          onClick={() => {
-                            setActiveHouseholdId(realHouseholds[0]?.id ?? null);
-                          }}
-                          type="button"
-                        >
-                          Switch to real household
-                        </button>
-                      ) : (
-                        <Link
-                          className={[styles.button, styles.buttonPrimary].join(" ")}
-                          href="/onboarding"
-                        >
-                          Create your own household
-                        </Link>
-                      )}
-                      <Link
-                        className={[styles.button, styles.buttonGhost].join(" ")}
-                        href="/onboarding"
-                      >
-                        Review onboarding steps
-                      </Link>
-                    </div>
-                  </div>
-                </Card>
-              ) : null}
-
-              {onboardingState === "not_started" && pathname !== "/onboarding" ? (
-                <Card
-                  className={styles.noticeCard}
-                  title="Finish setup or explore a guided demo"
-                  description="Create your household for real data, or use a demo scenario to get familiar with the product before connecting anything."
-                >
-                  <div className={styles.noticeActions}>
-                    <Link
-                      className={[styles.button, styles.buttonPrimary].join(" ")}
-                      href="/onboarding"
-                    >
-                      Open onboarding
-                    </Link>
-                    <Link
-                      className={[styles.button, styles.buttonGhost].join(" ")}
-                      href="/dashboard"
-                    >
-                      Browse the shell
-                    </Link>
-                  </div>
-                </Card>
-              ) : null}
-
-              {onboardingState === "demo_ready" && !activeDemoVariant && pathname !== "/onboarding" ? (
-                <Card
-                  className={styles.noticeCard}
-                  title="Demo access is ready"
-                  description="Your demo membership is active. Select a demo scenario from the top bar whenever you want to explore the sample data again."
-                >
-                  <div className={styles.noticeActions}>
-                    <Link
-                      className={[styles.button, styles.buttonPrimary].join(" ")}
-                      href="/onboarding"
-                    >
-                      Set up your real household
-                    </Link>
-                  </div>
-                </Card>
-              ) : null}
-
-              {children}
+              <div className={styles.pageFrame}>
+                <div className={styles.pageInner}>{children}</div>
+              </div>
             </main>
           </div>
         </div>
 
         <nav aria-label="Mobile navigation" className={styles.mobileNav}>
           {MOBILE_NAV_ITEMS.map((item) => {
-            const className = [styles.mobileNavLink, isActivePath(pathname, item.href) ? styles.mobileNavActive : ""]
+            const className = [
+              styles.mobileNavLink,
+              isActivePath(pathname, item.href) ? styles.mobileNavActive : "",
+            ]
               .filter(Boolean)
               .join(" ");
 
             return (
               <Link className={className} href={item.href} key={item.href}>
-                <span aria-hidden>{item.icon}</span>
-                <span className={styles.mobileNavLabel}>{item.label}</span>
+                <AppIcon className={styles.mobileNavIcon} name={item.icon} />
+                <span className={styles.mobileNavLabel}>{item.shortLabel}</span>
               </Link>
             );
           })}
