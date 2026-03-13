@@ -23,7 +23,6 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 | Sprint 4 | Timeline + life event + fitness | Completed | DB, backend/AI-services, frontend, and integration lanes merged to `main` |
 | Sprint 5 | Quarterly review + governance | Completed | DB, backend, AI, frontend, and integration lanes merged to `main` |
 | Sprint 6 | Demo data + polish + launch prep | Completed | Data seed, backend hardening, AI precompute, frontend polish, and release validation lanes are all merged to `main` |
-| Sprint 6.5 | Design system hardening + UX QA | Not Started | Planned quality bridge sprint; no dedicated Sprint 6.5 merge train has landed on `main` |
 | Sprint 7 | Brand excellence + interaction quality | In Progress | Frontend brand, backend regression, and AI quality lanes are merged; DB stability and integration/signoff remain pending |
 
 ## Sprint-by-Sprint Progress
@@ -276,9 +275,6 @@ Planned delivery:
 - DB stability lane for critical reliability or performance findings only
 - Integration/signoff lane covering accessibility, performance, and cross-surface regression QA
 - Final brand-quality pass across authenticated product surfaces
-
-Roadmap note:
-- Sprint 6.5 remains planned as a quality bridge in the roadmap, but no dedicated Sprint 6.5 implementation track has landed on `main`
 
 ## Sprint 3 Deep-Dive Section (Archived Plan)
 
