@@ -7,15 +7,11 @@ import { trackLandingEvent } from "@/components/marketing/analytics";
 import styles from "./landing.module.css";
 
 type FormValues = {
-  name: string;
   email: string;
-  householdContext: string;
 };
 
 type FieldErrors = {
-  name?: string;
   email?: string;
-  householdContext?: string;
 };
 
 type SubmissionState =
@@ -185,20 +181,10 @@ async function parseJsonSafely(response: Response): Promise<unknown> {
 
 function validateForm(values: FormValues): FieldErrors {
   const errors: FieldErrors = {};
-
-  const normalizedName = values.name.trim();
   const normalizedEmail = normalizeEmail(values.email);
-
-  if (normalizedName.length < 2) {
-    errors.name = "Enter your name so we can personalize onboarding updates.";
-  }
 
   if (!isValidEmail(normalizedEmail)) {
     errors.email = "Enter a valid email address.";
-  }
-
-  if (values.householdContext.length > 280) {
-    errors.householdContext = "Keep this note to 280 characters or fewer.";
   }
 
   return errors;
@@ -210,18 +196,13 @@ function hasValidationErrors(errors: FieldErrors): boolean {
 
 export function WaitlistForm() {
   const [values, setValues] = useState<FormValues>({
-    name: "",
     email: "",
-    householdContext: "",
   });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submissionState, setSubmissionState] = useState<SubmissionState>({ kind: "idle" });
 
   const idPrefix = useId();
-  const nameInputId = `${idPrefix}-name`;
   const emailInputId = `${idPrefix}-email`;
-  const contextInputId = `${idPrefix}-context`;
-
   const isSubmitting = submissionState.kind === "loading";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -233,24 +214,16 @@ export function WaitlistForm() {
     if (hasValidationErrors(nextErrors)) {
       setSubmissionState({ kind: "idle" });
       trackLandingEvent("waitlist_validation_error", {
-        has_name_error: Boolean(nextErrors.name),
         has_email_error: Boolean(nextErrors.email),
-        has_context_error: Boolean(nextErrors.householdContext),
       });
       return;
     }
 
     const normalizedEmail = normalizeEmail(values.email);
-    const normalizedName = values.name.trim();
-    const normalizedContext = values.householdContext.trim();
-    const firstName = normalizedName.split(/\s+/)[0] ?? "there";
     const knownDuplicate = hasSubmittedEmail(normalizedEmail);
 
     setSubmissionState({ kind: "loading" });
-
-    trackLandingEvent("waitlist_submit_attempt", {
-      has_household_context: normalizedContext.length > 0,
-    });
+    trackLandingEvent("waitlist_submit_attempt");
 
     try {
       const response = await fetch("/api/waitlist", {
@@ -271,7 +244,7 @@ export function WaitlistForm() {
         const duplicate = inferDuplicateFromSuccessPayload(payload) ?? knownDuplicate;
 
         if (duplicate) {
-          const message = "This email is already on the waitlist. We will send early-access updates here.";
+          const message = "This email is already registered. We will use it for Fyrk demo and access updates.";
           setSubmissionState({ kind: "duplicate", message });
           trackLandingEvent("waitlist_submit_duplicate", {
             source: "success_payload_or_local_cache",
@@ -279,23 +252,19 @@ export function WaitlistForm() {
           return;
         }
 
-        const message = `Thanks ${firstName}, you are on the waitlist. We will share early-access and onboarding updates by email.`;
+        const message = "You are on the list. We will follow up by email about private demos and early access.";
         setSubmissionState({ kind: "success", message });
         setValues({
-          name: "",
           email: "",
-          householdContext: "",
         });
-        trackLandingEvent("waitlist_submit_success", {
-          has_household_context: normalizedContext.length > 0,
-        });
+        trackLandingEvent("waitlist_submit_success");
         return;
       }
 
       if (inferDuplicateFromErrorPayload(payload)) {
         rememberSubmittedEmail(normalizedEmail);
 
-        const message = "This email is already on the waitlist. We will send early-access updates here.";
+        const message = "This email is already registered. We will use it for Fyrk demo and access updates.";
         setSubmissionState({ kind: "duplicate", message });
         trackLandingEvent("waitlist_submit_duplicate", {
           source: "error_payload",
@@ -322,115 +291,54 @@ export function WaitlistForm() {
       return;
     }
 
-    setErrors((currentErrors) => ({
-      ...currentErrors,
-      [field]: undefined,
-    }));
+    setErrors((currentErrors) => {
+      const nextErrors = { ...currentErrors };
+      delete nextErrors[field];
+      return nextErrors;
+    });
   }
 
   return (
     <form className={styles.waitlistForm} onSubmit={handleSubmit} noValidate>
-      <div className={styles.fieldGrid}>
-        <div className={styles.fieldBlock}>
-          <label htmlFor={nameInputId} className={styles.label}>
-            Name <span className={styles.requiredMarker}>*</span>
-          </label>
-          <input
-            id={nameInputId}
-            type="text"
-            name="name"
-            autoComplete="name"
-            className={styles.input}
-            value={values.name}
-            onChange={(event) => {
-              clearFieldError("name");
-              setValues((currentValues) => ({
-                ...currentValues,
-                name: event.currentTarget.value,
-              }));
-            }}
-            aria-invalid={Boolean(errors.name)}
-            aria-describedby={errors.name ? `${nameInputId}-error` : undefined}
-            required
-            disabled={isSubmitting}
-          />
-          {errors.name ? (
-            <p id={`${nameInputId}-error`} className={styles.inlineError} role="alert">
-              {errors.name}
-            </p>
-          ) : null}
-        </div>
-
-        <div className={styles.fieldBlock}>
-          <label htmlFor={emailInputId} className={styles.label}>
-            Email <span className={styles.requiredMarker}>*</span>
-          </label>
-          <input
-            id={emailInputId}
-            type="email"
-            name="email"
-            autoComplete="email"
-            className={styles.input}
-            value={values.email}
-            onChange={(event) => {
-              clearFieldError("email");
-              setValues((currentValues) => ({
-                ...currentValues,
-                email: event.currentTarget.value,
-              }));
-            }}
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? `${emailInputId}-error` : undefined}
-            required
-            disabled={isSubmitting}
-          />
-          {errors.email ? (
-            <p id={`${emailInputId}-error`} className={styles.inlineError} role="alert">
-              {errors.email}
-            </p>
-          ) : null}
-        </div>
-      </div>
-
       <div className={styles.fieldBlock}>
-        <label htmlFor={contextInputId} className={styles.label}>
-          Household context (optional)
+        <label htmlFor={emailInputId} className={styles.label}>
+          Email <span className={styles.requiredMarker}>*</span>
         </label>
-        <textarea
-          id={contextInputId}
-          name="householdContext"
-          className={styles.textarea}
-          rows={4}
-          maxLength={280}
-          value={values.householdContext}
+        <input
+          id={emailInputId}
+          type="email"
+          name="email"
+          autoComplete="email"
+          className={styles.input}
+          value={values.email}
           onChange={(event) => {
-            clearFieldError("householdContext");
-            setValues((currentValues) => ({
-              ...currentValues,
-              householdContext: event.currentTarget.value,
-            }));
+            clearFieldError("email");
+            setValues({
+              email: event.currentTarget.value,
+            });
           }}
-          aria-invalid={Boolean(errors.householdContext)}
-          aria-describedby={errors.householdContext ? `${contextInputId}-error` : `${contextInputId}-hint`}
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? `${emailInputId}-error` : `${emailInputId}-hint`}
+          required
           disabled={isSubmitting}
-          placeholder="Example: We are planning a home purchase and want a shared monthly overview."
+          placeholder="you@household.com"
         />
-        <p id={`${contextInputId}-hint`} className={styles.fieldHint}>
-          Helps us prioritize onboarding and private demo invites.
+        <p id={`${emailInputId}-hint`} className={styles.fieldHint}>
+          We use this to coordinate private demos and early access invitations.
         </p>
-        {errors.householdContext ? (
-          <p id={`${contextInputId}-error`} className={styles.inlineError} role="alert">
-            {errors.householdContext}
+        {errors.email ? (
+          <p id={`${emailInputId}-error`} className={styles.inlineError} role="alert">
+            {errors.email}
           </p>
         ) : null}
       </div>
 
       <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
-        {isSubmitting ? "Joining early access..." : "Join early access"}
+        {isSubmitting ? "Submitting..." : "Request demo or early access"}
       </button>
 
       <p className={styles.privacyNote}>
-        By joining, you agree to receive early-access updates from Fyrk. You can unsubscribe any time.
+        By submitting, you agree to receive a reply or launch updates from Fyrk. You can unsubscribe any time.
       </p>
 
       {submissionState.kind === "success" || submissionState.kind === "duplicate" || submissionState.kind === "error" ? (
