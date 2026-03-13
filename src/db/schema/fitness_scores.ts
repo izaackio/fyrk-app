@@ -8,6 +8,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -35,7 +36,7 @@ export const fitnessScores = pgTable(
   (table) => [
     index("idx_fitness_household").on(table.householdId),
     index("idx_fitness_date").on(table.calculatedAt),
-    index("idx_fitness_household_date").on(table.householdId, table.calculatedAt),
+    uniqueIndex("idx_fitness_household_date").on(table.householdId, table.calculatedAt),
     check("fitness_scores_total_score_range_check", sql`${table.totalScore} between 0 and 1000`),
     check("fitness_scores_buffer_score_range_check", sql`${table.bufferScore} between 0 and 200`),
     check("fitness_scores_growth_score_range_check", sql`${table.growthScore} between 0 and 200`),

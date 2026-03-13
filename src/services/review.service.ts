@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AuthContext } from "@/lib/auth/middleware";
 import { assertHouseholdWritable } from "@/lib/demo";
 import type { GenerateReviewInput } from "@/lib/validations/reviews";
-import { ServiceError } from "@/services/errors";
+import { isUniqueViolationError, ServiceError } from "@/services/errors";
 import type {
   HouseholdMemberStatus,
   HouseholdRole,
@@ -269,6 +269,23 @@ export class ReviewService {
       .single();
 
     if (error) {
+      if (isUniqueViolationError(error)) {
+        const existingReview = await this.findQuarterReview(
+          authContext.supabase,
+          input.householdId,
+          periodStart,
+          periodEnd,
+        );
+
+        if (existingReview) {
+          return {
+            reviewId: existingReview.id,
+            status: "generating",
+            estimatedSeconds: 30,
+          };
+        }
+      }
+
       throw error;
     }
 

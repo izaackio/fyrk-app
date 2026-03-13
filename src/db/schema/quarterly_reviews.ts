@@ -8,6 +8,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -47,6 +48,9 @@ export const quarterlyReviews = pgTable(
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (table) => [
+    uniqueIndex("quarterly_reviews_household_period_active_uniq")
+      .on(table.householdId, table.periodStart, table.periodEnd)
+      .where(sql`${table.deletedAt} is null`),
     index("idx_reviews_household").on(table.householdId),
     index("idx_reviews_household_period").on(table.householdId, table.periodEnd),
     index("idx_reviews_status").on(table.status),
