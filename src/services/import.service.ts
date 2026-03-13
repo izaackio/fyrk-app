@@ -11,7 +11,7 @@ import {
   type CanonicalPortfolioSnapshotImportRow,
   type CanonicalTransactionImportRow,
 } from "@/lib/csv";
-import { ServiceError } from "@/services/errors";
+import { isUniqueViolationError, ServiceError } from "@/services/errors";
 import type {
   AccountTransactionType,
   CsvImportConfirmView,
@@ -350,6 +350,11 @@ export class ImportService {
         });
 
         if (insertTransactionError) {
+          if (isUniqueViolationError(insertTransactionError) && row.dedupe_key) {
+            await this.markImportRowApplied(supabase, row.id, "ignored");
+            continue;
+          }
+
           throw insertTransactionError;
         }
 
@@ -680,36 +685,15 @@ export class ImportService {
     instrumentId: string,
     row: HoldingNormalizedData,
   ): Promise<void> {
-    const { data: existingHolding, error: existingHoldingError } = await supabase
-      .from("holdings")
-      .select("id")
-      .eq("account_id", accountId)
-      .eq("instrument_id", instrumentId)
-      .eq("as_of_date", row.asOfDate)
-      .is("deleted_at", null)
-      .limit(1)
-      .maybeSingle();
+    const existingHoldingId = await this.findActiveHoldingId(
+      supabase,
+      accountId,
+      instrumentId,
+      row.asOfDate,
+    );
 
-    if (existingHoldingError) {
-      throw existingHoldingError;
-    }
-
-    if (existingHolding) {
-      const { error: updateError } = await supabase
-        .from("holdings")
-        .update({
-          quantity: row.quantity,
-          average_cost: row.averageCost,
-          market_value: row.marketValue,
-          value_currency: row.valueCurrency,
-          source: "csv",
-        })
-        .eq("id", existingHolding.id);
-
-      if (updateError) {
-        throw updateError;
-      }
-
+    if (existingHoldingId) {
+      await this.updateHolding(supabase, existingHoldingId, row);
       return;
     }
 
@@ -725,7 +709,69 @@ export class ImportService {
     });
 
     if (insertError) {
+      if (isUniqueViolationError(insertError)) {
+        const concurrentHoldingId = await this.findActiveHoldingId(
+          supabase,
+          accountId,
+          instrumentId,
+          row.asOfDate,
+        );
+
+        if (concurrentHoldingId) {
+          await this.updateHolding(supabase, concurrentHoldingId, row);
+          return;
+        }
+      }
+
       throw insertError;
+    }
+  }
+
+  private async findActiveHoldingId(
+    supabase: SupabaseClient,
+    accountId: string,
+    instrumentId: string,
+    asOfDate: string,
+  ): Promise<string | null> {
+    const { data, error } = await supabase
+      .from("holdings")
+      .select("id")
+      .eq("account_id", accountId)
+      .eq("instrument_id", instrumentId)
+      .eq("as_of_date", asOfDate)
+      .is("deleted_at", null)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data || typeof data.id !== "string") {
+      return null;
+    }
+
+    return data.id;
+  }
+
+  private async updateHolding(
+    supabase: SupabaseClient,
+    holdingId: string,
+    row: HoldingNormalizedData,
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("holdings")
+      .update({
+        quantity: row.quantity,
+        average_cost: row.averageCost,
+        market_value: row.marketValue,
+        value_currency: row.valueCurrency,
+        source: "csv",
+      })
+      .eq("id", holdingId);
+
+    if (error) {
+      throw error;
     }
   }
 

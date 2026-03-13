@@ -43,6 +43,9 @@ export const timelineEntries = pgTable(
   },
   (table) => [
     index("idx_timeline_household").on(table.householdId),
+    index("idx_timeline_household_date_id_active")
+      .on(table.householdId, table.entryDate.desc(), table.id.desc())
+      .where(sql`${table.deletedAt} is null`),
     index("idx_timeline_date").on(table.entryDate),
     index("idx_timeline_type").on(table.entryType),
     index("idx_timeline_created_by").on(table.createdBy),
