@@ -10,6 +10,7 @@ export * from "./household_snapshots";
 export * from "./import_jobs";
 export * from "./import_rows";
 export * from "./weekly_narrative_cache";
+export * from "./waitlist_signups";
 export * from "./timeline_entries";
 export * from "./life_events";
 export * from "./playbook_actions";
