@@ -1,10 +1,17 @@
-import { FeaturePlaceholder } from "../../../components/dashboard/FeaturePlaceholder";
+import { ReviewExperience } from "../../../components/review/ReviewExperience";
+import styles from "../../../components/theme/theme.module.css";
 
 export default function ReviewPage() {
   return (
-    <FeaturePlaceholder
-      description="Quarterly review summaries, recommendations, and PDF export integrations are out of Sprint 1 scope."
-      title="Quarterly Review"
-    />
+    <section className={styles.pageSection}>
+      <header className={styles.sectionHeading}>
+        <h2 className={styles.sectionTitle}>Quarterly Review</h2>
+        <p className={styles.sectionDescription}>
+          Generate deterministic quarterly reviews, inspect detailed recommendations, and
+          track readiness for publication and export.
+        </p>
+      </header>
+      <ReviewExperience />
+    </section>
   );
 }

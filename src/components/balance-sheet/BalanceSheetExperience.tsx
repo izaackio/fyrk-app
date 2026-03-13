@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { formatDateTime, formatMoney, formatPercent } from "../accounts/formatters";
 import { useHouseholdContext } from "../accounts/useHouseholdContext";
@@ -43,6 +43,15 @@ const formatSignedMoney = (value: number, currency: string): string => {
   return `${prefix}${formatMoney(Math.abs(value), currency)}`;
 };
 
+const DONUT_RADIUS = 52;
+const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
+
+const toSegmentStyle = (pct: number, index: number, offset: number): CSSProperties => ({
+  "--segment-color": `var(--co-chart-${(index % 6) + 1})`,
+  strokeDasharray: `${(pct / 100) * DONUT_CIRCUMFERENCE} ${DONUT_CIRCUMFERENCE}`,
+  strokeDashoffset: `${-offset}`,
+}) as CSSProperties;
+
 export function BalanceSheetExperience() {
   const { activeHouseholdId, error: householdError, loading: householdLoading } =
     useHouseholdContext();
@@ -52,6 +61,7 @@ export function BalanceSheetExperience() {
   const [selectedMemberId, setSelectedMemberId] = useState("household");
   const [selectedDimension, setSelectedDimension] =
     useState<AllocationDimension>("assetClass");
+  const [hoveredAllocationKey, setHoveredAllocationKey] = useState<string | null>(null);
 
   const loadSnapshot = useCallback(async () => {
     if (!activeHouseholdId) {
@@ -187,6 +197,21 @@ export function BalanceSheetExperience() {
   }
 
   const allocationRows = activeView.allocation[selectedDimension];
+  const highlightedAllocation =
+    allocationRows.find((slice) => slice.key === hoveredAllocationKey) ?? allocationRows[0] ?? null;
+  let allocationOffset = 0;
+  const allocationSegments = allocationRows.map((slice, index) => {
+    const pct = Math.max(slice.pct, 0.8);
+    const segment = {
+      key: slice.key,
+      offset: allocationOffset,
+      pct,
+      style: toSegmentStyle(pct, index, allocationOffset),
+    };
+
+    allocationOffset += (pct / 100) * DONUT_CIRCUMFERENCE;
+    return segment;
+  });
 
   return (
     <section className={styles.stack}>
@@ -319,24 +344,109 @@ export function BalanceSheetExperience() {
             richer breakdown.
           </p>
         ) : (
-          <ul className={styles.allocationList}>
-            {allocationRows.map((slice) => (
-              <li className={styles.allocationRow} key={slice.key}>
-                <div className={styles.allocationHead}>
-                  <p className={styles.allocationLabel}>{slice.label}</p>
-                  <p className={styles.allocationValue}>
-                    {formatPercent(slice.pct)} · {formatMoney(slice.value, snapshot.currency)}
-                  </p>
-                </div>
-                <div className={styles.progressTrack}>
-                  <div
-                    className={styles.progressBar}
-                    style={{ width: `${Math.max(slice.pct, 1)}%` }}
+          <div className={styles.allocationLayout}>
+            <div className={styles.allocationChartWrap}>
+              <p className={themeStyles.srOnly}>
+                Allocation chart for {ALLOCATION_DIMENSIONS.find((dimension) => dimension.id === selectedDimension)?.label}.
+                {allocationRows
+                  .map((slice) => `${slice.label} ${formatPercent(slice.pct)}`)
+                  .join(", ")}
+              </p>
+              <div className={styles.allocationFigure}>
+                <svg
+                  aria-hidden
+                  className={styles.allocationSvg}
+                  viewBox="0 0 160 160"
+                >
+                  <circle
+                    className={styles.allocationTrackRing}
+                    cx="80"
+                    cy="80"
+                    r={DONUT_RADIUS}
                   />
+                  {allocationSegments.map((segment) => (
+                    <circle
+                      className={[
+                        styles.allocationSegment,
+                        hoveredAllocationKey && hoveredAllocationKey !== segment.key
+                          ? styles.allocationSegmentDimmed
+                          : "",
+                        hoveredAllocationKey === segment.key ? styles.allocationSegmentActive : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      cx="80"
+                      cy="80"
+                      key={segment.key}
+                      onMouseEnter={() => {
+                        setHoveredAllocationKey(segment.key);
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredAllocationKey(null);
+                      }}
+                      r={DONUT_RADIUS}
+                      style={segment.style}
+                    />
+                  ))}
+                </svg>
+                <div className={styles.allocationCenter}>
+                  <span className={styles.allocationCenterLabel}>
+                    {highlightedAllocation?.label ??
+                      ALLOCATION_DIMENSIONS.find((dimension) => dimension.id === selectedDimension)
+                        ?.label}
+                  </span>
+                  <strong className={styles.allocationCenterValue}>
+                    {formatMoney(highlightedAllocation?.value ?? activeView.totalAssets, snapshot.currency)}
+                  </strong>
+                  <span className={styles.allocationCenterMeta}>
+                    {formatPercent(highlightedAllocation?.pct ?? 100)} of tracked assets
+                  </span>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+            </div>
+
+            <ul className={styles.allocationLegend}>
+              {allocationRows.map((slice, index) => {
+                const isActive = hoveredAllocationKey === slice.key;
+                const legendStyle = {
+                  "--segment-color": `var(--co-chart-${(index % 6) + 1})`,
+                  "--segment-pct": `${Math.max(slice.pct, 1)}%`,
+                } as CSSProperties;
+
+                return (
+                  <li
+                    className={[
+                      styles.allocationLegendItem,
+                      isActive ? styles.allocationLegendActive : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    key={slice.key}
+                    onMouseEnter={() => {
+                      setHoveredAllocationKey(slice.key);
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredAllocationKey(null);
+                    }}
+                    style={legendStyle}
+                  >
+                    <div className={styles.legendHead}>
+                      <div className={styles.legendLabel}>
+                        <span aria-hidden className={styles.legendSwatch} />
+                        <span>{slice.label}</span>
+                      </div>
+                      <p className={styles.legendValue}>
+                        {formatPercent(slice.pct)} · {formatMoney(slice.value, snapshot.currency)}
+                      </p>
+                    </div>
+                    <div aria-hidden className={styles.legendBarTrack}>
+                      <span className={styles.legendBarFill} />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         )}
       </Card>
 

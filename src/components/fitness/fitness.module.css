@@ -1,0 +1,304 @@
+.stack {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.stateCard,
+.heroCard {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.stateMessage {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.errorText {
+  color: var(--co-status-down);
+  margin: 0;
+}
+
+.heroGrid {
+  align-items: center;
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.gaugeWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.gauge {
+  display: grid;
+  height: 152px;
+  place-items: center;
+  position: relative;
+  width: 176px;
+}
+
+.gaugeSvg {
+  height: 116px;
+  inset: 0;
+  overflow: visible;
+  position: absolute;
+  width: 176px;
+}
+
+.gaugeTrack,
+.gaugeProgress {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 12;
+}
+
+.gaugeTrack {
+  stroke: color-mix(in srgb, var(--co-bg-hover), var(--co-border) 45%);
+}
+
+.gaugeProgress {
+  stroke: url(#fitnessGaugeGradient);
+  transition: stroke-dasharray var(--motion-sweep) var(--ease-standard);
+}
+
+.gaugeInner {
+  align-items: center;
+  background: var(--co-bg-surface);
+  border: 1px solid var(--co-border);
+  border-radius: 24px;
+  box-shadow: 0 10px 32px rgb(26 24 21 / 7%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 98px;
+  justify-content: center;
+  margin-top: 38px;
+  padding: 0 18px;
+  width: 138px;
+}
+
+.scoreLabel {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.scoreValue {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.scoreScale {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.scoreTrend {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.scoreTrendPositive {
+  color: var(--co-status-up);
+}
+
+.scoreTrendNegative {
+  color: var(--co-status-down);
+}
+
+.scoreTrendNeutral {
+  color: var(--co-text-secondary);
+}
+
+.heroBody {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.explanation {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.calculatedAt {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  margin: 0;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.componentGrid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.componentCard {
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: var(--space-sm);
+  padding: 10px;
+}
+
+.componentHeader {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.componentTitle {
+  margin: 0;
+}
+
+.componentDescription {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+  margin: 3px 0 0;
+}
+
+.componentScore {
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.componentBar {
+  background: var(--co-bg-hover);
+  border-radius: var(--radius-full);
+  height: 8px;
+  overflow: hidden;
+}
+
+.componentFill {
+  background: linear-gradient(90deg, var(--co-brand-primary), var(--co-info));
+  display: block;
+  height: 100%;
+}
+
+.analyticsGrid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.trendChart {
+  background: var(--co-bg-subtle);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  height: 120px;
+  width: 100%;
+}
+
+.trendLine {
+  fill: none;
+  stroke: var(--co-brand-primary);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+}
+
+.historyList {
+  display: grid;
+  gap: 6px;
+}
+
+.historyRow {
+  color: var(--co-text-secondary);
+  display: flex;
+  font-size: var(--text-sm);
+  justify-content: space-between;
+}
+
+.actionList {
+  display: grid;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.actionItem {
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 6px;
+  padding: 9px 10px;
+}
+
+.actionHeader {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.actionImpact {
+  color: var(--co-status-up);
+  font-size: var(--text-sm);
+}
+
+.actionTitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  margin: 0;
+}
+
+.actionDescription {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+[data-density="terminal"] .gauge {
+  height: 140px;
+  width: 160px;
+}
+
+[data-density="terminal"] .gaugeSvg {
+  height: 108px;
+  width: 160px;
+}
+
+[data-density="terminal"] .gaugeInner {
+  border-radius: 18px;
+  height: 90px;
+  margin-top: 34px;
+  width: 126px;
+}
+
+[data-density="terminal"] .scoreValue {
+  font-family: var(--font-mono);
+}
+
+[data-density="terminal"] .componentScore,
+[data-density="terminal"] .historyRow span:last-child {
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 1040px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .heroBody {
+    width: 100%;
+  }
+
+  .analyticsGrid,
+  .componentGrid {
+    grid-template-columns: 1fr;
+  }
+}

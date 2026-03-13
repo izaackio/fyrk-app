@@ -1,6 +1,6 @@
 import { ServiceError } from "@/services/errors";
 
-type RateLimitBucket = "auth" | "read" | "write";
+export type RateLimitBucket = "auth" | "read" | "write" | "demo" | "privacy" | "cron";
 
 interface BucketConfig {
   max: number;
@@ -24,17 +24,35 @@ function parsePositiveInt(rawValue: string | undefined, fallback: number): numbe
 }
 
 function getBucketConfig(bucket: RateLimitBucket): BucketConfig {
-  if (bucket === "auth") {
-    return { max: 10, windowMs: 15 * 60 * 1000 };
-  }
+  const envPrefixByBucket: Record<RateLimitBucket, string | null> = {
+    auth: "RATE_LIMIT_AUTH",
+    read: null,
+    write: "RATE_LIMIT_WRITE",
+    demo: "RATE_LIMIT_DEMO",
+    privacy: "RATE_LIMIT_PRIVACY",
+    cron: "RATE_LIMIT_CRON",
+  };
 
-  if (bucket === "write") {
-    return { max: 30, windowMs: 60 * 1000 };
+  const defaults: Record<RateLimitBucket, BucketConfig> = {
+    auth: { max: 10, windowMs: 15 * 60 * 1000 },
+    read: {
+      max: parsePositiveInt(process.env.RATE_LIMIT_MAX, 100),
+      windowMs: parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60 * 1000),
+    },
+    write: { max: 20, windowMs: 60 * 1000 },
+    demo: { max: 6, windowMs: 10 * 60 * 1000 },
+    privacy: { max: 3, windowMs: 60 * 60 * 1000 },
+    cron: { max: 12, windowMs: 60 * 60 * 1000 },
+  };
+
+  const envPrefix = envPrefixByBucket[bucket];
+  if (!envPrefix) {
+    return defaults[bucket];
   }
 
   return {
-    max: parsePositiveInt(process.env.RATE_LIMIT_MAX, 100),
-    windowMs: parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60 * 1000),
+    max: parsePositiveInt(process.env[`${envPrefix}_MAX`], defaults[bucket].max),
+    windowMs: parsePositiveInt(process.env[`${envPrefix}_WINDOW_MS`], defaults[bucket].windowMs),
   };
 }
 
@@ -91,4 +109,8 @@ export function enforceRateLimit(request: Request, bucket: RateLimitBucket): voi
 
   current.count += 1;
   rateLimitStore.set(key, current);
+}
+
+export function resetRateLimitStore(): void {
+  rateLimitStore.clear();
 }

@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { AuthContext } from "@/lib/auth/middleware";
 import { createServiceRoleSupabaseClient } from "@/lib/auth/supabase";
+import { assertHouseholdWritable, isActiveDemoContext } from "@/lib/demo";
 import type { AccountTransactionsQueryInput, CreateAccountInput, UpdateAccountInput } from "@/lib/validations/accounts";
 import { convertFxAmount, fetchEcbFxSnapshot, type FxRatesSnapshot } from "@/lib/market-data/fx";
 import { ServiceError } from "@/services/errors";
@@ -121,6 +122,7 @@ export class AccountService {
   async create(authContext: AuthContext, input: CreateAccountInput): Promise<AccountDetailView> {
     const { supabase, user } = authContext;
     const membership = await this.requireHouseholdMembership(supabase, input.householdId, user.id);
+    await assertHouseholdWritable(supabase, input.householdId);
 
     if (!householdWritableRoles.includes(membership.role)) {
       throw new ServiceError("FORBIDDEN", "You are not allowed to add accounts to this household");
@@ -165,6 +167,7 @@ export class AccountService {
   async list(authContext: AuthContext, householdId: string): Promise<AccountSummaryView[]> {
     const { supabase, user } = authContext;
     await this.requireHouseholdMembership(supabase, householdId, user.id);
+    const demoAccess = isActiveDemoContext(authContext, householdId);
 
     const { data, error } = await supabase
       .from("accounts")
@@ -181,13 +184,15 @@ export class AccountService {
     }
 
     const accounts = (data ?? []) as AccountRow[];
-    const visibleAccounts = accounts.filter((account) => {
-      if (account.owner_user_id === user.id) {
-        return true;
-      }
+    const visibleAccounts = demoAccess
+      ? accounts
+      : accounts.filter((account) => {
+          if (account.owner_user_id === user.id) {
+            return true;
+          }
 
-      return this.normalizeVisibility(account.visibility) !== "private";
-    });
+          return this.normalizeVisibility(account.visibility) !== "private";
+        });
 
     if (visibleAccounts.length === 0) {
       return [];
@@ -207,6 +212,7 @@ export class AccountService {
         aggregates.get(account.id) ?? { holdingsCount: 0, totalValue: 0 },
         ownerDisplayName,
         user.id,
+        demoAccess,
       );
     });
   }
@@ -417,6 +423,7 @@ export class AccountService {
 
   private async requireOwnedAccount(authContext: AuthContext, accountId: string): Promise<AccountRow> {
     const access = await this.requireAccountReadAccess(authContext, accountId);
+    await assertHouseholdWritable(authContext.supabase, access.account.household_id);
 
     if (!access.isOwner) {
       throw new ServiceError("FORBIDDEN", "Only account owners can modify account settings");
@@ -436,18 +443,19 @@ export class AccountService {
     }
 
     await this.requireHouseholdMembership(authContext.supabase, account.household_id, authContext.user.id);
+    const demoAccess = isActiveDemoContext(authContext, account.household_id);
 
     const visibility = this.normalizeVisibility(account.visibility);
     const isOwner = account.owner_user_id === authContext.user.id;
 
-    if (!isOwner && visibility === "private") {
+    if (!demoAccess && !isOwner && visibility === "private") {
       throw new ServiceError("NOT_FOUND", "Account was not found");
     }
 
     return {
       account,
       isOwner,
-      canViewAmounts: isOwner || visibility === "full",
+      canViewAmounts: demoAccess || isOwner || visibility === "full",
     };
   }
 
@@ -585,10 +593,11 @@ export class AccountService {
     aggregates: AccountAggregates,
     ownerDisplayName: string,
     requestingUserId: string,
+    forceFullAccess = false,
   ): AccountSummaryView {
     const visibility = this.normalizeVisibility(account.visibility);
     const isOwn = account.owner_user_id === requestingUserId;
-    const canViewAmounts = isOwn || visibility === "full";
+    const canViewAmounts = forceFullAccess || isOwn || visibility === "full";
 
     return {
       id: account.id,

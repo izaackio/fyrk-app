@@ -24,9 +24,10 @@ export function MagicLinkForm({ mode }: MagicLinkFormProps) {
     () =>
       mode === "signup"
         ? {
-            title: "Create your Fyrk account",
-            subtitle: "Start with a secure magic link and set up your household.",
-            action: "Send signup link",
+            title: "Create your account",
+            subtitle:
+              "Start with your email, then set up your household when you are ready.",
+            action: "Email me a sign-in link",
             switchText: "Already have an account?",
             switchHref: "/login",
             switchLabel: "Sign in",
@@ -34,10 +35,10 @@ export function MagicLinkForm({ mode }: MagicLinkFormProps) {
             nextLabel: "Continue to household setup",
           }
         : {
-            title: "Welcome back",
+            title: "Sign in to Fyrk",
             subtitle:
-              "Sign in through magic link and continue with your household dashboard.",
-            action: "Send login link",
+              "We will send a secure link so you can pick up where your household left off.",
+            action: "Email me a sign-in link",
             switchText: "New to Fyrk?",
             switchHref: "/signup",
             switchLabel: "Create account",
@@ -91,7 +92,7 @@ export function MagicLinkForm({ mode }: MagicLinkFormProps) {
           type="email"
           value={email}
           {...(error ? { error } : {})}
-          hint="We only use your email for sign-in and household invites."
+          hint="We only use your email for sign-in, household access, and invitation messages."
         />
 
         <Button block disabled={submitting} size="lg" type="submit">
@@ -100,17 +101,13 @@ export function MagicLinkForm({ mode }: MagicLinkFormProps) {
       </form>
 
       {notice ? (
-        <p
-          className={[styles.chip, styles.chipPositive].join(" ")}
-          role="status"
-          style={{ marginTop: "16px" }}
-        >
+        <p className={[styles.authNotice, styles.chip, styles.chipPositive].join(" ")} role="status">
           {notice}
         </p>
       ) : null}
 
       {notice ? (
-        <div style={{ marginTop: "16px" }}>
+        <div className={styles.authNotice}>
           <Link className={styles.link} href={copy.nextHref}>
             {copy.nextLabel}
           </Link>

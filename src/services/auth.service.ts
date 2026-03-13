@@ -1,12 +1,21 @@
 import type { AuthContext } from "@/lib/auth/middleware";
 import { createStatelessSupabaseClient, getMagicLinkRedirectUrl } from "@/lib/auth/supabase";
+import type { DemoVariant } from "@/lib/demo";
 import { ServiceError } from "@/services/errors";
-import type { HouseholdRole, SessionHouseholdSummary, SessionUser } from "@/types/domain";
+import type {
+  HouseholdRole,
+  SessionDemoContext,
+  SessionHouseholdSummary,
+  SessionUser,
+} from "@/types/domain";
 
 interface SessionHouseholdMembershipRow {
   household_id: string;
   role: HouseholdRole;
-  households: { id: string; name: string } | Array<{ id: string; name: string }> | null;
+  households:
+    | { id: string; name: string; is_demo: boolean; demo_variant: DemoVariant | null }
+    | Array<{ id: string; name: string; is_demo: boolean; demo_variant: DemoVariant | null }>
+    | null;
 }
 
 interface HouseholdMemberCountRow {
@@ -16,6 +25,7 @@ interface HouseholdMemberCountRow {
 export interface AuthSessionPayload {
   user: SessionUser;
   households: SessionHouseholdSummary[];
+  demoContext: SessionDemoContext | null;
 }
 
 export class AuthService {
@@ -34,7 +44,7 @@ export class AuthService {
 
     const { data: memberships, error: membershipsError } = await supabase
       .from("household_members")
-      .select("household_id, role, households!inner(id, name)")
+      .select("household_id, role, households!inner(id, name, is_demo, demo_variant)")
       .eq("user_id", user.id)
       .eq("status", "active");
 
@@ -71,22 +81,32 @@ export class AuthService {
         baseCurrency: profile.base_currency,
         onboardingCompleted: profile.onboarding_completed,
       },
-      households: typedMemberships
-        .map((item) => {
+      households: typedMemberships.flatMap((item) => {
           const household = this.resolveHouseholdJoin(item.households);
 
           if (!household) {
-            return null;
+            return [];
           }
 
-          return {
-            id: household.id,
-            name: household.name,
-            role: item.role,
-            memberCount: memberCountByHousehold.get(item.household_id) ?? 0,
-          } satisfies SessionHouseholdSummary;
-        })
-        .filter((item): item is SessionHouseholdSummary => item !== null),
+          return [
+            {
+              id: household.id,
+              name: household.name,
+              role: item.role,
+              memberCount: memberCountByHousehold.get(item.household_id) ?? 0,
+              isDemo: household.is_demo,
+              demoVariant: household.demo_variant,
+            } satisfies SessionHouseholdSummary,
+          ];
+        }),
+      demoContext: authContext.demoContext
+        ? {
+            householdId: authContext.demoContext.householdId,
+            householdName: authContext.demoContext.householdName,
+            variant: authContext.demoContext.variant,
+            readOnly: true,
+          }
+        : null,
     };
   }
 
@@ -133,7 +153,12 @@ export class AuthService {
 
   private resolveHouseholdJoin(
     value: SessionHouseholdMembershipRow["households"],
-  ): { id: string; name: string } | null {
+  ): {
+    id: string;
+    name: string;
+    is_demo: boolean;
+    demo_variant: DemoVariant | null;
+  } | null {
     if (!value) {
       return null;
     }

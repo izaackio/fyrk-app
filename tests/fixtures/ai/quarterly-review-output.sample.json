@@ -1,0 +1,20 @@
+{
+  "narrative": "Q1 2026 closed with steady household progress. Recorded gains came from market participation alongside disciplined saving. Fee drag remained visible enough to merit a focused cleanup this quarter.",
+  "performanceExplanation": "Market returns were the largest positive contributor in the recorded attribution, while savings and debt paydown added supporting progress. Fee drag remained a smaller offset but still worth simplifying.",
+  "recommendations": [
+    {
+      "opportunityId": "fees-01",
+      "title": "Reduce recurring fee drag",
+      "description": "Review the costliest wrappers first and move the cleanup through a staged household plan. Keep the change list simple enough to complete within the quarter.",
+      "estimatedImpactSummary": "Creates a cleaner long-term cost base."
+    },
+    {
+      "opportunityId": "buffer-01",
+      "title": "Rebuild liquidity routine",
+      "description": "Reset the monthly buffer transfer so cash reserves recover without disrupting the current plan. Revisit the cadence after the next quarter closes.",
+      "estimatedImpactSummary": "Supports steadier liquidity through the quarter."
+    }
+  ],
+  "quarterSummary": "The quarter combined forward progress in net worth with a clear opportunity to simplify ongoing costs.",
+  "nextQuarterFocus": "Start with the fee-efficiency work, then confirm a practical buffer routine for the months ahead."
+}

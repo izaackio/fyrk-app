@@ -1,0 +1,264 @@
+.stack {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.stateCard {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.stateMessage {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.errorText {
+  color: var(--co-status-down);
+  margin: 0;
+}
+
+.eventGrid,
+.libraryGrid,
+.impactGrid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.eventCard,
+.libraryCard,
+.impactCard {
+  background: var(--co-bg-subtle);
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: var(--space-sm);
+  padding: 12px;
+}
+
+.eventHeader,
+.libraryHeader,
+.actionHeader {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.eventTitle,
+.libraryTitle,
+.actionTitle {
+  font-size: var(--text-lg);
+  margin: 0;
+}
+
+.eventMeta,
+.completedMeta,
+.impactNote,
+.actionDescription,
+.libraryDescription,
+.progressLabel,
+.subtleLabel {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.completedList,
+.actionList {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.completedRow {
+  align-items: center;
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.completedTitle {
+  font-size: var(--text-base);
+  margin: 0;
+}
+
+.requirementList {
+  color: var(--co-text-secondary);
+  display: grid;
+  gap: 4px;
+  list-style: disc;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.requirementItem {
+  font-size: var(--text-sm);
+}
+
+.progressWrap {
+  display: grid;
+  gap: 6px;
+}
+
+.progressBar {
+  background: var(--co-bg-hover);
+  border-radius: var(--radius-full);
+  height: 9px;
+  overflow: hidden;
+}
+
+.progressValue {
+  background: linear-gradient(90deg, var(--co-brand-primary), var(--co-info));
+  display: block;
+  height: 100%;
+}
+
+.eventSummary {
+  margin: 0;
+}
+
+.eventFooter,
+.actionFooter {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.formGrid,
+.actionControls {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.impactLabel {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.impactValue {
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  margin: 0;
+}
+
+.actionCard {
+  border: 1px solid var(--co-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: var(--space-sm);
+  padding: 12px;
+}
+
+.actionBadges {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.priorityBadge,
+.statusBadge {
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 4px 10px;
+  text-transform: uppercase;
+}
+
+.priorityCritical {
+  background: color-mix(in srgb, var(--co-status-down), transparent 88%);
+  color: var(--co-status-down);
+}
+
+.priorityHigh {
+  background: color-mix(in srgb, #b47c41, transparent 86%);
+  color: #8b5e2f;
+}
+
+.priorityMedium {
+  background: color-mix(in srgb, var(--co-info), transparent 86%);
+  color: var(--co-info);
+}
+
+.priorityLow {
+  background: color-mix(in srgb, var(--co-status-up), transparent 86%);
+  color: var(--co-status-up);
+}
+
+.statusPending {
+  background: var(--co-bg-hover);
+  color: var(--co-text-secondary);
+}
+
+.statusCompleted {
+  background: var(--co-status-up-bg);
+  color: var(--co-status-up);
+}
+
+.statusSkipped {
+  background: var(--co-status-down-bg);
+  color: var(--co-status-down);
+}
+
+.actionButtons {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 1024px) {
+  .eventGrid,
+  .libraryGrid,
+  .impactGrid,
+  .formGrid,
+  .actionControls {
+    grid-template-columns: 1fr;
+  }
+
+  .completedRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .actionButtons {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .eventHeader,
+  .libraryHeader,
+  .actionHeader,
+  .eventFooter,
+  .actionFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .actionBadges {
+    justify-content: flex-start;
+  }
+}

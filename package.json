@@ -12,7 +12,11 @@
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
-    "test": "tsx --test src/**/*.test.ts",
+    "db:seed:demo": "tsx src/db/seed/demo-seed.ts",
+    "db:seed:demo:reset": "tsx src/db/seed/demo-seed.ts --reset-only",
+    "db:seed:demo:seed-only": "tsx src/db/seed/demo-seed.ts --seed-only",
+    "test:db-seed": "tsx --test src/db/seed/demo-dataset.test.ts",
+    "test": "tsx --test $(find src -name '*.test.ts' -print)",
     "test:sprint3-backend": "tsx --test src/services/balance-sheet.contract.test.ts src/services/snapshot.contract.test.ts"
   },
   "dependencies": {

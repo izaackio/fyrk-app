@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { AuthContext } from "@/lib/auth/middleware";
+import { assertHouseholdWritable } from "@/lib/demo";
 import {
   CsvParserError,
   parseAvanzaCsv,
@@ -37,6 +38,7 @@ interface ImportJobRow {
 
 interface AccountRow {
   id: string;
+  household_id: string;
   owner_user_id: string;
   currency: string;
   deleted_at: string | null;
@@ -595,7 +597,7 @@ export class ImportService {
   ): Promise<AccountRow> {
     const { data, error } = await supabase
       .from("accounts")
-      .select("id, owner_user_id, currency, deleted_at, is_active")
+      .select("id, household_id, owner_user_id, currency, deleted_at, is_active")
       .eq("id", accountId)
       .maybeSingle();
 
@@ -612,6 +614,8 @@ export class ImportService {
     if (account.owner_user_id !== userId) {
       throw new ServiceError("FORBIDDEN", "Only account owners can import data");
     }
+
+    await assertHouseholdWritable(supabase, account.household_id);
 
     return account;
   }

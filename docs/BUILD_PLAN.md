@@ -2,7 +2,7 @@
 ## Sprint-by-Sprint Execution Roadmap + Multi-Agent Development Patterns
 
 > **Version:** 0.1
-> **Source:** All documents in `/docs/`
+> **Source:** All documents in `/docs/` (including `FINANCIAL_LOGIC.md`)
 > **Timeline:** 12 weeks (6 × two-week sprints)
 > **Output:** Demo-ready prototype deployable to fyrk.com
 > **Consumed by:** All agents, human developers, project management
@@ -19,9 +19,9 @@ This project is designed for parallel AI-assisted development. Multiple AI codin
 |---|---|---|---|
 | **Architect** | Project scaffolding, infra, CI/CD | CONTEXT, ARCHITECTURE | Project setup, config, deployment |
 | **DB Agent** | Schema, migrations, seed data, RLS | DATA_MODEL, SECURITY | Drizzle schema, migrations, seed scripts |
-| **Backend Agent** | API routes, services, validation | API_SPEC, DATA_MODEL, SECURITY | Route handlers, services, middleware |
+| **Backend Agent** | API routes, services, validation, deterministic financial logic | API_SPEC, DATA_MODEL, SECURITY, FINANCIAL_LOGIC | Route handlers, services, middleware, calculation engine |
 | **Frontend Agent** | UI components, pages, interactions | BRAND_GUIDELINES, PRD, API_SPEC | React components, pages, styles |
-| **AI Agent** | LLM pipelines, prompts, generation | LLM_INTEGRATION, DATA_MODEL | AI service, prompt templates, output schemas |
+| **AI Agent** | LLM pipelines, prompts, generation, interpretation layer | LLM_INTEGRATION, DATA_MODEL, FINANCIAL_LOGIC | AI service, prompt templates, output schemas (no direct math) |
 | **Data Agent** | CSV parsers, market data, providers | EXTERNAL_DATA, DATA_MODEL | Import service, provider adapters, pricing |
 
 ### Coordination contracts
@@ -52,6 +52,7 @@ src/
 1. **`src/types/domain.ts`** — canonical TypeScript types for all entities. DB Agent generates these from Drizzle schema. All agents import from here.
 2. **`src/lib/validations/`** — Zod schemas for API input/output. Backend Agent owns. Frontend Agent imports for form validation.
 3. **`src/db/schema/index.ts`** — Drizzle schema re-exports. Only DB Agent modifies; all agents can import for type inference.
+4. **`src/lib/calculations/*`** — deterministic financial math engine. Backend Agent owns implementation; AI Agent consumes outputs only.
 
 ### Development flow
 
@@ -247,18 +248,25 @@ GATE:
 BACKEND AGENT:
 □ GET /api/balance-sheet?householdId= (full aggregation)
 □ GET /api/balance-sheet/history?householdId=&period=
-□ Balance sheet calculation service (net worth, allocation, exposure)
+□ Balance sheet calculation service (net worth, allocation, exposure) driven by deterministic modules
+□ Implement financial logic baseline modules:
+  - net-worth.ts
+  - allocation.ts
+  - fx.ts
+  - assumptions.ts (default assumptions + metadata)
 □ Account snapshot cron job (daily snapshots for history)
+□ Data quality metadata surface (coverage, stale accounts, missing prices)
 
 AI AGENT:
 □ OpenAI client configuration
-□ Context assembler (household → structured context JSON)
+□ Context assembler (household + deterministic calculation outputs → structured context JSON)
 □ Weekly "What Changed" narrative pipeline
 □ POST /api/ai/narrative
 □ Prompt template: weekly narrative (from LLM_INTEGRATION.md)
 □ Structured output validation with Zod
 □ Error handling + fallback (data-only if AI fails)
 □ Vercel cron job for weekly narrative generation
+□ Enforce "LLM never does math" rule (narrative interprets computed values only)
 
 FRONTEND AGENT:
 □ Balance Sheet page: net worth header, member toggle
@@ -272,7 +280,9 @@ GATE:
   ✓ Balance Sheet page shows unified household net worth
   ✓ Allocation charts render correctly with real data
   ✓ Net worth history chart shows trend over time
+  ✓ Deterministic calculation tests pass for net worth + allocation + FX conversion
   ✓ AI weekly narrative generates successfully
+  ✓ AI output is interpretation-only of deterministic inputs
   ✓ Dashboard shows live net worth + narrative
   ✓ Member toggle filters by individual vs household
 ```
@@ -281,7 +291,7 @@ GATE:
 
 ### Sprint 4: Timeline, Life Events & Fitness (Weeks 7–8)
 
-**Goal:** Financial Timeline, one life event playbook, Financial Fitness Score.
+**Goal:** Financial Timeline, one life event playbook, Financial Fitness Score, and extended deterministic financial logic.
 
 ```
 DB AGENT:
@@ -291,17 +301,24 @@ DB AGENT:
 BACKEND AGENT:
 □ Timeline CRUD endpoints (GET, POST, PATCH, DELETE)
 □ Life event endpoints (library, trigger, action update)
-□ Financial Fitness calculation service
+□ Financial Fitness calculation service (5 deterministic components)
 □ GET /api/fitness?householdId=
 □ Fitness score cron job (daily recalculation)
+□ Implement financial logic expansion modules:
+  - fitness.ts
+  - forecast.ts
+  - scenario.ts (base what-if engine)
+  - mortgage.ts (amortization baseline)
+  - tax-wrappers.ts (ISK/KF/depå comparison baseline)
 □ Create TimelineService, EventService, FitnessService
 
 AI AGENT:
 □ Life Event playbook generation pipeline
 □ Prompt template: "Buying first apartment" playbook
-□ Impact modeling pipeline (what-if analysis)
+□ Impact modeling pipeline (what-if analysis using deterministic scenario outputs)
 □ Financial Fitness explanation pipeline
 □ Fitness micro-action suggestion pipeline
+□ Enforce "interpretation layer only" for score and scenario outputs
 
 FRONTEND AGENT:
 □ Financial Timeline page (scrollable, filterable)
@@ -321,6 +338,8 @@ GATE:
   ✓ AI generates personalized playbook with 10-15 actions
   ✓ Playbook actions are assignable and completable
   ✓ Financial Fitness Score displays with 5 components
+  ✓ Fitness score points are traceable to deterministic formula outputs
+  ✓ Scenario/forecast outputs include assumptions + data quality metadata
   ✓ Fitness trend chart shows history
   ✓ Micro-actions suggest concrete improvements
 ```
@@ -452,7 +471,7 @@ GATE:
 
 | Type | Tool | When | Coverage target |
 |---|---|---|---|
-| **Unit tests** | Vitest | Per service/util function | Critical business logic (fitness calc, allocation, CSV parsing) |
+| **Unit tests** | Vitest | Per service/util function | Critical business logic (net worth, allocation, fitness, scenario, CSV parsing) |
 | **API integration** | Vitest + Supabase test project | Per API endpoint | All P0 endpoints |
 | **Component tests** | Vitest + Testing Library | Key UI components | AmountDisplay, FitnessGauge, AllocationChart |
 | **E2E tests** | Playwright | Sprint 6 | Full onboarding + demo mode journey |
@@ -526,4 +545,5 @@ All development context documents in `/docs/`:
 | 7 | [EXTERNAL_DATA.md](./EXTERNAL_DATA.md) | Data sourcing — CSV, market data, provider adapters | Data agent guide |
 | 8 | [SECURITY.md](./SECURITY.md) | Auth, RLS, GDPR, audit logging | Security baseline |
 | 9 | [BRAND_GUIDELINES.md](./BRAND_GUIDELINES.md) | Brand system, design tokens, components, screen blueprints | Frontend agent + Figma |
-| 10 | [BUILD_PLAN.md](./BUILD_PLAN.md) | Sprint plan, agent assignments, testing, deployment | This document |
+| 10 | [FINANCIAL_LOGIC.md](./FINANCIAL_LOGIC.md) | Deterministic calculation engine, formulas, assumptions, scenario math | Backend + AI logic contract |
+| 11 | [BUILD_PLAN.md](./BUILD_PLAN.md) | Sprint plan, agent assignments, testing, deployment | This document |

@@ -1,0 +1,82 @@
+.stack {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.summaryCard,
+.stateCard {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.metricLabel {
+  color: var(--co-text-secondary);
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.metricValue {
+  font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.22;
+}
+
+.metricMeta {
+  color: var(--co-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.reviewStatus {
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  margin-right: 4px;
+  padding: 4px 8px;
+  text-transform: capitalize;
+}
+
+.reviewDraft {
+  background: color-mix(in srgb, var(--co-chart-3) 20%, var(--co-bg-surface));
+  color: var(--co-text-primary);
+}
+
+.reviewPublished {
+  background: var(--co-status-up-bg);
+  color: var(--co-status-up);
+}
+
+.reviewArchived {
+  background: var(--co-bg-hover);
+  color: var(--co-text-secondary);
+}
+
+.stateMessage {
+  color: var(--co-text-secondary);
+  margin: 0;
+}
+
+.errorText {
+  color: var(--co-status-down);
+  margin: 0;
+}
+
+@media (max-width: 1180px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

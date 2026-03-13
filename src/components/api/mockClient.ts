@@ -1,11 +1,14 @@
 import type {
   ApiEnvelope,
   CreateHouseholdRequest,
+  DemoInitialization,
+  DemoVariant,
   Household,
   HouseholdSummary,
   Invitation,
   InviteHouseholdMemberRequest,
   MagicLinkResponse,
+  SessionDemoContext,
   SessionResponseData,
   SessionUser,
 } from "./contracts";
@@ -17,6 +20,15 @@ interface MockState {
   user: SessionUser;
   households: HouseholdSummary[];
   invitations: Record<string, Invitation[]>;
+  demoContext: SessionDemoContext | null;
+}
+
+interface DemoScenarioSeed {
+  id: string;
+  name: string;
+  memberCount: number;
+  accountCount: number;
+  timelineEntries: number;
 }
 
 const DEFAULT_USER: SessionUser = {
@@ -31,6 +43,55 @@ const DEFAULT_STATE: MockState = {
   user: DEFAULT_USER,
   households: [],
   invitations: {},
+  demoContext: null,
+};
+
+const DEMO_SCENARIOS: Record<DemoVariant, DemoScenarioSeed> = {
+  standard: {
+    id: "f6f3d011-3afb-421f-9b37-bf6ed818a021",
+    name: "Balanced household demo",
+    memberCount: 2,
+    accountCount: 5,
+    timelineEntries: 8,
+  },
+  fire: {
+    id: "f6f3d011-3afb-421f-9b37-bf6ed818a022",
+    name: "FIRE planning demo",
+    memberCount: 2,
+    accountCount: 7,
+    timelineEntries: 11,
+  },
+  fam_family: {
+    id: "f6f3d011-3afb-421f-9b37-bf6ed818a023",
+    name: "Family office demo",
+    memberCount: 3,
+    accountCount: 9,
+    timelineEntries: 13,
+  },
+  friendly_family: {
+    id: "f6f3d011-3afb-421f-9b37-bf6ed818a024",
+    name: "Starter household demo",
+    memberCount: 2,
+    accountCount: 3,
+    timelineEntries: 6,
+  },
+};
+
+const toDemoHouseholdSummary = (
+  variant: DemoVariant,
+  overrides: Partial<HouseholdSummary> = {},
+): HouseholdSummary => {
+  const scenario = DEMO_SCENARIOS[variant];
+
+  return {
+    id: scenario.id,
+    name: scenario.name,
+    role: "member",
+    memberCount: scenario.memberCount,
+    isDemo: true,
+    demoVariant: variant,
+    ...overrides,
+  };
 };
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
@@ -68,6 +129,7 @@ const readState = (): MockState => {
         ...clone(DEFAULT_USER),
         ...parsed.user,
       },
+      demoContext: parsed.demoContext ?? null,
     };
   } catch {
     return clone(DEFAULT_STATE);
@@ -178,6 +240,7 @@ export const getSession = async (): Promise<ApiEnvelope<SessionResponseData>> =>
         data: {
           user: state.user,
           households: state.households,
+          demoContext: state.demoContext,
         },
       };
     },
@@ -222,7 +285,10 @@ export const createHousehold = async (
           name: household.name,
           role: "owner",
           memberCount: 1,
+          isDemo: false,
+          demoVariant: null,
         },
+        ...state.households.filter((existingHousehold) => existingHousehold.id !== household.id),
       ];
       writeState(state);
 
@@ -267,6 +333,47 @@ export const inviteHouseholdMember = async (
 
       writeState(state);
       return { data: invitation };
+    },
+  );
+
+export const initializeDemoHousehold = async (
+  variant: DemoVariant,
+): Promise<ApiEnvelope<DemoInitialization>> =>
+  requestWithFallback(
+    "/api/households/demo",
+    {
+      method: "POST",
+      body: JSON.stringify({ variant }),
+    },
+    async () => {
+      await wait(API_DELAY_MS);
+
+      const state = readState();
+      const scenario = DEMO_SCENARIOS[variant];
+
+      state.demoContext = {
+        householdId: scenario.id,
+        householdName: scenario.name,
+        variant,
+        readOnly: true,
+      };
+      state.households = [
+        ...state.households.filter((household) => !household.isDemo),
+        toDemoHouseholdSummary(variant),
+      ];
+      writeState(state);
+
+      return {
+        data: {
+          id: scenario.id,
+          name: scenario.name,
+          isDemo: true,
+          demoVariant: variant,
+          memberCount: scenario.memberCount,
+          accountCount: scenario.accountCount,
+          timelineEntries: scenario.timelineEntries,
+        },
+      };
     },
   );
 

@@ -1,10 +1,47 @@
+import type { Metadata } from "next";
+
+import { LandingPage } from "@/components/marketing/LandingPage";
+
+const title = "Fyrk | Shared household money planning for couples";
+const description =
+  "Fyrk helps couples plan money together with a shared household view, clearer weekly context, and calmer decision support.";
+
+export const metadata: Metadata = {
+  title,
+  description,
+  keywords: [
+    "Fyrk",
+    "household finance app",
+    "couples money planning",
+    "shared household planning",
+    "Swedish households",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title,
+    description,
+    type: "website",
+    url: "/",
+    siteName: "Fyrk",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Fyrk household planning preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/twitter-image"],
+  },
+};
+
 export default function HomePage() {
-  return (
-    <main className="mx-auto max-w-4xl px-6 py-20">
-      <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Fyrk Sprint 1 Baseline</h1>
-      <p className="mt-4 text-base text-slate-700 sm:text-lg">
-        Next.js App Router + TypeScript scaffold is configured with strict linting, type-checking, and CI.
-      </p>
-    </main>
-  );
+  return <LandingPage />;
 }

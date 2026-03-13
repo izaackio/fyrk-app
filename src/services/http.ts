@@ -20,6 +20,62 @@ export interface ApiErrorResponse {
   };
 }
 
+function createRequestId(): string {
+  return globalThis.crypto?.randomUUID?.() ?? `fyrk-${Date.now()}`;
+}
+
+function logUnexpectedApiError(error: ServiceError, requestId: string): void {
+  if (error.status < 500) {
+    return;
+  }
+
+  console.error("[api_error]", {
+    code: error.code,
+    details: error.details ?? null,
+    message: error.message,
+    requestId,
+  });
+}
+
+function applySecurityHeaders<T>(
+  response: NextResponse<T>,
+  options?: {
+    error?: ServiceError;
+    requestId?: string;
+  },
+): NextResponse<T> {
+  const requestId = options?.requestId ?? createRequestId();
+
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  response.headers.set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
+  response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
+  response.headers.set("Cross-Origin-Resource-Policy", "same-origin");
+  response.headers.set("Permissions-Policy", "camera=(), geolocation=(), microphone=(), browsing-topics=()");
+  response.headers.set("Referrer-Policy", "no-referrer");
+  response.headers.set("Vary", "Cookie");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Request-Id", requestId);
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+
+  if (process.env.NODE_ENV === "production") {
+    response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+
+  if (options?.error?.code === "RATE_LIMITED") {
+    const retryAfterMs =
+      typeof options.error.details?.retryAfterMs === "number"
+        ? options.error.details.retryAfterMs
+        : null;
+
+    if (retryAfterMs !== null) {
+      response.headers.set("Retry-After", String(Math.max(1, Math.ceil(retryAfterMs / 1000))));
+    }
+  }
+
+  return response;
+}
+
 export async function parseJsonBody<T>(request: Request, schema: ZodType<T>): Promise<T> {
   let payload: unknown;
 
@@ -52,7 +108,7 @@ export async function parseRouteParams<T>(
 }
 
 export function successResponse<T>(data: T, status = 200): NextResponse<ApiSuccessResponse<T>> {
-  return NextResponse.json({ data }, { status });
+  return applySecurityHeaders(NextResponse.json({ data }, { status }));
 }
 
 export function successResponseWithMeta<T, M>(
@@ -60,20 +116,29 @@ export function successResponseWithMeta<T, M>(
   meta: M,
   status = 200,
 ): NextResponse<ApiSuccessWithMetaResponse<T, M>> {
-  return NextResponse.json({ data, meta }, { status });
+  return applySecurityHeaders(NextResponse.json({ data, meta }, { status }));
 }
 
 export function errorResponse(error: unknown): NextResponse<ApiErrorResponse> {
   const normalized = toServiceError(error);
+  const requestId = createRequestId();
 
-  return NextResponse.json(
-    {
-      error: {
-        code: normalized.code,
-        message: normalized.message,
-        ...(normalized.details ? { details: normalized.details } : {}),
+  logUnexpectedApiError(normalized, requestId);
+
+  return applySecurityHeaders(
+    NextResponse.json(
+      {
+        error: {
+          code: normalized.code,
+          message: normalized.message,
+          ...(normalized.details ? { details: normalized.details } : {}),
+        },
       },
+      { status: normalized.status },
+    ),
+    {
+      error: normalized,
+      requestId,
     },
-    { status: normalized.status },
   );
 }

@@ -22,6 +22,7 @@ export function SelectField({
   className,
   ...props
 }: SelectFieldProps) {
+  const hintId = hint ? `${id}-hint` : undefined;
   const selectClasses = [styles.inputControl, className ?? ""].filter(Boolean).join(" ");
 
   return (
@@ -29,14 +30,18 @@ export function SelectField({
       <label className={styles.inputLabel} htmlFor={id}>
         {label}
       </label>
-      <select className={selectClasses} id={id} {...props}>
+      <select aria-describedby={hintId} className={selectClasses} id={id} {...props}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}
       </select>
-      {hint ? <span className={styles.inputHint}>{hint}</span> : null}
+      {hint ? (
+        <span className={styles.inputHint} id={hintId}>
+          {hint}
+        </span>
+      ) : null}
     </div>
   );
 }
