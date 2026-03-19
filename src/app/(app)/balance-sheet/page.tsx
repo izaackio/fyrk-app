@@ -7,7 +7,7 @@ export default function BalanceSheetPage() {
       <header className={styles.sectionHeading}>
         <h2 className={styles.sectionTitle}>Balance Sheet</h2>
         <p className={styles.sectionDescription}>
-          See assets, liabilities, and allocation in one household view.
+          Household net worth, exposures, and balance integrity in one working view.
         </p>
       </header>
       <BalanceSheetExperience />

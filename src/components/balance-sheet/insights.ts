@@ -4,6 +4,8 @@ import type {
   AccountSyncSource,
   AccountSummary,
   AccountType,
+  AccountVisibility,
+  WrapperType,
 } from "../accounts/contracts";
 import { formatDateTime, formatMoney, formatPercent } from "../accounts/formatters";
 
@@ -32,13 +34,42 @@ export interface AccountTypeSlice {
   value: number;
 }
 
+export interface BalanceSheetAccountRow {
+  accountType: AccountType;
+  currency: string;
+  holdingsCount: number;
+  id: string;
+  lastSynced: string | null;
+  name: string;
+  netValue: number;
+  ownerDisplayName: string;
+  providerName: string;
+  syncSource: AccountSyncSource;
+  visibility: AccountVisibility;
+  wrapperType: WrapperType;
+}
+
+export interface BalanceSheetQualitySummary {
+  accountsMissingSync: number;
+  csvAccounts: number;
+  estimatedAllocationAccounts: number;
+  estimatedAllocationValue: number;
+  holdingsBackedAccounts: number;
+  holdingsBackedValue: number;
+  manualAccounts: number;
+  providerAccounts: number;
+}
+
 export interface MemberBalanceView {
   accountsCount: number;
+  accounts: BalanceSheetAccountRow[];
   allocation: Record<AllocationDimension, AllocationSlice[]>;
   byAccountType: AccountTypeSlice[];
   displayName: string;
+  freshness: FreshnessSummary;
   id: string;
   netWorth: number;
+  quality: BalanceSheetQualitySummary;
   totalAssets: number;
   totalLiabilities: number;
 }
@@ -54,6 +85,7 @@ export interface FreshnessSummary {
 
 export interface BalanceSheetSnapshot {
   accountsCount: number;
+  accounts: BalanceSheetAccountRow[];
   allocation: Record<AllocationDimension, AllocationSlice[]>;
   asOfDate: string | null;
   byAccountType: AccountTypeSlice[];
@@ -61,6 +93,7 @@ export interface BalanceSheetSnapshot {
   freshness: FreshnessSummary;
   householdId: string;
   members: MemberBalanceView[];
+  quality: BalanceSheetQualitySummary;
   totalAssets: number;
   totalLiabilities: number;
   totalNetWorth: number;
@@ -68,11 +101,14 @@ export interface BalanceSheetSnapshot {
 
 export interface BalanceSheetViewSelection {
   accountsCount: number;
+  accounts: BalanceSheetAccountRow[];
   allocation: Record<AllocationDimension, AllocationSlice[]>;
   byAccountType: AccountTypeSlice[];
+  freshness: FreshnessSummary;
   id: string;
   label: string;
   netWorth: number;
+  quality: BalanceSheetQualitySummary;
   totalAssets: number;
   totalLiabilities: number;
 }
@@ -114,11 +150,17 @@ type AllocationAccumulator = Record<AllocationDimension, Map<string, AllocationB
 
 interface MemberAccumulator {
   accountsCount: number;
+  accounts: BalanceSheetAccountRow[];
   allocations: AllocationAccumulator;
   byAccountType: Map<string, AccountTypeSlice>;
+  coverageCount: number;
   displayName: string;
   id: string;
+  latestTimestamp: number | null;
   netWorth: number;
+  primarySyncSource: AccountSyncSource;
+  quality: BalanceSheetQualitySummary;
+  staleAccounts: number;
   totalAssets: number;
   totalLiabilities: number;
 }
@@ -159,6 +201,17 @@ const buildAllocationAccumulator = (): AllocationAccumulator => ({
   sector: new Map<string, AllocationBucket>(),
 });
 
+const createQualitySummary = (): BalanceSheetQualitySummary => ({
+  accountsMissingSync: 0,
+  csvAccounts: 0,
+  estimatedAllocationAccounts: 0,
+  estimatedAllocationValue: 0,
+  holdingsBackedAccounts: 0,
+  holdingsBackedValue: 0,
+  manualAccounts: 0,
+  providerAccounts: 0,
+});
+
 const createMemberId = (displayName: string): string => {
   const slug = displayName
     .trim()
@@ -181,11 +234,17 @@ const ensureMember = (
 
   const member: MemberAccumulator = {
     accountsCount: 0,
+    accounts: [],
     allocations: buildAllocationAccumulator(),
     byAccountType: new Map<string, AccountTypeSlice>(),
+    coverageCount: 0,
     displayName,
     id: createMemberId(displayName),
+    latestTimestamp: null,
     netWorth: 0,
+    primarySyncSource: "manual",
+    quality: createQualitySummary(),
+    staleAccounts: 0,
     totalAssets: 0,
     totalLiabilities: 0,
   };
@@ -236,6 +295,23 @@ const upsertAccountType = (
     label: ACCOUNT_TYPE_LABELS[accountType],
     value,
   });
+};
+
+const recordSyncSource = (
+  quality: BalanceSheetQualitySummary,
+  syncSource: AccountSyncSource,
+): void => {
+  if (syncSource === "provider") {
+    quality.providerAccounts += 1;
+    return;
+  }
+
+  if (syncSource === "csv") {
+    quality.csvAccounts += 1;
+    return;
+  }
+
+  quality.manualAccounts += 1;
 };
 
 const toSignedValue = (account: AccountSummary): number => {
@@ -347,6 +423,30 @@ const parseTimestamp = (value: string | null | undefined): number | null => {
   return timestamp;
 };
 
+const getFreshnessLevel = (
+  timestamp: number | null,
+): FreshnessSummary["level"] => {
+  if (!timestamp) {
+    return "unknown";
+  }
+
+  const ageHours = (Date.now() - timestamp) / (1000 * 60 * 60);
+  if (ageHours >= 168) {
+    return "stale";
+  }
+
+  if (ageHours >= 48) {
+    return "aged";
+  }
+
+  return "fresh";
+};
+
+const sortAccountRows = (
+  left: BalanceSheetAccountRow,
+  right: BalanceSheetAccountRow,
+): number => Math.abs(right.netValue) - Math.abs(left.netValue);
+
 const buildFreshnessSummary = ({
   coverageCount,
   latestTimestamp,
@@ -426,6 +526,7 @@ export const loadBalanceSheetSnapshot = async (
   if (accounts.length === 0) {
     return {
       accountsCount: 0,
+      accounts: [],
       allocation: {
         assetClass: [],
         currency: [],
@@ -445,6 +546,7 @@ export const loadBalanceSheetSnapshot = async (
       },
       householdId,
       members: [],
+      quality: createQualitySummary(),
       totalAssets: 0,
       totalLiabilities: 0,
       totalNetWorth: 0,
@@ -454,7 +556,9 @@ export const loadBalanceSheetSnapshot = async (
   const holdingsByAccountId = await loadHoldings(accounts);
 
   const householdAllocations = buildAllocationAccumulator();
+  const householdQuality = createQualitySummary();
   const byAccountType = new Map<string, AccountTypeSlice>();
+  const accountRows: BalanceSheetAccountRow[] = [];
   const members = new Map<string, MemberAccumulator>();
 
   let totalAssets = 0;
@@ -480,6 +584,23 @@ export const loadBalanceSheetSnapshot = async (
 
     const memberName = account.ownerDisplayName?.trim() || "Member";
     const member = ensureMember(members, memberName);
+    const accountRow: BalanceSheetAccountRow = {
+      accountType: account.accountType,
+      currency: account.currency,
+      holdingsCount: account.holdingsCount,
+      id: account.id,
+      lastSynced: account.lastSynced || null,
+      name: account.name,
+      netValue: signedValue,
+      ownerDisplayName: memberName,
+      providerName: account.providerName,
+      syncSource: account.syncSource,
+      visibility: account.visibility,
+      wrapperType: account.wrapperType,
+    };
+
+    accountRows.push(accountRow);
+    member.accounts.push(accountRow);
 
     member.accountsCount += 1;
     member.netWorth += signedValue;
@@ -490,26 +611,55 @@ export const loadBalanceSheetSnapshot = async (
     }
     upsertAccountType(member.byAccountType, account.accountType, signedValue);
 
-    if (account.holdingsCount > 0 || Math.abs(account.totalValue) > 0) {
+    recordSyncSource(householdQuality, account.syncSource);
+    recordSyncSource(member.quality, account.syncSource);
+
+    if (account.holdingsCount > 0 || Math.abs(signedValue) > 0) {
       coverageCount += 1;
+      member.coverageCount += 1;
     }
 
     const parsedTimestamp = parseTimestamp(account.lastSynced);
+    if (!latestTimestamp) {
+      primarySyncSource = account.syncSource;
+    }
+    if (!member.latestTimestamp) {
+      member.primarySyncSource = account.syncSource;
+    }
+
+    if (!parsedTimestamp) {
+      householdQuality.accountsMissingSync += 1;
+      member.quality.accountsMissingSync += 1;
+    }
+
     if (parsedTimestamp) {
       if (!latestTimestamp || parsedTimestamp > latestTimestamp) {
         latestTimestamp = parsedTimestamp;
         primarySyncSource = account.syncSource;
       }
 
-      const ageHours = (Date.now() - parsedTimestamp) / (1000 * 60 * 60);
-      if (ageHours >= 168) {
+      if (!member.latestTimestamp || parsedTimestamp > member.latestTimestamp) {
+        member.latestTimestamp = parsedTimestamp;
+        member.primarySyncSource = account.syncSource;
+      }
+
+      if (getFreshnessLevel(parsedTimestamp) === "stale") {
         staleAccounts += 1;
+        member.staleAccounts += 1;
       }
     }
 
     const holdings = holdingsByAccountId[account.id] ?? [];
 
     if (holdings.length > 0) {
+      householdQuality.holdingsBackedAccounts += 1;
+      member.quality.holdingsBackedAccounts += 1;
+
+      if (signedValue > 0) {
+        householdQuality.holdingsBackedValue += signedValue;
+        member.quality.holdingsBackedValue += signedValue;
+      }
+
       holdings.forEach((holding) => {
         const holdingValue = Math.max(0, holding.marketValue);
         if (holdingValue <= 0) {
@@ -587,6 +737,11 @@ export const loadBalanceSheetSnapshot = async (
       return;
     }
 
+    householdQuality.estimatedAllocationAccounts += 1;
+    householdQuality.estimatedAllocationValue += signedValue;
+    member.quality.estimatedAllocationAccounts += 1;
+    member.quality.estimatedAllocationValue += signedValue;
+
     const assetClass = inferAssetClassFromAccountType(account.accountType);
     const fallbackSector = ACCOUNT_TYPE_LABELS[account.accountType];
 
@@ -650,13 +805,11 @@ export const loadBalanceSheetSnapshot = async (
   });
 
   const currency = accounts[0]?.currency ?? "SEK";
-  const asOfDate = accounts
-    .map((account) => account.lastSynced)
-    .filter(Boolean)
-    .sort((left, right) => right.localeCompare(left))[0] ?? null;
+  const asOfDate = latestTimestamp ? new Date(latestTimestamp).toISOString() : null;
 
   const memberViews: MemberBalanceView[] = [...members.values()].map((member) => ({
     accountsCount: member.accountsCount,
+    accounts: [...member.accounts].sort(sortAccountRows),
     allocation: {
       assetClass: toAllocationSlices(member.allocations.assetClass, member.totalAssets),
       currency: toAllocationSlices(member.allocations.currency, member.totalAssets),
@@ -665,14 +818,23 @@ export const loadBalanceSheetSnapshot = async (
     },
     byAccountType: toAccountTypeSlices(member.byAccountType),
     displayName: member.displayName,
+    freshness: buildFreshnessSummary({
+      coverageCount: member.coverageCount,
+      latestTimestamp: member.latestTimestamp,
+      primarySyncSource: member.primarySyncSource,
+      staleAccounts: member.staleAccounts,
+      totalAccounts: member.accountsCount,
+    }),
     id: member.id,
     netWorth: member.netWorth,
+    quality: member.quality,
     totalAssets: member.totalAssets,
     totalLiabilities: member.totalLiabilities,
   }));
 
   return {
     accountsCount: accounts.length,
+    accounts: [...accountRows].sort(sortAccountRows),
     allocation: {
       assetClass: toAllocationSlices(householdAllocations.assetClass, totalAssets),
       currency: toAllocationSlices(householdAllocations.currency, totalAssets),
@@ -691,6 +853,7 @@ export const loadBalanceSheetSnapshot = async (
     }),
     householdId,
     members: memberViews.sort((left, right) => right.netWorth - left.netWorth),
+    quality: householdQuality,
     totalAssets,
     totalLiabilities,
     totalNetWorth,
@@ -704,11 +867,14 @@ export const selectBalanceSheetView = (
   if (selectedMemberId === "household") {
     return {
       accountsCount: snapshot.accountsCount,
+      accounts: snapshot.accounts,
       allocation: snapshot.allocation,
       byAccountType: snapshot.byAccountType,
+      freshness: snapshot.freshness,
       id: "household",
       label: "Household",
       netWorth: snapshot.totalNetWorth,
+      quality: snapshot.quality,
       totalAssets: snapshot.totalAssets,
       totalLiabilities: snapshot.totalLiabilities,
     };
@@ -718,11 +884,14 @@ export const selectBalanceSheetView = (
   if (!member) {
     return {
       accountsCount: snapshot.accountsCount,
+      accounts: snapshot.accounts,
       allocation: snapshot.allocation,
       byAccountType: snapshot.byAccountType,
+      freshness: snapshot.freshness,
       id: "household",
       label: "Household",
       netWorth: snapshot.totalNetWorth,
+      quality: snapshot.quality,
       totalAssets: snapshot.totalAssets,
       totalLiabilities: snapshot.totalLiabilities,
     };
@@ -730,11 +899,14 @@ export const selectBalanceSheetView = (
 
   return {
     accountsCount: member.accountsCount,
+    accounts: member.accounts,
     allocation: member.allocation,
     byAccountType: member.byAccountType,
+    freshness: member.freshness,
     id: member.id,
     label: member.displayName,
     netWorth: member.netWorth,
+    quality: member.quality,
     totalAssets: member.totalAssets,
     totalLiabilities: member.totalLiabilities,
   };
@@ -870,11 +1042,9 @@ export const loadWeeklyNetWorthDelta = async (
 
 interface AiNarrativeResponse {
   data?: {
-    fromCache?: unknown;
     generatedAt?: unknown;
     highlights?: unknown;
     narrative?: unknown;
-    source?: unknown;
   };
 }
 
@@ -1008,22 +1178,13 @@ export const loadWeeklyNarrative = async (
       typeof generatedAtRaw === "string" && generatedAtRaw
         ? generatedAtRaw
         : new Date().toISOString();
-    const source = payload.data?.source === "ai" ? "ai" : "fallback";
-    const fromCache = payload.data?.fromCache === true;
 
     return {
       generatedAt,
       highlights,
       narrative,
-      source,
-      sourceMessage:
-        source === "ai"
-          ? fromCache
-            ? `Loaded ${formatDateTime(generatedAt)} from the cached AI narrative artifact.`
-            : `Generated ${formatDateTime(generatedAt)} by AI narrative service.`
-          : fromCache
-            ? `Loaded ${formatDateTime(generatedAt)} from the precomputed fallback narrative artifact.`
-            : `Generated ${formatDateTime(generatedAt)} from deterministic fallback data.`,
+      source: "ai",
+      sourceMessage: `Generated ${formatDateTime(generatedAt)} by AI narrative service.`,
     };
   } catch {
     return buildFallbackNarrative(snapshot, weeklyDelta);
