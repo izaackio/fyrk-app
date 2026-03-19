@@ -9,22 +9,26 @@ This document is the running delivery log for Fyrk. Update it at the end of ever
 - `Blocked`: cannot proceed due to dependency or external constraint
 
 ## Current Snapshot
-- Last updated: 2026-03-12
+- Last updated: 2026-03-19
 - Baseline branch: `main`
-- Latest merged commit on `main`: `c149eb1`
-- Product phase: Prototype build-out
+- Product phase: Prototype build-out → Design system migration
 
 | Sprint | Scope | Status | Notes |
 |---|---|---|---|
-| Sprint 0 | Pre-launch waitlist page | In Progress | Landing page is live on `/`, but the waitlist API + persistence lane is not merged to `main` |
+| Sprint 0 | Pre-launch waitlist page | Completed | Waitlist page live at fyrk.com |
 | Sprint 1 | Foundation (arch + DB + backend + frontend shell) | Completed | All Sprint 1 agent tracks merged to `main` |
 | Sprint 2 | Accounts & data (manual + CSV + FX) | Completed | DB, data, backend, and frontend tracks merged to `main`; QA track intentionally skipped |
-| Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; backend financial-logic follow-up also merged; integration lane not run |
-| Sprint 4 | Timeline + life event + fitness | Completed | DB, backend/AI-services, frontend, and integration lanes merged to `main` |
-| Sprint 5 | Quarterly review + governance | Completed | DB, backend, AI, frontend, and integration lanes merged to `main` |
-| Sprint 6 | Demo data + polish + launch prep | Completed | Data seed, backend hardening, AI precompute, frontend polish, and release validation lanes are all merged to `main` |
-| Sprint 6.5 | Design system hardening + UX QA | Not Started | Planned quality bridge sprint; no dedicated Sprint 6.5 merge train has landed on `main` |
-| Sprint 7 | Brand excellence + interaction quality | In Progress | Frontend brand, backend regression, and AI quality lanes are merged; DB stability and integration/signoff remain pending |
+| Sprint 3 | Balance sheet + first AI narrative | Completed | DB, backend, frontend, and AI lanes merged to `main`; integration lane not run |
+| Sprint 4 | Timeline + life event + fitness | Completed | Timeline entries, life events, playbooks, fitness scoring delivered |
+| Sprint 5 | Quarterly review + governance | Completed | Quarterly reviews, proposals, governance flows delivered |
+| Sprint 6 | Demo data + polish + launch prep | Completed | Data seed, backend hardening, AI precompute, frontend polish, and release validation lanes merged |
+| Sprint 7 | **Design system migration — "10x Financial Copilot"** | **⬅️ NEXT** | New palette, fonts (DM Sans + Instrument Serif), ƒ logo, 3-panel layout. See [DESIGN_SPRINT.md](docs/DESIGN_SPRINT.md) |
+| Sprint 8 | Interaction quality + copilot polish | Not Started | Feed cards, ⌘K command bar, motion, density modes. Builds on S7 design system |
+| Sprint 9 | Data access + provider integration | Not Started | Tink PSD2, Avanza API, provider_connections |
+| Sprint 10 | Auto-generated timeline + charts | Not Started | Detection engine, auto-timeline, Recharts |
+| Sprint 11 | Intelligence + optimization | Not Started | Optimization engine, enhanced narrative, MarketConfig |
+| Sprint 12 | Weekly email + notification pipeline | Not Started | Resend integration, consent management, proactive alerts |
+| Sprint 13 | Scale preparation + agent architecture | Not Started | Temporal.io, production Tink, Insurely |
 
 ## Sprint-by-Sprint Progress
 

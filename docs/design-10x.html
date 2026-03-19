@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fyrk — 10x Concept: The Financial Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #f0f1f4;
+  color: #111;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════
+   VIEW TOGGLE (sticky top bar)
+   ═══════════════════════════════════════════════════════ */
+.view-toggle-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(240, 241, 244, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 24px;
+}
+.view-toggle-bar .bar-title {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: #444;
+  margin-right: 16px;
+}
+.view-toggle-btn {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 7px 20px;
+  border-radius: 10px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  color: #888;
+  cursor: pointer;
+  transition: all 150ms;
+}
+.view-toggle-btn:hover { border-color: #bbb; color: #555; }
+.view-toggle-btn.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SECTIONS (shown/hidden by toggle)
+   ═══════════════════════════════════════════════════════ */
+.view-section { display: none; }
+.view-section.visible { display: block; }
+
+/* ═══════════════════════════════════════════════════════
+   CONTEXT BRIEF
+   ═══════════════════════════════════════════════════════ */
+.brief {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 4vw, 2.5rem);
+}
+.brief h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 1.25rem;
+  color: #111;
+}
+.brief-lead {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #444;
+  max-width: 60ch;
+  margin: 0 0 2rem;
+}
+.brief-principles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+.principle {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 4%);
+}
+.principle-num { font-size: 0.625rem; font-weight: 700; letter-spacing: 0.12em; color: #0066ff; text-transform: uppercase; }
+.principle-text { font-size: 0.875rem; font-weight: 600; color: #222; margin-top: 4px; line-height: 1.4; }
+.brief-note {
+  font-size: 0.8125rem; color: #888; line-height: 1.6;
+  border-top: 1px solid #ddd; padding-top: 1rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   THE PRODUCT FRAME (DESKTOP)
+   ═══════════════════════════════════════════════════════ */
+.product-frame {
+  max-width: 1360px;
+  margin: 0 auto 4rem;
+  padding: 0 clamp(1rem, 2vw, 2rem);
+}
+.product-shell {
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 24px 80px rgb(0 0 0 / 10%);
+  border: 1px solid rgb(0 0 0 / 6%);
+  display: grid;
+  grid-template-columns: 64px 1fr 380px;
+  min-height: 780px;
+}
+
+/* ─── Rail (collapsed nav) ─── */
+.rail {
+  background: #fafafa;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 4px;
+}
+.rail-logo {
+  width: 36px; height: 36px;
+  background: #111;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.125rem;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+.rail-item {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.rail-item:hover { background: #f0f0f2; color: #555; }
+.rail-item.active { background: #111; color: #fff; }
+.rail-spacer { flex: 1; }
+.rail-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0066ff 0%, #00ccaa 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+/* ─── Main Feed ─── */
+.feed {
+  display: flex;
+  flex-direction: column;
+  background: #f6f7f9;
+  overflow: hidden;
+}
+.feed-header {
+  padding: 24px 28px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.feed-header-left { display: grid; gap: 2px; }
+.feed-greeting {
+  font-size: 0.8125rem;
+  color: #888;
+}
+.feed-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: #111;
+}
+.feed-vitals {
+  display: flex; gap: 8px;
+}
+.vital-chip {
+  background: #fff;
+  border: 1px solid #e8e8ec;
+  border-radius: 12px;
+  padding: 8px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.8125rem;
+}
+.vital-num {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.vital-trend { font-weight: 600; font-size: 0.6875rem; }
+.vital-trend-up { color: #00a866; }
+.vital-label { color: #888; font-size: 0.6875rem; }
+
+/* Feed content */
+.feed-body {
+  flex: 1;
+  padding: 20px 28px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  overflow-y: auto;
+}
+
+/* ─── Feed Cards ─── */
+.feed-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 20px 22px;
+  display: grid;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 3%);
+  transition: box-shadow 200ms, transform 200ms;
+}
+.feed-card:hover {
+  box-shadow: 0 4px 20px rgb(0 0 0 / 6%);
+  transform: translateY(-1px);
+}
+
+/* Card types */
+.card-header {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.card-source {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.6875rem; font-weight: 600; color: #888;
+}
+.card-source-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+}
+.card-time { font-size: 0.6875rem; color: #bbb; }
+.card-body { font-size: 0.9375rem; line-height: 1.6; color: #333; }
+.card-body strong { color: #111; }
+
+/* Insight card */
+.insight-highlight {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.375rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: #111;
+  letter-spacing: -0.01em;
+}
+
+/* Action card */
+.action-card { border-left: 3px solid #0066ff; }
+.action-title { font-size: 0.9375rem; font-weight: 700; color: #111; }
+.action-desc { font-size: 0.8125rem; color: #555; line-height: 1.55; }
+.action-impact {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.6875rem; font-weight: 600; color: #00a866;
+  background: #edfdf5; padding: 3px 10px; border-radius: 99px;
+}
+.action-buttons { display: flex; gap: 8px; }
+.btn-primary {
+  background: #111; color: #fff; border: none; border-radius: 10px;
+  padding: 8px 18px; font-size: 0.8125rem; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+}
+.btn-secondary {
+  background: #f4f4f6; color: #555; border: 1px solid #e0e0e4; border-radius: 10px;
+  padding: 8px 18px; font-size: 0.8125rem; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+}
+
+/* Alert card */
+.alert-card { background: #fffcf0; border: 1px solid #f0e6c0; }
+.alert-icon { font-size: 18px; }
+
+/* Metric row inside a card */
+.metric-row {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.metric-item { display: grid; gap: 1px; }
+.metric-label { font-size: 0.625rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #999; }
+.metric-val {
+  font-size: 1.375rem; font-weight: 700; letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums; color: #111;
+}
+.metric-val-sm { font-size: 1rem; }
+.metric-sub { font-size: 0.6875rem; color: #888; }
+
+/* Chart area in card */
+.card-chart {
+  background: #f8f9fb;
+  border-radius: 12px;
+  padding: 14px 16px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* ─── Command Bar ─── */
+.command-bar {
+  margin: 0 28px 20px;
+  background: #fff;
+  border: 1.5px solid #e0e0e6;
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 4%);
+  transition: border-color 200ms, box-shadow 200ms;
+}
+.command-bar:hover, .command-bar:focus-within {
+  border-color: #0066ff;
+  box-shadow: 0 2px 20px rgb(0 102 255 / 8%);
+}
+.command-icon { color: #bbb; font-size: 18px; flex-shrink: 0; }
+.command-input {
+  border: none; outline: none; flex: 1; font-family: inherit;
+  font-size: 0.875rem; color: #333; background: transparent;
+}
+.command-input::placeholder { color: #bbb; }
+.command-shortcuts {
+  display: flex; gap: 4px;
+}
+.kbd {
+  background: #f4f4f6; border: 1px solid #e0e0e4; border-radius: 6px;
+  padding: 2px 7px; font-size: 0.625rem; font-weight: 600; color: #888;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ─── Context Panel (right) ─── */
+.context-panel {
+  background: #fff;
+  border-left: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.context-header {
+  padding: 24px 22px 16px;
+  border-bottom: 1px solid #f0f0f2;
+}
+.context-tab-row {
+  display: flex; gap: 0; background: #f4f5f7; border-radius: 10px; padding: 3px;
+}
+.context-tab {
+  flex: 1; text-align: center; font-size: 0.6875rem; font-weight: 600;
+  padding: 7px 0; border-radius: 8px; color: #888; cursor: pointer;
+  border: none; background: none; font-family: inherit;
+}
+.context-tab.active { background: #fff; color: #111; box-shadow: 0 1px 3px rgb(0 0 0 / 5%); }
+
+.context-body {
+  flex: 1; padding: 16px 22px; display: grid; gap: 18px; align-content: start; overflow-y: auto;
+}
+
+/* Context sections */
+.ctx-section { display: grid; gap: 8px; }
+.ctx-section-title {
+  font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #aaa;
+}
+
+/* Net worth big number */
+.ctx-nw { display: grid; gap: 2px; }
+.ctx-nw-num {
+  font-size: 2rem; font-weight: 700; letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums; line-height: 1; color: #111;
+}
+.ctx-nw-trend { font-size: 0.75rem; font-weight: 600; color: #00a866; }
+.ctx-nw-sub { font-size: 0.6875rem; color: #999; }
+
+/* Mini chart in context */
+.ctx-chart {
+  background: #f8f9fb; border-radius: 12px; height: 80px;
+  display: flex; align-items: flex-end; padding: 0 8px 8px;
+}
+
+/* Account rows */
+.ctx-account {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f4f4f6;
+}
+.ctx-account:last-child { border-bottom: none; }
+.ctx-acc-left { display: grid; gap: 1px; }
+.ctx-acc-name { font-size: 0.8125rem; font-weight: 600; color: #222; }
+.ctx-acc-meta { font-size: 0.6875rem; color: #999; }
+.ctx-acc-right { text-align: right; }
+.ctx-acc-val { font-size: 0.875rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #111; }
+.ctx-acc-change { font-size: 0.625rem; font-weight: 600; }
+.ctx-acc-up { color: #00a866; }
+.ctx-acc-down { color: #e03e3e; }
+.ctx-acc-neg { color: #e03e3e; }
+
+/* Fitness in context */
+.ctx-fitness { display: flex; align-items: center; gap: 14px; }
+.ctx-fitness-score {
+  font-size: 2.5rem; font-weight: 700; letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.ctx-fitness-bars { flex: 1; display: grid; gap: 5px; }
+.ctx-bar-row { display: flex; align-items: center; gap: 6px; }
+.ctx-bar-label { font-size: 0.625rem; color: #999; width: 52px; }
+.ctx-bar-track { flex: 1; height: 5px; background: #f0f1f4; border-radius: 3px; overflow: hidden; }
+.ctx-bar-fill { height: 100%; border-radius: 3px; }
+.ctx-bar-fill-good { background: #00a866; }
+.ctx-bar-fill-mid { background: #f5a623; }
+.ctx-bar-fill-low { background: #e03e3e; }
+
+/* Pending actions in context */
+.ctx-pending {
+  background: #f8f9fb; border-radius: 12px; padding: 12px 14px;
+  display: grid; gap: 8px;
+}
+.ctx-pending-item { display: flex; align-items: center; gap: 8px; }
+.ctx-pending-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.ctx-pending-text { font-size: 0.75rem; color: #555; flex: 1; }
+.ctx-pending-action {
+  font-size: 0.625rem; font-weight: 600; color: #0066ff;
+  background: rgb(0 102 255 / 6%); padding: 2px 8px; border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE CONCEPT
+   ═══════════════════════════════════════════════════════ */
+.mobile-section {
+  max-width: 1100px;
+  margin: 0 auto 4rem;
+  padding: 0 clamp(1rem, 2vw, 2rem);
+}
+.mobile-row {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+}
+
+.phone-frame {
+  width: 320px;
+  min-height: 640px;
+  background: #fff;
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 20px 60px rgb(0 0 0 / 10%);
+  border: 1px solid rgb(0 0 0 / 6%);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+.phone-status {
+  padding: 12px 24px 0;
+  display: flex; justify-content: space-between;
+  font-size: 0.6875rem; font-weight: 600; color: #111;
+}
+.phone-content {
+  flex: 1; display: flex; flex-direction: column;
+}
+/* Mobile home */
+.m-home { padding: 8px 20px 20px; display: grid; gap: 14px; flex: 1; align-content: start; }
+.m-greeting { font-size: 0.8125rem; color: #888; }
+.m-title { font-family: 'Instrument Serif', serif; font-size: 1.5rem; font-weight: 400; margin: 0; }
+.m-nw-card {
+  background: #111; color: #fff; border-radius: 20px; padding: 20px;
+  display: grid; gap: 8px;
+}
+.m-nw-label { font-size: 0.5625rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+.m-nw-num { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1; }
+.m-nw-trend { font-size: 0.75rem; font-weight: 600; color: #34d399; }
+.m-nw-chart { height: 50px; margin-top: 4px; }
+.m-insight-card {
+  background: #f6f7f9; border-radius: 16px; padding: 16px 18px; display: grid; gap: 6px;
+}
+.m-insight-source { font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.1em; color: #0066ff; text-transform: uppercase; }
+.m-insight-text {
+  font-family: 'Instrument Serif', serif; font-size: 1.0625rem; font-style: italic;
+  line-height: 1.45; color: #222;
+}
+.m-action-card {
+  background: #fff; border: 1px solid #e8e8ec; border-radius: 16px; padding: 14px 16px;
+  display: grid; gap: 8px;
+}
+.m-action-title { font-size: 0.8125rem; font-weight: 700; color: #111; }
+.m-action-desc { font-size: 0.75rem; color: #666; line-height: 1.5; }
+.m-action-btns { display: flex; gap: 6px; }
+.m-btn {
+  padding: 7px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;
+  font-family: inherit; border: none; cursor: pointer;
+}
+.m-btn-dark { background: #111; color: #fff; }
+.m-btn-light { background: #f0f0f3; color: #555; }
+.m-command {
+  background: #f6f7f9; border-radius: 14px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.8125rem; color: #bbb;
+}
+.m-tab-bar {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  border-top: 1px solid #eee; padding: 8px 0 20px;
+}
+.m-tab {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-size: 0.5625rem; color: #bbb; font-weight: 600; padding: 6px 0;
+}
+.m-tab.active { color: #111; }
+.m-tab-icon { font-size: 18px; }
+
+/* Phone 2: conversation */
+.m-convo { padding: 8px 20px 12px; display: grid; gap: 10px; flex: 1; align-content: start; }
+.m-convo-title { font-size: 1rem; font-weight: 700; margin: 0; }
+.m-msg {
+  border-radius: 16px; padding: 12px 14px; font-size: 0.8125rem; line-height: 1.55;
+  max-width: 88%;
+}
+.m-msg-ai { background: #f6f7f9; color: #333; }
+.m-msg-user { background: #111; color: #fff; margin-left: auto; }
+.m-msg-table {
+  display: grid; gap: 4px; margin-top: 6px; font-size: 0.75rem;
+}
+.m-msg-row {
+  display: flex; justify-content: space-between;
+  padding: 3px 0; border-bottom: 1px solid #eee;
+}
+.m-msg-row:last-child { border: none; }
+.m-msg-key { color: #888; }
+.m-msg-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+.m-msg-val-up { color: #00a866; }
+.m-input-bar {
+  margin: auto 0 0;
+  padding: 0 0 4px;
+}
+.m-input {
+  background: #f6f7f9; border-radius: 14px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.8125rem; color: #bbb;
+}
+
+/* Phone 3: accounts */
+.m-accounts { padding: 8px 20px 12px; display: grid; gap: 12px; flex: 1; align-content: start; }
+.m-acc-title { font-size: 1rem; font-weight: 700; margin: 0; }
+.m-acc-total-row { display: flex; justify-content: space-between; align-items: baseline; }
+.m-acc-total-num { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.m-acc-total-trend { font-size: 0.75rem; font-weight: 600; color: #00a866; }
+.m-acc-card {
+  background: #f6f7f9; border-radius: 14px; padding: 14px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.m-acc-left { display: grid; gap: 2px; }
+.m-acc-name { font-size: 0.8125rem; font-weight: 600; }
+.m-acc-type { font-size: 0.6875rem; color: #888; }
+.m-acc-right { text-align: right; }
+.m-acc-amount { font-size: 0.875rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.m-acc-pct { font-size: 0.625rem; font-weight: 600; }
+.m-acc-up { color: #00a866; }
+.m-acc-down { color: #e03e3e; }
+.m-acc-liability { color: #e03e3e; }
+
+/* ═══════════════════════════════════════════════════════
+   MARKETING LANDING PAGE
+   ═══════════════════════════════════════════════════════ */
+.lp {
+  max-width: 100%;
+  overflow: hidden;
+}
+.lp-frame {
+  background: #fff;
+  border-radius: 24px;
+  margin: 0 clamp(1rem, 2vw, 2rem) 3rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 24px 80px rgb(0 0 0 / 10%);
+  border: 1px solid rgb(0 0 0 / 6%);
+  overflow: hidden;
+}
+
+/* ─── Nav ─── */
+.lp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 1px solid #f0f0f2;
+}
+.lp-nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.375rem; font-style: italic; color: #111;
+  text-decoration: none;
+}
+.lp-nav-logo-mark {
+  width: 32px; height: 32px; background: #111; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.9375rem;
+}
+.lp-nav-links {
+  display: flex; align-items: center; gap: 32px;
+}
+.lp-nav-link {
+  font-size: 0.8125rem; font-weight: 500; color: #666;
+  text-decoration: none; transition: color 120ms;
+}
+.lp-nav-link:hover { color: #111; }
+.lp-nav-cta {
+  background: #111; color: #fff; border: none; border-radius: 10px;
+  padding: 9px 22px; font-size: 0.8125rem; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: background 120ms;
+}
+.lp-nav-cta:hover { background: #333; }
+.lp-nav-cta-ghost {
+  background: none; color: #111; border: 1.5px solid #ddd; border-radius: 10px;
+  padding: 8px 20px; font-size: 0.8125rem; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+}
+
+/* ─── Hero ─── */
+.lp-hero {
+  text-align: center;
+  padding: 80px 48px 0;
+  position: relative;
+  overflow: hidden;
+}
+.lp-hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #f4f5f7; border: 1px solid #e8e8ec; border-radius: 99px;
+  padding: 6px 16px; font-size: 0.6875rem; font-weight: 600; color: #555;
+  margin-bottom: 24px;
+}
+.lp-hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #0066ff;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+.lp-hero h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin: 0 auto 20px;
+  max-width: 14ch;
+  color: #111;
+}
+.lp-hero h1 span { color: #0066ff; }
+.lp-hero-sub {
+  font-size: 1.1875rem;
+  line-height: 1.65;
+  color: #666;
+  max-width: 52ch;
+  margin: 0 auto 36px;
+}
+.lp-hero-actions {
+  display: flex; justify-content: center; gap: 12px;
+  margin-bottom: 56px;
+}
+.lp-hero-btn-primary {
+  background: #111; color: #fff; border: none; border-radius: 12px;
+  padding: 14px 32px; font-size: 0.9375rem; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 150ms;
+}
+.lp-hero-btn-primary:hover { background: #222; transform: translateY(-1px); box-shadow: 0 6px 24px rgb(0 0 0 / 15%); }
+.lp-hero-btn-secondary {
+  background: transparent; color: #555; border: 1.5px solid #ddd; border-radius: 12px;
+  padding: 14px 28px; font-size: 0.9375rem; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+  transition: all 150ms;
+}
+.lp-hero-btn-secondary:hover { border-color: #bbb; color: #111; }
+
+/* Hero product preview */
+.lp-hero-preview {
+  max-width: 1080px;
+  margin: 0 auto;
+  border-radius: 18px 18px 0 0;
+  overflow: hidden;
+  box-shadow: 0 -4px 40px rgb(0 0 0 / 6%);
+  border: 1px solid #e8e8ec;
+  border-bottom: none;
+  background: #f6f7f9;
+}
+.lp-hero-preview-bar {
+  background: #fafafa;
+  border-bottom: 1px solid #eee;
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 6px;
+}
+.lp-hero-preview-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.lp-hero-preview-inner {
+  display: grid;
+  grid-template-columns: 52px 1fr 300px;
+  min-height: 380px;
+}
+
+/* Mini rail in preview */
+.lp-mini-rail {
+  background: #fafafa; border-right: 1px solid #eee;
+  display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 4px;
+}
+.lp-mini-rail-logo {
+  width: 28px; height: 28px; background: #111; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-family: 'Instrument Serif', serif; font-size: 0.8125rem; font-style: italic;
+  margin-bottom: 12px;
+}
+.lp-mini-rail-dot {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #bbb;
+}
+.lp-mini-rail-dot.active { background: #111; color: #fff; }
+
+/* Mini feed in preview */
+.lp-mini-feed {
+  padding: 18px 20px;
+  display: grid; gap: 10px; align-content: start;
+}
+.lp-mini-greet { font-size: 0.6875rem; color: #999; }
+.lp-mini-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.25rem; font-weight: 400; margin: 0 0 6px;
+}
+.lp-mini-card {
+  background: #fff; border-radius: 14px; padding: 14px 16px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 3%); display: grid; gap: 6px;
+}
+.lp-mini-card-src {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.5625rem; font-weight: 600; color: #999;
+}
+.lp-mini-card-src-dot { width: 5px; height: 5px; border-radius: 50%; }
+.lp-mini-card-insight {
+  font-family: 'Instrument Serif', serif; font-style: italic;
+  font-size: 0.9375rem; line-height: 1.4; color: #222;
+}
+.lp-mini-card-action {
+  border-left: 2px solid #0066ff;
+}
+.lp-mini-card-action-title { font-size: 0.75rem; font-weight: 700; color: #111; }
+.lp-mini-card-action-desc { font-size: 0.6875rem; color: #777; line-height: 1.4; }
+.lp-mini-card-btns { display: flex; gap: 4px; }
+.lp-mini-btn {
+  padding: 4px 10px; border-radius: 7px; font-size: 0.5625rem; font-weight: 600;
+  border: none; cursor: pointer; font-family: inherit;
+}
+.lp-mini-btn-dark { background: #111; color: #fff; }
+.lp-mini-btn-light { background: #f0f0f3; color: #777; }
+
+/* Mini context panel */
+.lp-mini-ctx {
+  border-left: 1px solid #eee; padding: 18px 16px;
+  display: grid; gap: 12px; align-content: start; background: #fff;
+}
+.lp-mini-ctx-label { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; }
+.lp-mini-ctx-nw { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.lp-mini-ctx-trend { font-size: 0.625rem; font-weight: 600; color: #00a866; }
+.lp-mini-ctx-chart { height: 50px; }
+.lp-mini-ctx-acc { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f4f4f6; }
+.lp-mini-ctx-acc:last-child { border: none; }
+.lp-mini-ctx-acc-name { font-size: 0.6875rem; font-weight: 600; color: #333; }
+.lp-mini-ctx-acc-val { font-size: 0.6875rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #111; }
+
+/* ─── Social proof ─── */
+.lp-social {
+  padding: 56px 48px;
+  text-align: center;
+  border-top: 1px solid #f0f0f2;
+}
+.lp-social-row {
+  display: flex; justify-content: center; align-items: center; gap: 48px;
+  flex-wrap: wrap;
+}
+.lp-social-stat { display: grid; gap: 2px; }
+.lp-social-num {
+  font-size: 2rem; font-weight: 700; letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums; color: #111;
+}
+.lp-social-label { font-size: 0.75rem; color: #999; font-weight: 500; }
+.lp-social-divider { width: 1px; height: 48px; background: #e8e8ec; }
+
+/* ─── Value Props Section ─── */
+.lp-values {
+  padding: 72px 48px;
+  border-top: 1px solid #f0f0f2;
+}
+.lp-values-header {
+  text-align: center; margin-bottom: 56px;
+}
+.lp-values-header h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.5rem; font-weight: 400; font-style: italic;
+  letter-spacing: -0.03em; line-height: 1.1;
+  margin: 0 0 12px;
+}
+.lp-values-header p { font-size: 1rem; color: #888; max-width: 50ch; margin: 0 auto; }
+.lp-values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.lp-value-card {
+  background: #f8f9fb;
+  border-radius: 20px;
+  padding: 32px 28px;
+  display: grid; gap: 12px;
+  transition: transform 200ms, box-shadow 200ms;
+}
+.lp-value-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgb(0 0 0 / 6%); }
+.lp-value-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.lp-value-card h3 { font-size: 1rem; font-weight: 700; margin: 0; color: #111; }
+.lp-value-card p { font-size: 0.8125rem; color: #666; line-height: 1.6; margin: 0; }
+
+/* ─── How It Works ─── */
+.lp-how {
+  padding: 72px 48px;
+  border-top: 1px solid #f0f0f2;
+  background: #fafbfc;
+}
+.lp-how-header {
+  text-align: center; margin-bottom: 48px;
+}
+.lp-how-header h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.25rem; font-weight: 400; font-style: italic;
+  letter-spacing: -0.03em; margin: 0 0 8px;
+}
+.lp-how-header p { font-size: 0.9375rem; color: #888; margin: 0; }
+.lp-how-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 32px; max-width: 960px; margin: 0 auto;
+}
+.lp-how-step { display: grid; gap: 10px; text-align: center; }
+.lp-how-num {
+  width: 40px; height: 40px; border-radius: 50%; background: #111; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8125rem; font-weight: 700; margin: 0 auto 4px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.lp-how-step h3 { font-size: 0.9375rem; font-weight: 700; margin: 0; }
+.lp-how-step p { font-size: 0.8125rem; color: #666; line-height: 1.55; margin: 0; }
+
+/* ─── Copilot Demo Section ─── */
+.lp-demo {
+  padding: 72px 48px;
+  border-top: 1px solid #f0f0f2;
+}
+.lp-demo-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 48px; max-width: 1100px; margin: 0 auto;
+  align-items: center;
+}
+.lp-demo-text h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.25rem; font-weight: 400; font-style: italic;
+  letter-spacing: -0.03em; line-height: 1.15; margin: 0 0 16px;
+}
+.lp-demo-text p { font-size: 0.9375rem; color: #666; line-height: 1.65; margin: 0 0 24px; }
+.lp-demo-convo {
+  background: #f6f7f9; border-radius: 20px; padding: 24px; display: grid; gap: 10px;
+}
+.lp-demo-bubble {
+  border-radius: 14px; padding: 12px 16px; font-size: 0.8125rem; line-height: 1.55;
+  max-width: 90%;
+}
+.lp-demo-user { background: #111; color: #fff; margin-left: auto; }
+.lp-demo-ai { background: #fff; color: #333; box-shadow: 0 1px 3px rgb(0 0 0 / 4%); }
+.lp-demo-ai-serif {
+  font-family: 'Instrument Serif', serif; font-style: italic;
+  font-size: 0.9375rem; line-height: 1.5; margin-bottom: 6px;
+}
+.lp-demo-action {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #111; color: #fff; border-radius: 8px; padding: 6px 14px;
+  font-size: 0.6875rem; font-weight: 600; margin-top: 6px;
+}
+
+/* ─── Fitness Score Section ─── */
+.lp-fitness {
+  padding: 72px 48px;
+  border-top: 1px solid #f0f0f2;
+  background: #111;
+  color: #fff;
+}
+.lp-fitness-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 56px; max-width: 1100px; margin: 0 auto;
+  align-items: center;
+}
+.lp-fitness-text h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.25rem; font-weight: 400; font-style: italic;
+  letter-spacing: -0.03em; line-height: 1.15; margin: 0 0 16px;
+}
+.lp-fitness-text p { font-size: 0.9375rem; color: #999; line-height: 1.65; margin: 0 0 24px; }
+.lp-fitness-categories { display: grid; gap: 8px; }
+.lp-fitness-cat {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+}
+.lp-fitness-cat-name { font-size: 0.75rem; font-weight: 600; color: #888; width: 72px; }
+.lp-fitness-cat-bar { flex: 1; height: 6px; background: #2a2a2a; border-radius: 4px; overflow: hidden; }
+.lp-fitness-cat-fill { height: 100%; border-radius: 4px; }
+.lp-fitness-visual {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.lp-fitness-score-big {
+  font-size: 7rem; font-weight: 700; letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums; line-height: 1;
+  background: linear-gradient(180deg, #fff 0%, #666 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.lp-fitness-score-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #666; }
+
+/* ─── For Investors section ─── */
+.lp-investors {
+  padding: 72px 48px;
+  border-top: 1px solid #f0f0f2;
+}
+.lp-investors-header {
+  text-align: center; margin-bottom: 48px;
+}
+.lp-investors-header h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.25rem; font-weight: 400; font-style: italic;
+  letter-spacing: -0.03em; margin: 0 0 8px;
+}
+.lp-investors-header p { font-size: 0.9375rem; color: #888; max-width: 55ch; margin: 0 auto; }
+.lp-investors-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; max-width: 1100px; margin: 0 auto;
+}
+.lp-investor-card {
+  background: #f8f9fb; border-radius: 18px; padding: 28px 24px;
+  display: grid; gap: 6px; text-align: center;
+}
+.lp-investor-card-num {
+  font-size: 2rem; font-weight: 700; letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #0066ff;
+}
+.lp-investor-card h4 { font-size: 0.8125rem; font-weight: 700; margin: 0; color: #111; }
+.lp-investor-card p { font-size: 0.75rem; color: #888; line-height: 1.5; margin: 0; }
+
+/* ─── CTA Section ─── */
+.lp-cta {
+  padding: 80px 48px;
+  text-align: center;
+  border-top: 1px solid #f0f0f2;
+  background: linear-gradient(180deg, #fafbfc 0%, #fff 100%);
+}
+.lp-cta h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400; font-style: italic;
+  letter-spacing: -0.04em; line-height: 1.1;
+  margin: 0 auto 16px;
+  max-width: 16ch;
+}
+.lp-cta p { font-size: 1rem; color: #888; margin: 0 auto 32px; max-width: 45ch; }
+.lp-cta-email {
+  display: flex; gap: 8px; justify-content: center;
+  max-width: 440px; margin: 0 auto 16px;
+}
+.lp-cta-input {
+  flex: 1; padding: 14px 18px; border-radius: 12px;
+  border: 1.5px solid #ddd; font-size: 0.9375rem;
+  font-family: inherit; outline: none; background: #fff;
+  transition: border-color 200ms;
+}
+.lp-cta-input:focus { border-color: #0066ff; }
+.lp-cta-input::placeholder { color: #bbb; }
+.lp-cta-submit {
+  background: #0066ff; color: #fff; border: none; border-radius: 12px;
+  padding: 14px 28px; font-size: 0.9375rem; font-weight: 600;
+  font-family: inherit; cursor: pointer; white-space: nowrap;
+  transition: background 150ms;
+}
+.lp-cta-submit:hover { background: #0052cc; }
+.lp-cta-fine { font-size: 0.6875rem; color: #bbb; margin-top: 8px; }
+
+/* ─── Footer ─── */
+.lp-footer {
+  padding: 32px 48px;
+  border-top: 1px solid #f0f0f2;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.lp-footer-logo {
+  font-family: 'Instrument Serif', serif; font-style: italic;
+  font-size: 1rem; color: #bbb;
+}
+.lp-footer-links { display: flex; gap: 24px; }
+.lp-footer-link { font-size: 0.75rem; color: #bbb; text-decoration: none; }
+.lp-footer-link:hover { color: #666; }
+
+/* ═══════════════════════════════════════════════════════
+   LOGO PROPOSALS
+   ═══════════════════════════════════════════════════════ */
+.logo-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem clamp(1.5rem, 4vw, 2.5rem) 4rem;
+}
+.logo-section-header {
+  margin-bottom: 3rem;
+}
+.logo-section-header h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.5rem; font-weight: 400; font-style: italic;
+  letter-spacing: -0.03em; margin: 0 0 0.75rem;
+}
+.logo-section-header p {
+  font-size: 1rem; color: #666; line-height: 1.65; max-width: 55ch;
+}
+.logo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.logo-proposal {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 4%), 0 8px 32px rgb(0 0 0 / 6%);
+  border: 1px solid rgb(0 0 0 / 5%);
+  transition: transform 200ms, box-shadow 200ms;
+}
+.logo-proposal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 8%), 0 12px 48px rgb(0 0 0 / 8%);
+}
+.logo-proposal-num {
+  font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #0066ff;
+}
+.logo-proposal-name {
+  font-size: 1.125rem; font-weight: 700; margin: 4px 0 6px; color: #111;
+}
+.logo-proposal-desc {
+  font-size: 0.8125rem; color: #777; line-height: 1.55;
+}
+
+/* Logo display area */
+.logo-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+  min-height: 240px;
+  gap: 32px;
+}
+.logo-display-light { background: #f6f7f9; }
+.logo-display-dark { background: #111; }
+.logo-display-split {
+  background: linear-gradient(90deg, #f6f7f9 50%, #111 50%);
+}
+
+/* Logo info */
+.logo-info {
+  padding: 20px 24px 24px;
+  border-top: 1px solid #f0f0f2;
+}
+
+/* Logo usage row */
+.logo-usage-row {
+  display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap;
+}
+.logo-usage-item {
+  display: flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; border-radius: 14px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+}
+.logo-usage-item-light { background: #fff; }
+.logo-usage-item-dark { background: #111; }
+.logo-usage-item-blue { background: #0066ff; }
+
+/* Wordmark display */
+.logo-wordmark {
+  display: flex; align-items: center; gap: 12px;
+}
+.logo-wordmark-text {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.75rem; font-style: italic;
+  letter-spacing: -0.02em;
+}
+.logo-wordmark-text-light { color: #111; }
+.logo-wordmark-text-dark { color: #fff; }
+
+/* Full-width comparison row */
+.logo-comparison {
+  grid-column: 1 / -1;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 4%), 0 8px 32px rgb(0 0 0 / 6%);
+  border: 1px solid rgb(0 0 0 / 5%);
+}
+.logo-comparison-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0f2;
+}
+.logo-comparison-header h3 { font-size: 1rem; font-weight: 700; margin: 0 0 4px; }
+.logo-comparison-header p { font-size: 0.8125rem; color: #888; margin: 0; }
+.logo-comparison-row {
+  display: flex;
+  overflow-x: auto;
+}
+.logo-comparison-cell {
+  flex: 1; min-width: 180px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px 20px;
+  gap: 12px;
+  border-right: 1px solid #f0f0f2;
+}
+.logo-comparison-cell:last-child { border-right: none; }
+.logo-comparison-label {
+  font-size: 0.625rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #aaa;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- STICKY TOGGLE BAR                                      -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view-toggle-bar">
+  <span class="bar-title">The Financial Copilot</span>
+  <button class="view-toggle-btn active" data-view="desktop" onclick="switchView('desktop')">Desktop</button>
+  <button class="view-toggle-btn" data-view="mobile" onclick="switchView('mobile')">Mobile</button>
+  <button class="view-toggle-btn" data-view="marketing" onclick="switchView('marketing')">Marketing</button>
+  <button class="view-toggle-btn" data-view="logo" onclick="switchView('logo')">Logo</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BRIEF (always visible)                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="brief">
+  <h1>The Financial Copilot</h1>
+  <p class="brief-lead">
+    Not a dashboard. Not a tracker. A copilot — an intelligent agent that watches your entire financial life, tells you what matters, and acts when you say go. One surface, every provider, zero lock-in.
+  </p>
+
+  <div class="brief-principles">
+    <div class="principle">
+      <div class="principle-num">01</div>
+      <div class="principle-text">Feed, not dashboard. The copilot brings what matters to you — you don't hunt for it.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">02</div>
+      <div class="principle-text">Context on demand. Data appears when relevant — net worth, accounts, fitness live in a right panel, not scattered across pages.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">03</div>
+      <div class="principle-text">Every card is actionable. Insights come with a "what to do about it" button. No dead-end data.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">04</div>
+      <div class="principle-text">Command-first. Type what you want — "show me our insurance gaps" or "propose switching to index funds." Natural language is the primary nav.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">05</div>
+      <div class="principle-text">Household-native. Two people, one financial life. The copilot mediates, proposes, and records decisions together.</div>
+    </div>
+  </div>
+
+  <p class="brief-note">The visual language: black + white + one accent (blue). Instrument Serif italic for the copilot's editorial voice. DM Sans for everything functional. No beige, no navy, no warm tones. The product is the intelligence — the design just gets out of the way.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- DESKTOP VIEW                                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="view-desktop" class="view-section visible">
+  <div class="product-frame">
+    <div class="product-shell">
+
+      <!-- Rail nav -->
+      <nav class="rail">
+        <div class="rail-logo">f</div>
+        <div class="rail-item active" title="Feed">◉</div>
+        <div class="rail-item" title="Accounts">◫</div>
+        <div class="rail-item" title="Timeline">◷</div>
+        <div class="rail-item" title="Planning">▣</div>
+        <div class="rail-item" title="Proposals">◎</div>
+        <div class="rail-spacer"></div>
+        <div class="rail-item" title="Settings">⚙</div>
+        <div class="rail-avatar">IA</div>
+      </nav>
+
+      <!-- Main Feed -->
+      <main class="feed">
+        <div class="feed-header">
+          <div class="feed-header-left">
+            <div class="feed-greeting">Wednesday, March 18</div>
+            <h1 class="feed-title">Good morning, Isac</h1>
+          </div>
+          <div class="feed-vitals">
+            <div class="vital-chip">
+              <div><div class="vital-num">2.43M</div><div class="vital-label">Net worth</div></div>
+              <div class="vital-trend vital-trend-up">↑ 0.5%</div>
+            </div>
+            <div class="vital-chip">
+              <div><div class="vital-num">720</div><div class="vital-label">Fitness</div></div>
+              <div class="vital-trend vital-trend-up">↑ 20</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="feed-body">
+
+          <!-- Insight card -->
+          <div class="feed-card">
+            <div class="card-header">
+              <div class="card-source"><div class="card-source-dot" style="background:#0066ff"></div> Copilot Insight</div>
+              <div class="card-time">2 hours ago</div>
+            </div>
+            <div class="insight-highlight">Your household net worth crossed 2.4M for the first time. Nordic equities drove a 12,400 SEK gain this week — Investor AB and Volvo B leading.</div>
+            <div class="metric-row">
+              <div class="metric-item"><div class="metric-label">This week</div><div class="metric-val" style="color:#00a866">+12 400</div></div>
+              <div class="metric-item"><div class="metric-label">This month</div><div class="metric-val">+38 200</div></div>
+              <div class="metric-item"><div class="metric-label">YTD</div><div class="metric-val">+142 000</div></div>
+            </div>
+          </div>
+
+          <!-- Action card -->
+          <div class="feed-card action-card">
+            <div class="card-header">
+              <div class="card-source"><div class="card-source-dot" style="background:#f5a623"></div> Action Required</div>
+              <div class="card-time">Today</div>
+            </div>
+            <div class="action-title">Your mortgage rate expires in 8 months</div>
+            <div class="action-desc">Current rate: 2.89% fixed. Market 5Y fixed rates have dropped to 2.6%. Refinancing now could save ~18,000 SEK/year. I've prepared a comparison.</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <div class="action-impact">↑ Saves ~18 000 SEK/yr</div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn-primary">View comparison</button>
+              <button class="btn-secondary">Remind me later</button>
+            </div>
+          </div>
+
+          <!-- Proposal card -->
+          <div class="feed-card">
+            <div class="card-header">
+              <div class="card-source"><div class="card-source-dot" style="background:#a855f7"></div> Proposal from Sara</div>
+              <div class="card-time">Yesterday</div>
+            </div>
+            <div class="action-title">Move 50 000 SEK from savings to index fund</div>
+            <div class="card-body">"Our savings buffer is 6.2 months of expenses — more than our 4-month target. Can we put the excess to work?"</div>
+            <div class="metric-row">
+              <div class="metric-item"><div class="metric-label">Impact on buffer</div><div class="metric-val metric-val-sm">6.2 → 5.1 mo</div></div>
+              <div class="metric-item"><div class="metric-label">Expected return</div><div class="metric-val metric-val-sm" style="color:#00a866">+7% / yr</div></div>
+              <div class="metric-item"><div class="metric-label">Fitness impact</div><div class="metric-val metric-val-sm">720 → 728</div></div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn-primary">Approve</button>
+              <button class="btn-secondary">Discuss</button>
+              <button class="btn-secondary">Decline</button>
+            </div>
+          </div>
+
+          <!-- Alert card -->
+          <div class="feed-card alert-card">
+            <div class="card-header">
+              <div class="card-source"><span class="alert-icon">⚡</span> Auto-detected</div>
+              <div class="card-time">Mon</div>
+            </div>
+            <div class="card-body">Dividend received: <strong>Investor AB — 2 340 SEK</strong> into ISK Avanza. Your annual dividend income is now 14 200 SEK (+18% YoY).</div>
+          </div>
+
+        </div>
+
+        <!-- Command bar -->
+        <div class="command-bar">
+          <div class="command-icon">⌘</div>
+          <input class="command-input" placeholder="Ask anything — &quot;what's our insurance coverage?&quot; or &quot;propose selling Volvo B&quot;" readonly>
+          <div class="command-shortcuts"><span class="kbd">⌘</span><span class="kbd">K</span></div>
+        </div>
+      </main>
+
+      <!-- Context Panel -->
+      <aside class="context-panel">
+        <div class="context-header">
+          <div class="context-tab-row">
+            <button class="context-tab active">Overview</button>
+            <button class="context-tab">Accounts</button>
+            <button class="context-tab">Fitness</button>
+          </div>
+        </div>
+
+        <div class="context-body">
+
+          <!-- Net worth -->
+          <div class="ctx-section">
+            <div class="ctx-section-title">Net Worth</div>
+            <div class="ctx-nw">
+              <div class="ctx-nw-num">2 430 000</div>
+              <div style="display:flex;gap:8px;align-items:baseline">
+                <div class="ctx-nw-trend">↑ 12 400 this week</div>
+                <div class="ctx-nw-sub">Assets 2.85M · Liabilities 420K</div>
+              </div>
+            </div>
+            <div class="ctx-chart">
+              <svg width="100%" height="60" viewBox="0 0 320 60" preserveAspectRatio="none">
+                <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0066ff" stop-opacity="0.08"/><stop offset="100%" stop-color="#0066ff" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0,52 C40,50 80,46 120,40 C160,34 200,28 240,20 C280,14 300,10 320,6 V60 H0Z" fill="url(#cg)"/>
+                <path d="M0,52 C40,50 80,46 120,40 C160,34 200,28 240,20 C280,14 300,10 320,6" fill="none" stroke="#0066ff" stroke-width="1.5"/>
+                <circle cx="320" cy="6" r="3" fill="#0066ff"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Accounts -->
+          <div class="ctx-section">
+            <div class="ctx-section-title">Accounts</div>
+            <div>
+              <div class="ctx-account">
+                <div class="ctx-acc-left"><div class="ctx-acc-name">ISK Avanza</div><div class="ctx-acc-meta">5 holdings · ISK</div></div>
+                <div class="ctx-acc-right"><div class="ctx-acc-val">350 000</div><div class="ctx-acc-change ctx-acc-up">↑ 2.3%</div></div>
+              </div>
+              <div class="ctx-account">
+                <div class="ctx-acc-left"><div class="ctx-acc-name">Sparkonto SEB</div><div class="ctx-acc-meta">Savings</div></div>
+                <div class="ctx-acc-right"><div class="ctx-acc-val">450 000</div><div class="ctx-acc-change" style="color:#888">Fixed</div></div>
+              </div>
+              <div class="ctx-account">
+                <div class="ctx-acc-left"><div class="ctx-acc-name">PPM</div><div class="ctx-acc-meta">Pension · 3 funds</div></div>
+                <div class="ctx-acc-right"><div class="ctx-acc-val">380 000</div><div class="ctx-acc-change ctx-acc-up">↑ 1.1%</div></div>
+              </div>
+              <div class="ctx-account">
+                <div class="ctx-acc-left"><div class="ctx-acc-name">KF Nordnet</div><div class="ctx-acc-meta">3 holdings · KF</div></div>
+                <div class="ctx-acc-right"><div class="ctx-acc-val">180 000</div><div class="ctx-acc-change ctx-acc-down">↓ 0.8%</div></div>
+              </div>
+              <div class="ctx-account">
+                <div class="ctx-acc-left"><div class="ctx-acc-name">Bolån Nordea</div><div class="ctx-acc-meta">Mortgage · 2.89%</div></div>
+                <div class="ctx-acc-right"><div class="ctx-acc-val ctx-acc-neg">−420 000</div><div class="ctx-acc-change" style="color:#888">8 mo to renewal</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fitness -->
+          <div class="ctx-section">
+            <div class="ctx-section-title">Financial Fitness</div>
+            <div class="ctx-fitness">
+              <div class="ctx-fitness-score">720</div>
+              <div class="ctx-fitness-bars">
+                <div class="ctx-bar-row"><div class="ctx-bar-label">Buffer</div><div class="ctx-bar-track"><div class="ctx-bar-fill ctx-bar-fill-good" style="width:82%"></div></div></div>
+                <div class="ctx-bar-row"><div class="ctx-bar-label">Growth</div><div class="ctx-bar-track"><div class="ctx-bar-fill ctx-bar-fill-good" style="width:74%"></div></div></div>
+                <div class="ctx-bar-row"><div class="ctx-bar-label">Protection</div><div class="ctx-bar-track"><div class="ctx-bar-fill ctx-bar-fill-mid" style="width:58%"></div></div></div>
+                <div class="ctx-bar-row"><div class="ctx-bar-label">Efficiency</div><div class="ctx-bar-track"><div class="ctx-bar-fill ctx-bar-fill-good" style="width:70%"></div></div></div>
+                <div class="ctx-bar-row"><div class="ctx-bar-label">Trajectory</div><div class="ctx-bar-track"><div class="ctx-bar-fill ctx-bar-fill-good" style="width:68%"></div></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending -->
+          <div class="ctx-section">
+            <div class="ctx-section-title">Pending</div>
+            <div class="ctx-pending">
+              <div class="ctx-pending-item">
+                <div class="ctx-pending-dot" style="background:#a855f7"></div>
+                <div class="ctx-pending-text">Sara's proposal: Move 50K to index</div>
+                <div class="ctx-pending-action">Review</div>
+              </div>
+              <div class="ctx-pending-item">
+                <div class="ctx-pending-dot" style="background:#f5a623"></div>
+                <div class="ctx-pending-text">Mortgage refinancing comparison</div>
+                <div class="ctx-pending-action">View</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MOBILE VIEW                                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="view-mobile" class="view-section">
+  <section class="mobile-section">
+    <div class="mobile-row">
+
+      <!-- Phone 1: Home Feed -->
+      <div class="phone-frame">
+        <div class="phone-status"><span>9:41</span><span>●●●</span></div>
+        <div class="phone-content">
+          <div class="m-home">
+            <div><div class="m-greeting">Wednesday, March 18</div><h2 class="m-title">Good morning, Isac</h2></div>
+            <div class="m-nw-card">
+              <div class="m-nw-label">Net Worth</div>
+              <div class="m-nw-num">2 430 000</div>
+              <div class="m-nw-trend">↑ 12 400 (+0.5%) this week</div>
+              <svg class="m-nw-chart" viewBox="0 0 280 50" preserveAspectRatio="none">
+                <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff" stop-opacity="0.12"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0,42 C40,40 80,36 120,30 C160,24 200,18 240,12 L280,8 V50 H0Z" fill="url(#mg)"/>
+                <path d="M0,42 C40,40 80,36 120,30 C160,24 200,18 240,12 L280,8" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="m-insight-card">
+              <div class="m-insight-source">Copilot</div>
+              <div class="m-insight-text">Your net worth crossed 2.4M for the first time this week.</div>
+            </div>
+            <div class="m-action-card">
+              <div class="m-action-title">Mortgage rate expires in 8 months</div>
+              <div class="m-action-desc">Refinancing could save ~18 000 SEK/yr</div>
+              <div class="m-action-btns">
+                <button class="m-btn m-btn-dark">View comparison</button>
+                <button class="m-btn m-btn-light">Later</button>
+              </div>
+            </div>
+            <div class="m-command">⌘ Ask your copilot anything...</div>
+          </div>
+          <nav class="m-tab-bar">
+            <div class="m-tab active"><span class="m-tab-icon">◉</span>Feed</div>
+            <div class="m-tab"><span class="m-tab-icon">◫</span>Accounts</div>
+            <div class="m-tab"><span class="m-tab-icon">◷</span>Timeline</div>
+            <div class="m-tab"><span class="m-tab-icon">◈</span>Fitness</div>
+            <div class="m-tab"><span class="m-tab-icon">◎</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Phone 2: Conversation -->
+      <div class="phone-frame">
+        <div class="phone-status"><span>9:41</span><span>●●●</span></div>
+        <div class="phone-content">
+          <div class="m-convo">
+            <h2 class="m-convo-title">Copilot</h2>
+            <div class="m-msg m-msg-user">How are we doing compared to last quarter?</div>
+            <div class="m-msg m-msg-ai">
+              <div style="font-family:'Instrument Serif',serif;font-style:italic;font-size:0.9375rem;line-height:1.5;margin-bottom:8px">You're ahead on every metric.</div>
+              <div class="m-msg-table">
+                <div class="m-msg-row"><span class="m-msg-key">Net worth</span><span class="m-msg-val m-msg-val-up">+142 000 (+6.2%)</span></div>
+                <div class="m-msg-row"><span class="m-msg-key">Fitness score</span><span class="m-msg-val m-msg-val-up">680 → 720</span></div>
+                <div class="m-msg-row"><span class="m-msg-key">Savings rate</span><span class="m-msg-val">32% (target: 30%)</span></div>
+                <div class="m-msg-row"><span class="m-msg-key">Fee leakage</span><span class="m-msg-val m-msg-val-up">↓ 1 200 SEK</span></div>
+              </div>
+            </div>
+            <div class="m-msg m-msg-user">What should we focus on next?</div>
+            <div class="m-msg m-msg-ai">
+              <div style="font-size:0.8125rem;line-height:1.55">Your biggest opportunity is the mortgage refinancing — it alone would save 18K/yr. Second: your Protection score is below target. I can prepare an insurance review.</div>
+              <div style="display:flex;gap:4px;margin-top:8px">
+                <button class="m-btn m-btn-dark" style="font-size:0.6875rem;padding:5px 10px">Start insurance review</button>
+              </div>
+            </div>
+          </div>
+          <div class="m-input-bar">
+            <div class="m-input">💬 Ask your copilot...</div>
+          </div>
+          <nav class="m-tab-bar">
+            <div class="m-tab"><span class="m-tab-icon">◉</span>Feed</div>
+            <div class="m-tab"><span class="m-tab-icon">◫</span>Accounts</div>
+            <div class="m-tab"><span class="m-tab-icon">◷</span>Timeline</div>
+            <div class="m-tab"><span class="m-tab-icon">◈</span>Fitness</div>
+            <div class="m-tab active"><span class="m-tab-icon">◎</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Phone 3: Accounts -->
+      <div class="phone-frame">
+        <div class="phone-status"><span>9:41</span><span>●●●</span></div>
+        <div class="phone-content">
+          <div class="m-accounts">
+            <h2 class="m-acc-title">Accounts</h2>
+            <div>
+              <div class="m-acc-total-row"><div class="m-acc-total-num">2 430 000</div><div class="m-acc-total-trend">↑ 0.5%</div></div>
+              <div style="font-size:0.75rem;color:#999">Assets 2.85M · Liabilities 420K</div>
+            </div>
+            <div class="m-acc-card"><div class="m-acc-left"><div class="m-acc-name">ISK Avanza</div><div class="m-acc-type">5 holdings · ISK</div></div><div class="m-acc-right"><div class="m-acc-amount">350 000</div><div class="m-acc-pct m-acc-up">↑ 2.3%</div></div></div>
+            <div class="m-acc-card"><div class="m-acc-left"><div class="m-acc-name">Sparkonto SEB</div><div class="m-acc-type">Savings</div></div><div class="m-acc-right"><div class="m-acc-amount">450 000</div><div class="m-acc-pct" style="color:#888">Fixed</div></div></div>
+            <div class="m-acc-card"><div class="m-acc-left"><div class="m-acc-name">PPM Pension</div><div class="m-acc-type">3 funds</div></div><div class="m-acc-right"><div class="m-acc-amount">380 000</div><div class="m-acc-pct m-acc-up">↑ 1.1%</div></div></div>
+            <div class="m-acc-card"><div class="m-acc-left"><div class="m-acc-name">KF Nordnet</div><div class="m-acc-type">3 holdings · KF</div></div><div class="m-acc-right"><div class="m-acc-amount">180 000</div><div class="m-acc-pct m-acc-down">↓ 0.8%</div></div></div>
+            <div class="m-acc-card"><div class="m-acc-left"><div class="m-acc-name">Bolån Nordea</div><div class="m-acc-type">Mortgage · 2.89%</div></div><div class="m-acc-right"><div class="m-acc-amount m-acc-liability">−420 000</div><div class="m-acc-pct" style="color:#888">8 mo</div></div></div>
+          </div>
+          <nav class="m-tab-bar">
+            <div class="m-tab"><span class="m-tab-icon">◉</span>Feed</div>
+            <div class="m-tab active"><span class="m-tab-icon">◫</span>Accounts</div>
+            <div class="m-tab"><span class="m-tab-icon">◷</span>Timeline</div>
+            <div class="m-tab"><span class="m-tab-icon">◈</span>Fitness</div>
+            <div class="m-tab"><span class="m-tab-icon">◎</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MARKETING LANDING PAGE VIEW                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="view-marketing" class="view-section">
+  <div class="lp">
+    <div class="lp-frame">
+
+      <!-- Navigation -->
+      <nav class="lp-nav">
+        <a class="lp-nav-logo" href="#">
+          <div class="lp-nav-logo-mark">f</div>
+          fyrk
+        </a>
+        <div class="lp-nav-links">
+          <a class="lp-nav-link" href="#">Product</a>
+          <a class="lp-nav-link" href="#">How it works</a>
+          <a class="lp-nav-link" href="#">For households</a>
+          <a class="lp-nav-link" href="#">Security</a>
+          <a class="lp-nav-link" href="#">Pricing</a>
+          <button class="lp-nav-cta-ghost">Log in</button>
+          <button class="lp-nav-cta">Get early access</button>
+        </div>
+      </nav>
+
+      <!-- Hero -->
+      <section class="lp-hero">
+        <div class="lp-hero-badge">
+          <span class="lp-hero-badge-dot"></span>
+          Now in private beta — Stockholm
+        </div>
+        <h1>Your finances deserve a <span>copilot</span></h1>
+        <p class="lp-hero-sub">
+          Fyrk connects every bank, broker, and pension provider into one intelligent surface. It watches your entire financial life, tells you what matters, and acts when you say go.
+        </p>
+        <div class="lp-hero-actions">
+          <button class="lp-hero-btn-primary">
+            Get early access
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8h9M8.5 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="lp-hero-btn-secondary">See how it works</button>
+        </div>
+
+        <!-- Live product preview -->
+        <div class="lp-hero-preview">
+          <div class="lp-hero-preview-bar">
+            <div class="lp-hero-preview-dot" style="background:#ff5f57"></div>
+            <div class="lp-hero-preview-dot" style="background:#ffbd2e"></div>
+            <div class="lp-hero-preview-dot" style="background:#28c840"></div>
+          </div>
+          <div class="lp-hero-preview-inner">
+            <div class="lp-mini-rail">
+              <div class="lp-mini-rail-logo">f</div>
+              <div class="lp-mini-rail-dot active">◉</div>
+              <div class="lp-mini-rail-dot">◫</div>
+              <div class="lp-mini-rail-dot">◷</div>
+              <div class="lp-mini-rail-dot">▣</div>
+            </div>
+            <div class="lp-mini-feed">
+              <div class="lp-mini-greet">Wednesday, March 18</div>
+              <h3 class="lp-mini-title">Good morning, Isac</h3>
+              <div class="lp-mini-card">
+                <div class="lp-mini-card-src"><div class="lp-mini-card-src-dot" style="background:#0066ff"></div> Copilot Insight</div>
+                <div class="lp-mini-card-insight">Your household net worth crossed 2.4M for the first time. Nordic equities drove a 12,400 SEK gain this week.</div>
+              </div>
+              <div class="lp-mini-card lp-mini-card-action">
+                <div class="lp-mini-card-src"><div class="lp-mini-card-src-dot" style="background:#f5a623"></div> Action Required</div>
+                <div class="lp-mini-card-action-title">Your mortgage rate expires in 8 months</div>
+                <div class="lp-mini-card-action-desc">Refinancing now could save ~18,000 SEK/year.</div>
+                <div class="lp-mini-card-btns">
+                  <button class="lp-mini-btn lp-mini-btn-dark">View comparison</button>
+                  <button class="lp-mini-btn lp-mini-btn-light">Later</button>
+                </div>
+              </div>
+            </div>
+            <div class="lp-mini-ctx">
+              <div>
+                <div class="lp-mini-ctx-label">Net Worth</div>
+                <div class="lp-mini-ctx-nw">2 430 000</div>
+                <div class="lp-mini-ctx-trend">↑ 12 400 this week</div>
+              </div>
+              <svg class="lp-mini-ctx-chart" viewBox="0 0 260 50" preserveAspectRatio="none">
+                <defs><linearGradient id="lpcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0066ff" stop-opacity="0.08"/><stop offset="100%" stop-color="#0066ff" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0,42 C30,40 70,36 110,30 C150,24 190,18 230,12 L260,8 V50 H0Z" fill="url(#lpcg)"/>
+                <path d="M0,42 C30,40 70,36 110,30 C150,24 190,18 230,12 L260,8" fill="none" stroke="#0066ff" stroke-width="1.5"/>
+              </svg>
+              <div>
+                <div class="lp-mini-ctx-label">Accounts</div>
+                <div class="lp-mini-ctx-acc"><span class="lp-mini-ctx-acc-name">ISK Avanza</span><span class="lp-mini-ctx-acc-val">350 000</span></div>
+                <div class="lp-mini-ctx-acc"><span class="lp-mini-ctx-acc-name">Sparkonto SEB</span><span class="lp-mini-ctx-acc-val">450 000</span></div>
+                <div class="lp-mini-ctx-acc"><span class="lp-mini-ctx-acc-name">PPM Pension</span><span class="lp-mini-ctx-acc-val">380 000</span></div>
+                <div class="lp-mini-ctx-acc"><span class="lp-mini-ctx-acc-name">KF Nordnet</span><span class="lp-mini-ctx-acc-val">180 000</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Social proof -->
+      <section class="lp-social">
+        <div class="lp-social-row">
+          <div class="lp-social-stat">
+            <div class="lp-social-num">2.4M+ SEK</div>
+            <div class="lp-social-label">Avg. household net worth tracked</div>
+          </div>
+          <div class="lp-social-divider"></div>
+          <div class="lp-social-stat">
+            <div class="lp-social-num">6</div>
+            <div class="lp-social-label">Banks & brokers connected</div>
+          </div>
+          <div class="lp-social-divider"></div>
+          <div class="lp-social-stat">
+            <div class="lp-social-num">18K SEK</div>
+            <div class="lp-social-label">Avg. annual savings found</div>
+          </div>
+          <div class="lp-social-divider"></div>
+          <div class="lp-social-stat">
+            <div class="lp-social-num">45 sec</div>
+            <div class="lp-social-label">To connect your first account</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Value propositions -->
+      <section class="lp-values">
+        <div class="lp-values-header">
+          <h2>Not a dashboard. A copilot.</h2>
+          <p>Traditional finance apps show you data. Fyrk interprets it, prioritizes it, and gives you one clear thing to do next.</p>
+        </div>
+        <div class="lp-values-grid">
+          <div class="lp-value-card">
+            <div class="lp-value-icon" style="background:#eef4ff;color:#0066ff">◉</div>
+            <h3>Intelligence, not charts</h3>
+            <p>Your copilot analyzes every account, every transaction, every rate. It surfaces what matters in plain language — not 47 pie charts.</p>
+          </div>
+          <div class="lp-value-card">
+            <div class="lp-value-icon" style="background:#f0fdf5;color:#00a866">↑</div>
+            <h3>Actions, not information</h3>
+            <p>Every insight comes with a "what to do about it" button. Mortgage expiring? Here's a comparison. Excess savings? Here's where to invest.</p>
+          </div>
+          <div class="lp-value-card">
+            <div class="lp-value-icon" style="background:#faf5ff;color:#a855f7">◎</div>
+            <h3>Household-native</h3>
+            <p>Two people. One financial life. Fyrk mediates proposals, records joint decisions, and keeps both partners in the loop — no spreadsheet required.</p>
+          </div>
+          <div class="lp-value-card">
+            <div class="lp-value-icon" style="background:#fffbeb;color:#f5a623">⚡</div>
+            <h3>Zero lock-in</h3>
+            <p>We connect to every Swedish bank, broker, and pension provider. Keep your accounts where you want them. See everything in one place.</p>
+          </div>
+          <div class="lp-value-card">
+            <div class="lp-value-icon" style="background:#f0f1f4;color:#111">⌘</div>
+            <h3>Command-first</h3>
+            <p>"Show me our insurance gaps." "Propose switching to index funds." "Compare our mortgage options." Type what you want, get what you need.</p>
+          </div>
+          <div class="lp-value-card">
+            <div class="lp-value-icon" style="background:#fef2f2;color:#e03e3e">◫</div>
+            <h3>Bank-grade security</h3>
+            <p>BankID authentication. Read-only connections. End-to-end encryption. Your data never leaves Sweden. We can't move your money — only you can.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section class="lp-how">
+        <div class="lp-how-header">
+          <h2>Live in 45 seconds</h2>
+          <p>No spreadsheets. No manual imports. No setup wizard from 2015.</p>
+        </div>
+        <div class="lp-how-steps">
+          <div class="lp-how-step">
+            <div class="lp-how-num">1</div>
+            <h3>Sign in with BankID</h3>
+            <p>One tap. We verify your identity the same way your bank does. Nothing to memorize.</p>
+          </div>
+          <div class="lp-how-step">
+            <div class="lp-how-num">2</div>
+            <h3>Connect your accounts</h3>
+            <p>Banks, brokers, pension. Select from 12+ Swedish providers. Read-only — we see the data, never touch the money.</p>
+          </div>
+          <div class="lp-how-step">
+            <div class="lp-how-num">3</div>
+            <h3>Your copilot takes it from here</h3>
+            <p>Within minutes, your copilot has mapped your full financial picture and surfaced the first insights.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Copilot demo -->
+      <section class="lp-demo">
+        <div class="lp-demo-grid">
+          <div class="lp-demo-text">
+            <h2>Ask anything. Get answers that matter.</h2>
+            <p>Your copilot understands your full financial context — every account, every rate, every deadline. Ask it anything in plain Swedish or English. It doesn't just answer, it acts.</p>
+            <div style="display:grid;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#555"><span style="color:#0066ff;font-weight:700">→</span> "What happens if we pay off the mortgage early?"</div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#555"><span style="color:#0066ff;font-weight:700">→</span> "Are we paying unnecessary fees anywhere?"</div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#555"><span style="color:#0066ff;font-weight:700">→</span> "Propose moving to cheaper index funds"</div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#555"><span style="color:#0066ff;font-weight:700">→</span> "Show me our insurance coverage gaps"</div>
+            </div>
+          </div>
+          <div class="lp-demo-convo">
+            <div class="lp-demo-bubble lp-demo-user">Are we paying too much in fund fees?</div>
+            <div class="lp-demo-bubble lp-demo-ai">
+              <div class="lp-demo-ai-serif">Yes — you're leaking about 4,200 SEK/year in avoidable fees.</div>
+              <div style="font-size:0.8125rem;color:#555;line-height:1.55;margin-bottom:8px">Your PPM fund "Swedbank Robur Technology" charges 1.2% vs. comparable index options at 0.2%. Switching three funds could save 4,200 SEK annually without changing your risk profile.</div>
+              <div class="lp-demo-action">Switch to cheaper alternatives →</div>
+            </div>
+            <div class="lp-demo-bubble lp-demo-user">Do it. Send the proposal to Sara first.</div>
+            <div class="lp-demo-bubble lp-demo-ai">
+              <div style="font-size:0.8125rem;color:#555;line-height:1.55">Done. I've sent a proposal to Sara with the fund comparison and expected savings. She'll see it in her feed next time she opens the app.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Financial Fitness -->
+      <section class="lp-fitness">
+        <div class="lp-fitness-grid">
+          <div class="lp-fitness-text">
+            <h2>Your financial fitness score</h2>
+            <p>A single number that captures how well your household is set up — not just how much you have, but how efficiently you're growing, how well you're protected, and whether you're on trajectory.</p>
+            <div class="lp-fitness-categories">
+              <div class="lp-fitness-cat">
+                <div class="lp-fitness-cat-name">Buffer</div>
+                <div class="lp-fitness-cat-bar"><div class="lp-fitness-cat-fill" style="width:82%;background:#00a866"></div></div>
+              </div>
+              <div class="lp-fitness-cat">
+                <div class="lp-fitness-cat-name">Growth</div>
+                <div class="lp-fitness-cat-bar"><div class="lp-fitness-cat-fill" style="width:74%;background:#00a866"></div></div>
+              </div>
+              <div class="lp-fitness-cat">
+                <div class="lp-fitness-cat-name">Protection</div>
+                <div class="lp-fitness-cat-bar"><div class="lp-fitness-cat-fill" style="width:58%;background:#f5a623"></div></div>
+              </div>
+              <div class="lp-fitness-cat">
+                <div class="lp-fitness-cat-name">Efficiency</div>
+                <div class="lp-fitness-cat-bar"><div class="lp-fitness-cat-fill" style="width:70%;background:#00a866"></div></div>
+              </div>
+              <div class="lp-fitness-cat">
+                <div class="lp-fitness-cat-name">Trajectory</div>
+                <div class="lp-fitness-cat-bar"><div class="lp-fitness-cat-fill" style="width:68%;background:#0066ff"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="lp-fitness-visual">
+            <div class="lp-fitness-score-big">720</div>
+            <div class="lp-fitness-score-label">Financial Fitness Score</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- For Investors -->
+      <section class="lp-investors">
+        <div class="lp-investors-header">
+          <h2>The Nordic opportunity</h2>
+          <p>5.4 million Swedish households manage 18T SEK in assets across fragmented providers. Nobody owns the household layer.</p>
+        </div>
+        <div class="lp-investors-grid">
+          <div class="lp-investor-card">
+            <div class="lp-investor-card-num">18T</div>
+            <h4>SEK in household assets</h4>
+            <p>Swedish households hold 18 trillion SEK across banks, brokers, and pension providers — completely fragmented.</p>
+          </div>
+          <div class="lp-investor-card">
+            <div class="lp-investor-card-num">5.4M</div>
+            <h4>Swedish households</h4>
+            <p>Every household is a potential customer. Starting with asset-rich families (1M+ SEK) and expanding down.</p>
+          </div>
+          <div class="lp-investor-card">
+            <div class="lp-investor-card-num">0</div>
+            <h4>Real competitors</h4>
+            <p>Banks can't aggregate across providers. Tink was acquired for infrastructure. Nobody owns the intelligence layer.</p>
+          </div>
+          <div class="lp-investor-card">
+            <div class="lp-investor-card-num">4→</div>
+            <h4>Nordic expansion</h4>
+            <p>Sweden first, then Norway, Denmark, Finland. Same PSD2 rails, same fragmentation problem, same opportunity.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="lp-cta">
+        <h2>Take control of your financial life</h2>
+        <p>Join the private beta. Free during early access. Your copilot is waiting.</p>
+        <div class="lp-cta-email">
+          <input class="lp-cta-input" placeholder="your@email.com" type="email" readonly>
+          <button class="lp-cta-submit">Get early access</button>
+        </div>
+        <div class="lp-cta-fine">Free during beta. No credit card required. Cancel anytime.</div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="lp-footer">
+        <div class="lp-footer-logo">fyrk</div>
+        <div class="lp-footer-links">
+          <a class="lp-footer-link" href="#">Privacy</a>
+          <a class="lp-footer-link" href="#">Security</a>
+          <a class="lp-footer-link" href="#">Terms</a>
+          <a class="lp-footer-link" href="#">Contact</a>
+          <a class="lp-footer-link" href="#">Stockholm, Sweden</a>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- LOGO PROPOSALS VIEW                                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="view-logo" class="view-section">
+  <div class="logo-section">
+    <div class="logo-section-header">
+      <h1>The ƒ mark</h1>
+      <p>Six proposals built from the true ƒ (function) glyph — top hook, crossbar, and the signature descender tail that curves below the baseline. Each variation keeps the full ƒ anatomy intact while connecting to the brand's personality.</p>
+    </div>
+
+    <div class="logo-grid">
+
+      <!--
+        V3: Refined proposals inspired by D (calligraphic S-curve) and F (typeset Instrument Serif).
+        Goal: iconic single-gesture mark like Apple or Nike. Reducible, ownable, timeless.
+      -->
+
+      <!-- ═══ PROPOSAL 1: The Swoosh ƒ ═══ -->
+      <div class="logo-proposal">
+        <div class="logo-display logo-display-split">
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#111"/>
+            <!-- Single continuous S-curve: the Nike swoosh of finance. One gesture, instantly recognized -->
+            <path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>
+          </svg>
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#fff"/>
+            <path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="27" y1="40" x2="58" y2="40" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="logo-info">
+          <div class="logo-proposal-num">Proposal 1</div>
+          <div class="logo-proposal-name">The Swoosh ƒ</div>
+          <div class="logo-proposal-desc">One continuous S-curve with a crossbar. Reducible to a single gesture — like the Nike swoosh, but mathematical. The curve reads as both ƒ and an upward growth trajectory inverted. Monoline. Timeless.</div>
+          <div class="logo-usage-row">
+            <div class="logo-usage-item logo-usage-item-dark"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg></div>
+            <div class="logo-usage-item logo-usage-item-light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#111" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#111" stroke-width="5" stroke-linecap="round"/></svg></div>
+            <div class="logo-usage-item logo-usage-item-blue"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PROPOSAL 2: The Weighted Serif ƒ ═══ -->
+      <div class="logo-proposal">
+        <div class="logo-display logo-display-split">
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#111"/>
+            <!-- Contrast stroke: thick verticals, thin curves — like a proper serif typeface -->
+            <path d="M28 68C34 68 38 62 40 54L42 40" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <path d="M42 40V26C42 20 46 15 52 15C55 15 57 16 59 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <line x1="42" y1="16" x2="42" y2="68" stroke="#fff" stroke-width="5.5" stroke-linecap="round" opacity="0"/>
+            <!-- Thick stem overlay -->
+            <path d="M42 26V54" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/>
+            <!-- Thin transitions at curves -->
+            <path d="M42 54C41 59 38 63 34 66C31 68 28 68 28 68" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <path d="M42 26C42 20 46 15 52 15C55 15 57 16 59 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <line x1="27" y1="40" x2="57" y2="40" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#fff"/>
+            <path d="M42 26V54" stroke="#111" stroke-width="5.5" stroke-linecap="round"/>
+            <path d="M42 54C41 59 38 63 34 66C31 68 28 68 28 68" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+            <path d="M42 26C42 20 46 15 52 15C55 15 57 16 59 18" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+            <line x1="27" y1="40" x2="57" y2="40" stroke="#111" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="logo-info">
+          <div class="logo-proposal-num">Proposal 2</div>
+          <div class="logo-proposal-name">The Weighted Serif ƒ</div>
+          <div class="logo-proposal-desc">Thick stem, thin curves — the stress pattern of a serif typeface, applied to the ƒ mark. The contrast creates visual sophistication and premium feel. Inspired by Instrument Serif's own weight distribution. Feels hand-crafted, authoritative.</div>
+          <div class="logo-usage-row">
+            <div class="logo-usage-item logo-usage-item-dark"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M42 26V54" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M42 54C41 59 38 63 34 66C31 68 28 68 28 68" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M42 26C42 20 46 15 52 15C55 15 57 16 59 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/><line x1="27" y1="40" x2="57" y2="40" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg></div>
+            <div class="logo-usage-item logo-usage-item-light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M42 26V54" stroke="#111" stroke-width="6" stroke-linecap="round"/><path d="M42 54C41 59 38 63 34 66C31 68 28 68 28 68" stroke="#111" stroke-width="3" stroke-linecap="round"/><path d="M42 26C42 20 46 15 52 15C55 15 57 16 59 18" stroke="#111" stroke-width="3" stroke-linecap="round"/><line x1="27" y1="40" x2="57" y2="40" stroke="#111" stroke-width="3.5" stroke-linecap="round"/></svg></div>
+            <div class="logo-usage-item logo-usage-item-blue"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M42 26V54" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M42 54C41 59 38 63 34 66C31 68 28 68 28 68" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M42 26C42 20 46 15 52 15C55 15 57 16 59 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/><line x1="27" y1="40" x2="57" y2="40" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PROPOSAL 3: The Typeset ƒ (refined) ═══ -->
+      <div class="logo-proposal">
+        <div class="logo-display logo-display-split">
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#111"/>
+            <text x="44" y="66" font-family="'Instrument Serif', Georgia, serif" font-size="72" font-style="italic" fill="#fff" text-anchor="middle">ƒ</text>
+          </svg>
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#fff"/>
+            <text x="44" y="66" font-family="'Instrument Serif', Georgia, serif" font-size="72" font-style="italic" fill="#111" text-anchor="middle">ƒ</text>
+          </svg>
+        </div>
+        <div class="logo-info">
+          <div class="logo-proposal-num">Proposal 3</div>
+          <div class="logo-proposal-name">The Pure Typeset ƒ</div>
+          <div class="logo-proposal-desc">The Instrument Serif italic ƒ, scaled to fill the mark. No modification — radical honesty. The typeface IS the brand. Like Apple using Myriad or Google using Product Sans for their wordmarks, the letterform does all the work. The descender and serifs create a uniquely ownable silhouette.</div>
+          <div class="logo-usage-row">
+            <div class="logo-usage-item logo-usage-item-dark"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><text x="44" y="66" font-family="'Instrument Serif', Georgia, serif" font-size="72" font-style="italic" fill="#fff" text-anchor="middle">ƒ</text></svg></div>
+            <div class="logo-usage-item logo-usage-item-light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><text x="44" y="66" font-family="'Instrument Serif', Georgia, serif" font-size="72" font-style="italic" fill="#111" text-anchor="middle">ƒ</text></svg></div>
+            <div class="logo-usage-item logo-usage-item-blue"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><text x="44" y="66" font-family="'Instrument Serif', Georgia, serif" font-size="72" font-style="italic" fill="#fff" text-anchor="middle">ƒ</text></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PROPOSAL 4: The Negative Space ƒ ═══ -->
+      <div class="logo-proposal">
+        <div class="logo-display logo-display-split">
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#111"/>
+            <!-- White circle with ƒ cut out — like the Apple silhouette approach -->
+            <circle cx="44" cy="44" r="28" fill="#fff"/>
+            <text x="44" y="59" font-family="'Instrument Serif', Georgia, serif" font-size="56" font-style="italic" fill="#111" text-anchor="middle">ƒ</text>
+          </svg>
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#fff"/>
+            <circle cx="44" cy="44" r="28" fill="#111"/>
+            <text x="44" y="59" font-family="'Instrument Serif', Georgia, serif" font-size="56" font-style="italic" fill="#fff" text-anchor="middle">ƒ</text>
+          </svg>
+        </div>
+        <div class="logo-info">
+          <div class="logo-proposal-num">Proposal 4</div>
+          <div class="logo-proposal-name">The Coin ƒ</div>
+          <div class="logo-proposal-desc">The ƒ inscribed in a perfect circle — the coin, the most primal symbol of finance. The serif ƒ inside a solid disc creates a medallion-like mark with instant gravitas. Think currency symbol meets tech icon. Works as a stamp, watermark, or favicon.</div>
+          <div class="logo-usage-row">
+            <div class="logo-usage-item logo-usage-item-dark"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><circle cx="44" cy="44" r="28" fill="#fff"/><text x="44" y="59" font-family="'Instrument Serif', Georgia, serif" font-size="56" font-style="italic" fill="#111" text-anchor="middle">ƒ</text></svg></div>
+            <div class="logo-usage-item logo-usage-item-light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><circle cx="44" cy="44" r="28" fill="#111"/><text x="44" y="59" font-family="'Instrument Serif', Georgia, serif" font-size="56" font-style="italic" fill="#fff" text-anchor="middle">ƒ</text></svg></div>
+            <div class="logo-usage-item logo-usage-item-blue"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><circle cx="44" cy="44" r="28" fill="#fff"/><text x="44" y="59" font-family="'Instrument Serif', Georgia, serif" font-size="56" font-style="italic" fill="#0066ff" text-anchor="middle">ƒ</text></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PROPOSAL 5: The Hairline ƒ ═══ -->
+      <div class="logo-proposal">
+        <div class="logo-display logo-display-split">
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#111"/>
+            <!-- Ultra-thin, precise ƒ — like a watchmaker's engraving -->
+            <path d="M28 70C34 70 39 64 41 55C43 46 43 42 43 38C43 34 43 26 45.5 20C48 14 52 12 58 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="25" y1="40" x2="60" y2="40" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#fff"/>
+            <path d="M28 70C34 70 39 64 41 55C43 46 43 42 43 38C43 34 43 26 45.5 20C48 14 52 12 58 12" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+            <line x1="25" y1="40" x2="60" y2="40" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="logo-info">
+          <div class="logo-proposal-num">Proposal 5</div>
+          <div class="logo-proposal-name">The Hairline ƒ</div>
+          <div class="logo-proposal-desc">Ultra-fine single-weight line. The ƒ reduced to its absolute minimum — like an engraving on a luxury watch or the gridlines of a financial chart. Extreme Scandinavian restraint. Whisper-quiet confidence. Unmistakably premium at large scale.</div>
+          <div class="logo-usage-row">
+            <div class="logo-usage-item logo-usage-item-dark"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 70C34 70 39 64 41 55C43 46 43 42 43 38C43 34 43 26 45.5 20C48 14 52 12 58 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><line x1="25" y1="40" x2="60" y2="40" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+            <div class="logo-usage-item logo-usage-item-light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 70C34 70 39 64 41 55C43 46 43 42 43 38C43 34 43 26 45.5 20C48 14 52 12 58 12" stroke="#111" stroke-width="2.5" stroke-linecap="round"/><line x1="25" y1="40" x2="60" y2="40" stroke="#111" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+            <div class="logo-usage-item logo-usage-item-blue"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 70C34 70 39 64 41 55C43 46 43 42 43 38C43 34 43 26 45.5 20C48 14 52 12 58 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><line x1="25" y1="40" x2="60" y2="40" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PROPOSAL 6: The Swoosh ƒ + Signal ═══ -->
+      <div class="logo-proposal">
+        <div class="logo-display logo-display-split">
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#111"/>
+            <path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>
+            <circle cx="60" cy="14" r="4.5" fill="#0066ff"/>
+          </svg>
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            <rect width="88" height="88" rx="22" fill="#fff"/>
+            <path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="27" y1="40" x2="58" y2="40" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+            <circle cx="60" cy="14" r="4.5" fill="#0066ff"/>
+          </svg>
+        </div>
+        <div class="logo-info">
+          <div class="logo-proposal-num">Proposal 6</div>
+          <div class="logo-proposal-name">The Signal Swoosh ƒ</div>
+          <div class="logo-proposal-desc">The calligraphic S-curve combined with the blue intelligence dot — the best of D and C fused. One flowing stroke says "function." The blue dot says "intelligent." Together: the financial copilot in a single mark. The dot terminates the top hook like a period ending a confident sentence.</div>
+          <div class="logo-usage-row">
+            <div class="logo-usage-item logo-usage-item-dark"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="14" r="4.5" fill="#0066ff"/></svg></div>
+            <div class="logo-usage-item logo-usage-item-light"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#111" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#111" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="14" r="4.5" fill="#0066ff"/></svg></div>
+            <div class="logo-usage-item logo-usage-item-blue"><svg width="26" height="26" viewBox="0 0 88 88" fill="none"><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="14" r="4.5" fill="#fff"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ FULL-WIDTH COMPARISON ═══ -->
+      <div class="logo-comparison">
+        <div class="logo-comparison-header">
+          <h3>Side-by-side at app icon scale</h3>
+          <p>How each proposal looks at 32px — the size users see most often (favicon, mobile home screen, tab bar)</p>
+        </div>
+        <div class="logo-comparison-row">
+          <div class="logo-comparison-cell" style="background:#fafafa">
+            <svg width="44" height="44" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>
+            <div class="logo-comparison-label">1 · Swoosh</div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#fafafa">
+            <svg width="44" height="44" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><path d="M42 26V54" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M42 54C41 59 38 63 34 66C31 68 28 68 28 68" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M42 26C42 20 46 15 52 15C55 15 57 16 59 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/><line x1="27" y1="40" x2="57" y2="40" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg>
+            <div class="logo-comparison-label">2 · Weighted</div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#fafafa">
+            <svg width="44" height="44" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><text x="44" y="66" font-family="'Instrument Serif', Georgia, serif" font-size="72" font-style="italic" fill="#fff" text-anchor="middle">ƒ</text></svg>
+            <div class="logo-comparison-label">3 · Typeset</div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#fafafa">
+            <svg width="44" height="44" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><circle cx="44" cy="44" r="28" fill="#fff"/><text x="44" y="59" font-family="'Instrument Serif', Georgia, serif" font-size="56" font-style="italic" fill="#111" text-anchor="middle">ƒ</text></svg>
+            <div class="logo-comparison-label">4 · Coin</div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#fafafa">
+            <svg width="44" height="44" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><path d="M28 70C34 70 39 64 41 55C43 46 43 42 43 38C43 34 43 26 45.5 20C48 14 52 12 58 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><line x1="25" y1="40" x2="60" y2="40" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+            <div class="logo-comparison-label">5 · Hairline</div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#fafafa">
+            <svg width="44" height="44" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="14" r="4.5" fill="#0066ff"/></svg>
+            <div class="logo-comparison-label">6 · Signal Swoosh</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ WORDMARK ROW ═══ -->
+      <div class="logo-comparison">
+        <div class="logo-comparison-header">
+          <h3>Wordmark pairings</h3>
+          <p>The top contenders paired with "fyrk" — showing the mark + name lockup at actual usage scale</p>
+        </div>
+        <div class="logo-comparison-row">
+          <div class="logo-comparison-cell" style="background:#fff;padding:28px 24px">
+            <div class="logo-wordmark">
+              <svg width="36" height="36" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>
+              <span class="logo-wordmark-text logo-wordmark-text-light">fyrk</span>
+            </div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#fff;padding:28px 24px">
+            <div class="logo-wordmark">
+              <svg width="36" height="36" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><text x="44" y="66" font-family="'Instrument Serif', Georgia, serif" font-size="72" font-style="italic" fill="#fff" text-anchor="middle">ƒ</text></svg>
+              <span class="logo-wordmark-text logo-wordmark-text-light">fyrk</span>
+            </div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#fff;padding:28px 24px">
+            <div class="logo-wordmark">
+              <svg width="36" height="36" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#111"/><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="14" r="4.5" fill="#0066ff"/></svg>
+              <span class="logo-wordmark-text logo-wordmark-text-light">fyrk</span>
+            </div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#111;padding:28px 24px">
+            <div class="logo-wordmark">
+              <svg width="36" height="36" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#fff"/><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#111" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#111" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="14" r="4.5" fill="#0066ff"/></svg>
+              <span class="logo-wordmark-text logo-wordmark-text-dark">fyrk</span>
+            </div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#111;padding:28px 24px">
+            <div class="logo-wordmark">
+              <svg width="36" height="36" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#fff"/><text x="44" y="66" font-family="'Instrument Serif', Georgia, serif" font-size="72" font-style="italic" fill="#111" text-anchor="middle">ƒ</text></svg>
+              <span class="logo-wordmark-text logo-wordmark-text-dark">fyrk</span>
+            </div>
+          </div>
+          <div class="logo-comparison-cell" style="background:#0066ff;padding:28px 24px">
+            <div class="logo-wordmark">
+              <svg width="36" height="36" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="22" fill="#fff"/><path d="M28 68C33 68 37 63 39 56C41 49 42 43 42 38C42 33 42 26 44.5 21C47 16 51 14 57 14" stroke="#0066ff" stroke-width="5" stroke-linecap="round"/><line x1="27" y1="40" x2="58" y2="40" stroke="#0066ff" stroke-width="5" stroke-linecap="round"/></svg>
+              <span class="logo-wordmark-text logo-wordmark-text-dark">fyrk</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function switchView(view) {
+  // Toggle buttons
+  document.querySelectorAll('.view-toggle-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+  // Toggle all sections
+  var views = ['desktop', 'mobile', 'marketing', 'logo'];
+  views.forEach(function(v) {
+    var el = document.getElementById('view-' + v);
+    if (el) el.classList.toggle('visible', v === view);
+  });
+  // Hide brief for marketing (it has its own context)
+  document.querySelector('.brief').style.display = (view === 'marketing' || view === 'logo') ? 'none' : '';
+  // Scroll to top of content
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
