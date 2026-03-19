@@ -1,7 +1,7 @@
 # FYRK — Brand & UI Guidelines
-## "Warm Authority" Design System
+## "10x Financial Copilot" Design System
 
-> **Version:** 0.2 — Warm Authority
+> **Version:** 1.0 — 10x Financial Copilot
 > **Source:** [PRD.md](./PRD.md) · [API_SPEC.md](./API_SPEC.md)
 > **Platforms:** Web (responsive, desktop-first) + Mobile app (React Native, future)
 > **Design tool integration:** All tokens and components are Figma-export ready
@@ -9,20 +9,20 @@
 
 ---
 
-## 1. Design Philosophy: Warm Authority
+## 1. Design Philosophy: 10x Financial Copilot
 
-"Warm Authority" bridges the gap between the analytical precision required by a "Household CFO" and the anxiety-reducing clarity needed by a more reluctant, less financially engaged partner. It uses the visual language of high-end editorial and private banking (**authority**) mixed with Scandinavian minimalism and soft aesthetics (**warmth**).
+"10x Financial Copilot" is a high-contrast modern fintech design language that positions Fyrk as an intelligent copilot for household finances. It combines Scandinavian minimalism with tech confidence — a feed-based copilot UI where AI-driven insights flow naturally alongside structured financial data.
 
 | Attribute | Do | Don't |
 |---|---|---|
-| **Tone** | Calm confidence, institutional trust, editorial warmth | Flashy, gamified, anxious, cold-corporate |
-| **Density** | Adaptive — Narrative View (default) and Terminal View (CFO toggle) | One fixed density that frustrates one persona |
-| **Color** | Warm, muted, sophisticated — Forest Navy, Sage, Terracotta | Neon greens, SaaS-blue gradients, traffic-light red/green |
-| **Typography** | Serif for narrative (human layer), Sans for data (precision layer) | All-serif (newspaper) or all-sans (generic SaaS) |
+| **Tone** | Confident, modern, intelligent — copilot clarity | Warm-cozy, gamified, anxious, old-school banking |
+| **Density** | Adaptive — Feed View (default) and Terminal View (CFO toggle) | One fixed density that frustrates one persona |
+| **Color** | High-contrast, clean — Electric Blue primary, neutral grays | Earth tones, muted palettes, warm creams |
+| **Typography** | Italic serif for copilot voice, geometric sans for UI/data | All-serif (newspaper) or all-sans (generic SaaS) |
 | **Motion** | Subtle, purposeful (data transitions, micro-feedback) | Bouncy animations, parallax, confetti |
-| **Charts** | Clean, warm palette, readable with context | 3D charts, excessive decoration, aggressive colors |
+| **Charts** | Clean, vibrant palette, readable with context | 3D charts, excessive decoration, muted colors |
 
-**Inspiration references:** Carta (equity management), Mercury (banking), Kinfolk magazine (editorial warmth), Scandinavian private banking reports (typographic authority).
+**Inspiration references:** Linear (product craft), Mercury (banking clarity), Vercel (developer confidence), Stripe Dashboard (data density), Arc Browser (copilot patterns).
 
 ### The Two-Persona Problem
 
@@ -33,9 +33,37 @@ The design system must serve two users who live in the **same household**:
 | **Engagement** | Daily/weekly, proactive | Monthly, prompted by CFO |
 | **Needs** | Precision, density, speed | "Are we okay?", clarity, calm |
 | **Frustrated by** | Too much padding, hidden data, scrolling | Walls of data, jargon, complexity |
-| **Design answer** | Terminal View (density toggle) | Narrative View (default) |
+| **Design answer** | Terminal View (density toggle) | Feed View (default) |
 
 This is solved via the **Density Toggle** (see Section 4.1).
+
+---
+
+## 1.5 Logo Mark — "The Pure Typeset ƒ"
+
+### Primary Mark
+
+The Fyrk logo is built from a single typographic element: the **italic ƒ character** set in Instrument Serif italic.
+
+- **Mark:** Instrument Serif italic `ƒ` character
+- **Wordmark:** "fyrk" set in DM Sans weight 600
+- **Lockup:** ƒ mark + wordmark, horizontally aligned with optical baseline alignment
+
+### Usage Rules
+
+- **Clear space:** Minimum 1× the height of the ƒ character on all sides
+- **Monochrome only:** `#111111` on light backgrounds, `#f0f0f0` on dark backgrounds
+- **Minimum size:** 16px for the ƒ mark
+- **No effects:** No drop shadows, gradients, outlines, or 3D treatments on the mark
+- **Background:** Always place on solid backgrounds — never on photos or busy patterns
+
+### Lockup Variants
+
+| Variant | Usage |
+|---|---|
+| **ƒ mark only** | App icon, favicon, compact spaces |
+| **ƒ + wordmark** | Navigation, marketing, documentation |
+| **Wordmark only** | Legal footers, dense UI contexts |
 
 ---
 
@@ -46,79 +74,95 @@ This is solved via the **Density Toggle** (see Section 4.1).
 ```css
 :root {
   /* ── Backgrounds & Surfaces ── */
-  --co-bg-app:        #FDFDFC;   /* Alabaster — warm off-white base */
-  --co-bg-surface:    #FFFFFF;   /* Pure white — elevated cards */
-  --co-bg-hover:      #F4F3F0;   /* Oatmeal — hover/selected state */
-  --co-bg-subtle:     #F8F7F5;   /* Between app and hover */
+  --co-bg-app:            #fafafa;   /* Neutral off-white base */
+  --co-bg-surface:        #ffffff;   /* Pure white — elevated cards */
+  --co-bg-surface-strong: #ffffff;   /* Strong surface */
+  --co-bg-hover:          #f0f0f0;   /* Hover/selected state */
+  --co-bg-subtle:         #f5f5f5;   /* Between app and hover */
+  --co-bg-inset:          #e8e8e8;   /* Inset/recessed areas */
 
   /* ── Typography ── */
-  --co-text-primary:   #1A1A1A;  /* Deep Charcoal — headings, primary figures */
-  --co-text-secondary: #5E6266;  /* Slate Gray — metadata, labels */
-  --co-text-muted:     #A4A7AB;  /* Dusty Gray — placeholder, disabled */
+  --co-text-primary:   #111111;  /* Near-black — headings, primary figures */
+  --co-text-secondary: #666666;  /* Medium gray — metadata, labels */
+  --co-text-muted:     #999999;  /* Light gray — placeholder, disabled */
 
   /* ── Brand & Semantic ── */
-  --co-brand-primary:  #2A3B4C;  /* Forest Navy — links, primary actions, institutional trust */
-  --co-brand-light:    #3A5068;  /* Lighter navy — hover states */
-  --co-status-up:      #4A7C59;  /* Sage Green — growth, positive change */
-  --co-status-up-bg:   #EDF5F0;  /* Sage Green background */
-  --co-status-down:    #CC5A50;  /* Muted Terracotta — warnings, liabilities */
-  --co-status-down-bg: #FDF0EF;  /* Terracotta background */
-  --co-info:           #6B8E9B;  /* Soft Steel — informational, neutral */
-  --co-info-bg:        #EFF4F6;  /* Soft Steel background */
+  --co-brand-primary:  #0066ff;  /* Electric Blue — links, primary actions */
+  --co-brand-light:    #3384ff;  /* Lighter blue — hover states */
+  --co-brand-accent:   #f5a623;  /* Amber — accent highlights */
+  --co-status-up:      #00a866;  /* Green — growth, positive change */
+  --co-status-up-bg:   #e6f9ef;  /* Green background */
+  --co-status-down:    #e03e3e;  /* Red — warnings, liabilities */
+  --co-status-down-bg: #fde8e8;  /* Red background */
+  --co-info:           #6b7280;  /* Cool gray — informational, neutral */
+  --co-info-bg:        #f0f1f3;  /* Info background */
+  --co-status-warning:    #f5a623;  /* Amber — warnings */
+  --co-status-warning-bg: #fef6e6;  /* Warning background */
 
   /* ── Data Visualization (6-color palette) ── */
-  --co-chart-1: #2A3B4C;        /* Forest Navy */
-  --co-chart-2: #6B8E9B;        /* Soft Steel */
-  --co-chart-3: #D4B872;        /* Pale Gold — wealth/premium feel */
-  --co-chart-4: #5C4D5C;        /* Dusky Purple */
-  --co-chart-5: #C4A882;        /* Sandstone (darkened for contrast) */
-  --co-chart-6: #3D8B8B;        /* Coastal Teal */
+  --co-chart-1: #0066ff;        /* Electric Blue */
+  --co-chart-2: #00a866;        /* Green */
+  --co-chart-3: #f5a623;        /* Amber */
+  --co-chart-4: #a855f7;        /* Purple */
+  --co-chart-5: #e03e3e;        /* Red */
+  --co-chart-6: #6b7280;        /* Cool Gray */
 
   /* ── Borders & Elevation ── */
-  --co-border:         #EAEAEA;  /* Soft gray — primary border */
-  --co-border-strong:  #D4D4D4;  /* Stronger border for emphasis */
-  --co-shadow-soft:    0 4px 20px rgba(0, 0, 0, 0.03);  /* Single, ultra-subtle shadow */
+  --co-border:         #e5e5e5;  /* Soft gray — primary border */
+  --co-border-strong:  #cccccc;  /* Stronger border for emphasis */
+  --co-border-soft:    #f0f0f0;  /* Subtle border */
+  --co-shadow-soft:    0 18px 36px rgb(0 0 0 / 5%);
+  --co-shadow-raised:  0 24px 48px rgb(0 0 0 / 8%);
 
   /* ── Focus & Interaction ── */
-  --co-focus-ring:     #6B8E9B;  /* Soft Steel — visible but not heavy */
-  --co-focus-ring-offset: 2px;
+  --co-focus-ring:        #0066ff;
+  --co-focus-ring-offset: 3px;
+  --co-shadow-focus:      0 0 0 1px rgb(255 255 255 / 94%), 0 0 0 4px rgb(0 102 255 / 24%);
 }
 ```
 
-### Warm Dark Mode
+### High-Contrast Dark Mode
 
-Dark mode maintains the warm character — **not** cold blue-black.
+Dark mode uses pure neutral grays — clean and modern, not warm.
 
 ```css
 [data-theme="dark"] {
   /* ── Backgrounds ── */
-  --co-bg-app:        #1A1815;   /* Warm charcoal — not pure black */
-  --co-bg-surface:    #242220;   /* Warm elevated surface */
-  --co-bg-hover:      #2E2B28;   /* Warm hover */
-  --co-bg-subtle:     #1F1D1B;
+  --co-bg-app:            #111111;   /* Near-black base */
+  --co-bg-surface:        #1a1a1a;   /* Elevated surface */
+  --co-bg-surface-strong: #222222;   /* Strong surface */
+  --co-bg-hover:          #2a2a2a;   /* Hover state */
+  --co-bg-subtle:         #161616;   /* Subtle background */
+  --co-bg-inset:          #0d0d0d;   /* Inset/recessed */
 
   /* ── Typography ── */
-  --co-text-primary:   #F0EDE8;  /* Warm off-white */
-  --co-text-secondary: #9A9590;  /* Warm gray */
-  --co-text-muted:     #6B6560;
+  --co-text-primary:   #f0f0f0;  /* Near-white */
+  --co-text-secondary: #a0a0a0;  /* Medium gray */
+  --co-text-muted:     #666666;  /* Muted gray */
 
-  /* ── Brand (lightened for dark bg) ── */
-  --co-brand-primary:  #7BA3BC;  /* Lighter navy for readability */
-  --co-brand-light:    #92B8CE;
-  --co-status-up:      #6AAF7B;  /* Lightened sage */
-  --co-status-up-bg:   #1E2A22;
-  --co-status-down:    #E07A70;  /* Lightened terracotta */
-  --co-status-down-bg: #2A1F1E;
-  --co-info:           #8AAFBC;
-  --co-info-bg:        #1E2628;
+  /* ── Brand (brightened for dark bg) ── */
+  --co-brand-primary:  #4d94ff;  /* Lighter blue for readability */
+  --co-brand-light:    #6ba6ff;
+  --co-brand-accent:   #ffb84d;  /* Brightened amber */
+  --co-status-up:      #33cc80;  /* Brightened green */
+  --co-status-up-bg:   #112a1a;
+  --co-status-down:    #ff6b6b;  /* Brightened red */
+  --co-status-down-bg: #2a1515;
+  --co-info:           #9ca3af;
+  --co-info-bg:        #1a1d23;
+  --co-status-warning:    #ffb84d;
+  --co-status-warning-bg: #2a2010;
 
   /* ── Borders ── */
-  --co-border:         #3A3632;
-  --co-border-strong:  #4A4540;
-  --co-shadow-soft:    0 4px 20px rgba(0, 0, 0, 0.15);
+  --co-border:         #2a2a2a;
+  --co-border-strong:  #3a3a3a;
+  --co-border-soft:    #222222;
+  --co-shadow-soft:    0 20px 40px rgb(0 0 0 / 28%);
+  --co-shadow-raised:  0 28px 56px rgb(0 0 0 / 36%);
 
   /* ── Focus ── */
-  --co-focus-ring:     #8AAFBC;
+  --co-focus-ring:     #4d94ff;
+  --co-shadow-focus:   0 0 0 1px rgb(17 17 17 / 92%), 0 0 0 4px rgb(77 148 255 / 28%);
 }
 ```
 
@@ -126,30 +170,30 @@ Dark mode maintains the warm character — **not** cold blue-black.
 
 ### 2.2 Typography System
 
-Typography does the heavy lifting to establish authority. The key innovation: **serif for narrative, sans for data**.
+Typography establishes intelligence and clarity. The key innovation: **italic serif for copilot voice, geometric sans for data**.
 
 ```css
 :root {
   /* ── Font Families ── */
 
-  /* Narrative/editorial — the "human layer" of the app */
-  --font-narrative: 'Playfair Display', ui-serif, Georgia, serif;
-  
+  /* Copilot/editorial — the AI "intelligence layer" of the app */
+  --font-narrative: 'Instrument Serif', ui-serif, Georgia, serif;
+
   /* UI, data, and controls — the "precision layer" */
-  --font-data: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  
+  --font-data: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
   /* Financial figures in CFO/Terminal mode (optional density toggle) */
-  --font-mono: 'JetBrains Mono', 'Source Code Pro', ui-monospace, monospace;
+  --font-mono: 'IBM Plex Mono', 'Source Code Pro', ui-monospace, monospace;
 
   /* ── Scale ── */
   --text-xs:    0.75rem;    /* 12px */
   --text-sm:    0.875rem;   /* 14px */
   --text-base:  1rem;       /* 16px */
   --text-lg:    1.125rem;   /* 18px */
-  --text-xl:    1.25rem;    /* 20px */
-  --text-2xl:   1.5rem;     /* 24px */
-  --text-3xl:   1.875rem;   /* 30px */
-  --text-4xl:   2.25rem;    /* 36px */
+  --text-xl:    1.375rem;   /* 22px */
+  --text-2xl:   1.75rem;    /* 28px */
+  --text-3xl:   2.125rem;   /* 34px */
+  --text-4xl:   clamp(2.5rem, 5vw, 3.5rem);
 
   /* ── Weights ── */
   --font-regular:  400;
@@ -166,15 +210,15 @@ Typography does the heavy lifting to establish authority. The key innovation: **
 
 ### Strict Typography Boundary
 
-The serif font (`--font-narrative`) is strictly limited to the **human/editorial layer**:
+The serif font (`--font-narrative`) is strictly limited to the **copilot/intelligence layer**:
 
-| ✅ Serif (Playfair Display) allowed | ❌ Serif forbidden |
+| Instrument Serif italic allowed | Serif forbidden |
 |---|---|
-| "What Changed This Week" narrative | Dashboard metrics & numbers |
+| AI-generated narratives and insights | Dashboard metrics & numbers |
 | Life Event Playbook introductions | Balance Sheet data |
-| Quarterly Review letter | Account lists & tables |
+| Quarterly Review copilot letter | Account lists & tables |
 | Proposal discussion thread text | Settings, forms, inputs |
-| Page titles on editorial screens | Navigation, buttons, labels |
+| Copilot voice on editorial screens | Navigation, buttons, labels |
 | Financial Timeline narrative snippets | Chart axes and legends |
 
 All numerical values must use `--font-data` with the `font-variant-numeric: tabular-nums` CSS property so decimal places and amounts align perfectly in tables and the Balance Sheet.
@@ -185,9 +229,9 @@ In **Terminal/CFO Mode** (density toggle active), financial figures switch to `-
 
 | Font | Source | License | Notes |
 |---|---|---|---|
-| Inter | Google Fonts | Free / OFL | Self-host for performance |
-| Playfair Display | Google Fonts | Free / OFL | Prototype. Consider GT Super (~$200) for production |
-| JetBrains Mono | JetBrains | Free / OFL | Terminal mode only |
+| DM Sans | Google Fonts | Free / OFL | Loaded via next/font/google |
+| Instrument Serif | Google Fonts | Free / OFL | Italic only — copilot voice |
+| IBM Plex Mono | Google Fonts | Free / OFL | Terminal mode only |
 
 ### 2.3 Spacing & Form
 
@@ -198,21 +242,21 @@ In **Terminal/CFO Mode** (density toggle active), financial figures switch to `-
   --space-sm:  8px;
   --space-md:  16px;
   --space-lg:  24px;
-  --space-xl:  32px;
+  --space-xl:  36px;
   --space-2xl: 48px;
-  --space-3xl: 64px;
+  --space-3xl: 72px;
   --space-4xl: 96px;
 
   /* ── Border Radius ── */
-  --radius-sm:   4px;    /* Badges, tags, inputs */
-  --radius-md:   12px;   /* Standard cards, timeline events */
+  --radius-sm:   10px;   /* Badges, tags, inputs */
+  --radius-md:   16px;   /* Standard cards, timeline events */
   --radius-lg:   24px;   /* Major sections, modals */
   --radius-full: 9999px; /* Pills, avatars */
 }
 ```
 
 **Elevation philosophy:** border-first, not shadow-first.
-- Use `1px solid var(--co-border)` as the **primary** way to define card edges on the alabaster background
+- Use `1px solid var(--co-border)` as the **primary** way to define card edges
 - Reserve `var(--co-shadow-soft)` for hover states and elevated interactive elements only
 - Never use dark, sharp drop shadows
 
@@ -223,59 +267,82 @@ In **Terminal/CFO Mode** (density toggle active), financial figures switch to `-
 ### App Layout (authenticated)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Topbar: Logo · Household Selector · Search · Notifications │
-├────────┬────────────────────────────────────────────────────┤
-│        │                                                    │
-│  Side  │              Main Content Area                     │
-│  nav   │              (max-width: 1200px, centered)         │
-│        │              bg: var(--co-bg-app)                   │
-│  240px │                                                    │
-│  fixed │              Cards: var(--co-bg-surface)            │
-│  bg:   │              with 1px var(--co-border)              │
-│  white │                                                    │
-│        │                                                    │
-└────────┴────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│  Icon Rail (64px) │  Feed (flex)                │  Context (380px)  │
+│                   │                              │  (future P4)      │
+│  ƒ logo           │  Main Content Area           │                   │
+│  ──────           │  (max-width: 1200px)         │  AI insights      │
+│  Dashboard        │  bg: var(--co-bg-app)        │  Quick actions    │
+│  Balance Sheet    │                              │  Contextual help  │
+│  Timeline         │  Cards: var(--co-bg-surface) │                   │
+│  Events           │  with 1px var(--co-border)   │                   │
+│  Review           │                              │                   │
+│  Fitness          │                              │                   │
+│  Proposals        │                              │                   │
+│  ──────           │                              │                   │
+│  Household        │                              │                   │
+│  Settings         │                              │                   │
+└───────────────────┴──────────────────────────────┴───────────────────┘
 ```
 
-### Sidebar navigation
+### Icon Rail Navigation (64px)
 
-```
-📊  Dashboard
-📈  Balance Sheet
-🕐  Timeline
-📋  Life Events
-📊  Quarterly Review
-💪  Financial Fitness
-📝  Proposals
-───────────────
-👥  Household
-⚙️  Settings
-```
+The sidebar is a compact 64px icon rail with tooltip labels on hover:
 
-Sidebar text in `--font-data`. Active item: `--co-brand-primary` text with `--co-bg-hover` background. Hover: `--co-bg-hover`.
+- Icon style: 20px line icons, `--co-text-secondary` default
+- Active state: `--co-brand-primary` icon color with `--co-bg-hover` pill background
+- Hover: `--co-bg-hover` pill background
+- Text labels visible on hover (tooltip) or in expanded mode (tablet+)
 
 ### Responsive breakpoints
 
 | Breakpoint | Width | Layout change |
 |---|---|---|
-| **Desktop** | ≥1280px | Full sidebar + content |
-| **Tablet** | 768–1279px | Collapsible sidebar (overlay) |
-| **Mobile** | <768px | Bottom tab navigation, no sidebar |
+| **Desktop** | ≥1280px | Icon rail + feed + context panel |
+| **Tablet** | 768–1279px | Icon rail + feed (context panel hidden) |
+| **Mobile** | <768px | Bottom tab navigation, no rail |
 
 ---
 
 ## 4. Component Specifications
 
+### 4.0 Command Bar (⌘K)
+
+A global command palette accessible via `⌘K` (macOS) or `Ctrl+K` (Windows/Linux):
+
+```
+┌──────────────────────────────────────────┐
+│  🔍 Search or type a command...          │
+│──────────────────────────────────────────│
+│  RECENT                                  │
+│  → Balance Sheet                         │
+│  → Q4 2025 Review                        │
+│  NAVIGATION                              │
+│  → Go to Dashboard                       │
+│  → Go to Timeline                        │
+│  ACTIONS                                 │
+│  → Create Proposal                       │
+│  → Start Life Event                      │
+│  → Generate Quarterly Review             │
+└──────────────────────────────────────────┘
+```
+
+- Background: `--co-bg-surface` with `--co-shadow-raised`
+- Border: `1px solid var(--co-border)`
+- Border radius: `--radius-lg`
+- Input: DM Sans, `--text-lg`, no border
+- Results: grouped by category, keyboard navigable
+- Backdrop: `rgba(17, 17, 17, 0.4)`
+
 ### 4.1 The Density Toggle (Key Innovation)
 
 The UI supports two density modes, toggled by the user:
 
-**State A: Narrative View (Default)**
+**State A: Feed View (Default)**
 - High whitespace, `--text-base` / `--text-lg` for body text
 - Cards with `--radius-md`, generous padding (`--space-lg`)
 - Net Worth and Fitness Score prominent
-- AI narratives displayed inline
+- AI narratives displayed inline in Instrument Serif italic
 - Best for: The Reluctant Partner, first-time users, demo mode
 
 **State B: Terminal View (CFO Mode)**
@@ -289,11 +356,11 @@ The UI supports two density modes, toggled by the user:
 ```typescript
 // Toggle implementation
 interface DensityMode {
-  mode: 'narrative' | 'terminal'
+  mode: 'feed' | 'terminal'
 }
 
 // Applied via data attribute on root layout
-// <body data-density="narrative"> or <body data-density="terminal">
+// <body data-density="feed"> or <body data-density="terminal">
 
 // CSS adjusts spacing, font sizes, and layout via attribute selectors
 // [data-density="terminal"] .card { padding: var(--space-sm); }
@@ -304,13 +371,13 @@ Toggle location: top-right of main content area, next to dark mode toggle. Icon:
 
 ### 4.2 Base Components (shadcn/ui, customized)
 
-All shadcn/ui components customized to Warm Authority tokens:
+All shadcn/ui components customized to 10x Financial Copilot tokens:
 
-- **Button:** Sizes: `sm` (32px), `md` (40px), `lg` (48px). Primary variant uses `--co-brand-primary` (Forest Navy). Destructive uses `--co-status-down`. Border radius: `--radius-sm`.
+- **Button:** Sizes: `sm` (32px), `md` (40px), `lg` (48px). Primary variant uses `--co-brand-primary` (Electric Blue). Destructive uses `--co-status-down`. Border radius: `--radius-sm`.
 - **Card:** Border: `1px solid var(--co-border)`. Border radius: `--radius-md`. Background: `--co-bg-surface`. No shadow by default; `--co-shadow-soft` on hover.
-- **Input:** Height 40px, `--radius-sm`, border `--co-border`. Focus ring: `--co-focus-ring` with 2px offset.
-- **Dialog/Modal:** Centered, max-width 560px, `--radius-lg`, backdrop with warm tint `rgba(26,24,21,0.4)`.
-- **Toast:** Bottom-right, auto-dismiss 5s. Success uses Sage Green border, error uses Terracotta border.
+- **Input:** Height 40px, `--radius-sm`, border `--co-border`. Focus ring: `--co-focus-ring` with 3px offset.
+- **Dialog/Modal:** Centered, max-width 560px, `--radius-lg`, backdrop with `rgba(17, 17, 17, 0.4)`.
+- **Toast:** Bottom-right, auto-dismiss 5s. Success uses green border (`--co-status-up`), error uses red border (`--co-status-down`).
 
 ### 4.3 Domain Components
 
@@ -321,7 +388,7 @@ interface AmountDisplayProps {
   amount: number           // minor units (öre)
   currency: string         // ISO 4217
   showSign?: boolean       // +/- prefix
-  colorize?: boolean       // Sage Green positive, Terracotta negative
+  colorize?: boolean       // Green positive, Red negative
   size?: 'sm' | 'md' | 'lg' | 'xl'
   showCurrency?: boolean
 }
@@ -340,13 +407,13 @@ interface AmountDisplayProps {
 Design: Semi-circular arc gauge
 - Score number: large, center, font-data tabular-nums (e.g., "720")
 - Arc fills clockwise based on score (0=empty, 1000=full)
-- Color gradient uses Warm Authority semantic colors:
-  0–300:   var(--co-status-down)  Muted Terracotta
-  300–500: #D4B872               Pale Gold  
-  500–700: var(--co-info)        Soft Steel
-  700–1000: var(--co-status-up)  Sage Green
+- Color gradient uses semantic colors:
+  0–300:   var(--co-status-down)  Red
+  300–500: var(--co-brand-accent) Amber
+  500–700: var(--co-info)         Cool Gray
+  700–1000: var(--co-status-up)   Green
 - Label below: "Financial Fitness" in --font-data
-- Trend arrow: ↑↓ with delta value
+- Trend arrow: up/down with delta value
 ```
 
 #### AllocationChart
@@ -368,25 +435,25 @@ The Financial Timeline is the signature UX. Specific design pattern:
 
 ```
 Design:
-- A continuous, thin (2px), vertical line in var(--co-info) (Soft Steel)
+- A continuous, thin (2px), vertical line in var(--co-info) (Cool Gray)
   running down the left side
-  
+
 - Events are dots on the line:
-  - AUTOMATIC events (dividends, market shifts, system): 
+  - AUTOMATIC events (dividends, market shifts, system):
     Small solid dots (8px), --co-info color
-  - HUMAN events (proposals approved, life events, decisions): 
+  - HUMAN events (proposals approved, life events, decisions):
     Larger dots (16px) containing miniature icons, --co-brand-primary
   - MILESTONES (fitness crossed threshold, goal reached):
     Larger dots (16px), --co-status-up with glow ring
 
 - Content card (right of line):
   - Title: --font-data, --co-text-primary
-  - Narrative snippet: --font-narrative (serif), --co-text-secondary
+  - Narrative snippet: --font-narrative (Instrument Serif italic), --co-text-secondary
   - Metadata: --font-data --text-xs, --co-text-muted
 
 - Hover interaction:
   - Slightly expands the card (scale 1.01)
-  - Highlights the path from this event back to the present day  
+  - Highlights the path from this event back to the present day
     (line brightens between hovered event and "today" marker)
   - Visually reinforces "decisions compounding over time"
 
@@ -399,15 +466,15 @@ Design:
 ```
 Design: Card with status badge
 - Border: 1px solid var(--co-border)
-- Status badge corner: 
-  Pending → Pale Gold background with --co-text-primary text
-  Approved → Sage Green background
-  Rejected → Terracotta background
+- Status badge corner:
+  Pending → Amber background (--co-brand-accent) with --co-text-primary text
+  Approved → Green background (--co-status-up)
+  Rejected → Red background (--co-status-down)
 - Title: --font-data semibold
 - Description: --font-data regular
-- Discussion thread: --font-narrative for comment content (human layer)
+- Discussion thread: --font-narrative for comment content (copilot layer)
 - Impact analysis section (collapsible): data in --font-data
-- Action buttons: Forest Navy primary, outline secondary
+- Action buttons: Electric Blue primary, outline secondary
 ```
 
 #### AccountCard
@@ -415,14 +482,14 @@ Design: Card with status badge
 ```
 Design: Horizontal card with provider identity
 - 1px --co-border, --radius-md, --co-bg-surface
-- Provider logo (left, 32×32, --radius-sm)
-- Account name (--font-data semibold) + wrapper badge (ISK/KF/Depå)
+- Provider logo (left, 32x32, --radius-sm)
+- Account name (--font-data semibold) + wrapper badge (ISK/KF/Depa)
   - Badge: --radius-sm, --co-bg-hover background, --text-xs
 - Total value (right, large, --font-data tabular-nums)
   - Terminal mode: --font-mono
 - Holdings count + last synced (--text-xs, --co-text-muted)
 - Owner avatar (if household view, not own account)
-- Privacy indicator: 🔒 icon if amount_hidden or private
+- Privacy indicator: lock icon if amount_hidden or private
 - Hover: --co-shadow-soft + border shifts to --co-border-strong
 ```
 
@@ -430,7 +497,7 @@ Design: Horizontal card with provider identity
 
 ```
 Design: Area chart
-- Line: var(--co-brand-primary) (Forest Navy)
+- Line: var(--co-brand-primary) (Electric Blue)
 - Fill: gradient from --co-brand-primary (10% opacity) to transparent
 - X-axis: dates (monthly ticks), --font-data --text-xs, --co-text-muted
 - Y-axis: SEK values (abbreviated: "2.4M SEK"), --font-data --text-xs
@@ -448,26 +515,26 @@ Design: Area chart
 
 ```
 ┌────────────────────────────────────────────────────┐
-│ Good morning, Isac · Andersson Household    [⊞/≡] │  ← density toggle
+│ Good morning, Isac · Andersson Household    [⊞/≡] │  <- density toggle
 ├────────────────────────────────────────────────────┤
 │                                                    │
 │ ┌──────────────────┐ ┌──────────────────────────┐ │
 │ │  NET WORTH        │ │  FINANCIAL FITNESS        │ │
 │ │  2 430 000 SEK    │ │      ┌──────┐             │ │
-│ │  ▲ +12 400 (+0.5%)│ │      │ 720  │             │ │
+│ │  +12 400 (+0.5%)  │ │      │ 720  │             │ │
 │ │  this week        │ │      └──────┘             │ │
-│ │  [Net worth chart]│ │  ▲ +20 from last month   │ │
+│ │  [Net worth chart]│ │  +20 from last month      │ │
 │ └──────────────────┘ └──────────────────────────┘ │
 │                                                    │
 │ ┌──────────────────────────────────────────────┐   │
-│ │  📰 WHAT CHANGED THIS WEEK                    │   │
-│ │  ─────────────────────                         │   │
-│ │  "Your household net worth grew by 12,400     │   │  ← serif (--font-narrative)
-│ │   SEK as Nordic markets continued their       │   │
-│ │   steady climb. Your Avanza ISK..."            │   │
-│ │                                                │   │
-│ │   • ISK Avanza up 2.3%                 [sans]  │   │  ← sans (--font-data)
-│ │   • Mortgage fixed rate expires in 8 months    │   │
+│ │  COPILOT INSIGHTS                            │   │
+│ │  ─────────────────                           │   │
+│ │  "Your household net worth grew by 12,400    │   │  <- Instrument Serif italic
+│ │   SEK as Nordic markets continued their      │   │
+│ │   steady climb. Your Avanza ISK..."          │   │
+│ │                                              │   │
+│ │   - ISK Avanza up 2.3%               [sans]  │   │  <- DM Sans
+│ │   - Mortgage fixed rate expires in 8 months  │   │
 │ └──────────────────────────────────────────────┘   │
 │                                                    │
 │ ┌──────────────┐ ┌──────────────┐ ┌──────────┐   │
@@ -478,9 +545,9 @@ Design: Area chart
 │ └──────────────┘ └──────────────┘ └──────────┘   │
 │                                                    │
 │ ┌──────────────────────────────────────────────┐   │
-│ │  🕐 RECENT TIMELINE                           │   │
-│ │  [Latest 5 timeline entries...]               │   │
-│ │  → View full timeline                          │   │
+│ │  RECENT TIMELINE                             │   │
+│ │  [Latest 5 timeline entries...]              │   │
+│ │  → View full timeline                        │   │
 │ └──────────────────────────────────────────────┘   │
 └────────────────────────────────────────────────────┘
 ```
@@ -489,10 +556,10 @@ Design: Area chart
 
 ```
 ┌────────────────────────────────────────────────────┐
-│ Household Balance Sheet          as of Feb 23, 2026│
+│ Household Balance Sheet          as of Mar 20, 2026│
 ├────────────────────────────────────────────────────┤
 │                                                    │
-│  NET WORTH: 2 430 000 SEK                   [⊞/≡] │  ← density toggle
+│  NET WORTH: 2 430 000 SEK                   [⊞/≡] │  <- density toggle
 │  Assets: 2 850 000 · Liabilities: 420 000          │
 │                                                    │
 │  [Toggle: Household | Isac | Partner]              │
@@ -504,19 +571,19 @@ Design: Area chart
 │ │ 6-color      │ │ palette      │ │              ││
 │ └──────────────┘ └──────────────┘ └──────────────┘│
 │                                                    │
-│  NARRATIVE VIEW:              TERMINAL VIEW:       │
+│  FEED VIEW:                  TERMINAL VIEW:        │
 │  ┌──────────────────────┐     ┌──────────────────┐│
-│  │ 🏦 ISK Avanza        │     │ ISK Avanza 350K  ││
+│  │ ISK Avanza           │     │ ISK Avanza 350K  ││
 │  │    350 000 SEK        │     │ KF Nordnet  180K ││
-│  │    5 holdings · ↑2.3% │     │ SEB Savings 450K ││
+│  │    5 holdings · +2.3% │     │ SEB Savings 450K ││
 │  │    Updated today      │     │ PPM         380K ││
 │  └──────────────────────┘     │ Skandia     220K ││
 │  ┌──────────────────────┐     │ Mortgage   -420K ││
-│  │ 🏦 KF Nordnet         │     └──────────────────┘│
+│  │ KF Nordnet            │     └──────────────────┘│
 │  │    180 000 SEK        │                          │
 │  └──────────────────────┘                          │
 │                                                    │
-│ ⚠️ Data quality: 85% · 1 account stale             │
+│ Data quality: 85% · 1 account stale                │
 └────────────────────────────────────────────────────┘
 ```
 
@@ -524,31 +591,31 @@ Design: Area chart
 
 ```
 ┌────────────────────────────────────────────────────┐
-│ Financial Timeline          [Filter ▾] [+ Add]     │
+│ Financial Timeline          [Filter] [+ Add]       │
 ├────────────────────────────────────────────────────┤
 │                                                    │
 │  FUTURE ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌ (dotted line)  │
 │     ╎                                              │
-│     ╎  🎯 Sep 2026 · Summer house (goal)           │
+│     ╎  Sep 2026 · Summer house (goal)              │
 │     ╎     Target: 500 000 SEK                      │
 │     ╎                                              │
 │  ── TODAY ──────────────────────────                │
 │     │                                              │
-│  Feb ●  📊 Q4 2025 Review · Score: 720 (▲+20)     │  ← large dot (human)
-│  20  │     "Strong quarter..."  [serif]             │
+│  Feb ●  Q4 2025 Review · Score: 720 (+20)          │  <- large dot (human)
+│  20  │     "Strong quarter..."  [serif italic]      │
 │     │                                              │
-│  Feb ●  📝 Reviewed insurance coverage              │  ← large dot (human)
+│  Feb ●  Reviewed insurance coverage                 │  <- large dot (human)
 │  12  │     "We decided to increase..."  [serif]     │
 │     │                                              │
-│  Jan ●  🏠 Apartment Search Started                 │  ← large dot + icon
+│  Jan ●  Apartment Search Started                    │  <- large dot + icon
 │  15  │     Life Event active                        │
 │     │     Budget: 3 500 000 SEK · Q3 2026          │
 │     │     Playbook: 8/12 actions complete           │
 │     │                                              │
-│  Dec ·  Auto: Dividend received (Investor AB)       │  ← small dot (auto)
+│  Dec ·  Auto: Dividend received (Investor AB)       │  <- small dot (auto)
 │  18  │  +2 340 SEK                                  │
 │     │                                              │
-│  Dec ●  🏆 Fitness: Crossed 700                     │  ← milestone dot + glow
+│  Dec ●  Fitness: Crossed 700                        │  <- milestone dot + glow
 │  01  │     Buffer score improved to 160             │
 │     │                                              │
 │  ... │  [Load more]                                │
@@ -568,9 +635,10 @@ Design: Area chart
 | Timeline entry appear | Fade + slide-up from 8px | 300ms | ease-out |
 | Timeline hover path | Line brightens from event to today | 400ms | ease-out |
 | Toast appear | Slide from right | 250ms | ease-out |
-| Modal open | Fade warm backdrop + scale 0.97→1 | 200ms | ease-out |
+| Modal open | Fade backdrop + scale 0.97→1 | 200ms | ease-out |
 | Skeleton loading | Shimmer pulse on `--co-bg-hover` | 1500ms loop | linear |
 | Density toggle | Cross-fade between states | 300ms | ease-in-out |
+| Command bar open | Fade + scale 0.98→1 | 150ms | ease-out |
 
 All animations respect `prefers-reduced-motion: reduce` — instantly apply final state, no transitions.
 
@@ -584,15 +652,14 @@ Every screen has a designed empty state:
 1. **Icon** (subtle, single-color in `--co-text-muted`, not cartoon)
 2. **Title** in `--font-data` semibold
 3. **Description** in `--font-data` regular, `--co-text-secondary`
-4. **Primary action** button (Forest Navy)
+4. **Primary action** button (Electric Blue)
 
 Example (Balance Sheet, no accounts):
 ```
-  📊
   Your Household Balance Sheet
-  Add your first financial account to see your 
+  Add your first financial account to see your
   complete financial picture in one place.
-  
+
   [+ Add Account]     [Import from CSV]
 ```
 
@@ -600,7 +667,7 @@ Example (Balance Sheet, no accounts):
 
 - **Page-level:** Skeleton matching target layout — card shapes in `--co-bg-hover` with shimmer
 - **Component-level:** Pulse shimmer on individual cards/charts
-- **AI generation:** Serif typography progress message: *"Writing your quarterly review..."* with estimated time
+- **AI generation:** Instrument Serif italic progress message: *"Writing your quarterly review..."* with estimated time
 - **Never a blank white screen** — always show structure immediately
 
 ---
@@ -609,12 +676,12 @@ Example (Balance Sheet, no accounts):
 
 | Requirement | Implementation |
 |---|---|
-| Color contrast | 4.5:1 minimum. Verified: `--co-text-primary` on `--co-bg-app` = 14.5:1 ✓; `--co-text-secondary` on `--co-bg-surface` = 5.2:1 ✓ |
-| Focus indicators | 2px ring in `--co-focus-ring` (Soft Steel) with 2px offset. Visible on both light and dark |
-| Keyboard navigation | All features accessible via keyboard; logical tab order |
+| Color contrast | 4.5:1 minimum. Verified: `--co-text-primary` (#111111) on `--co-bg-app` (#fafafa) = 17.4:1; `--co-text-secondary` (#666666) on `--co-bg-surface` (#ffffff) = 5.7:1 |
+| Focus indicators | `--co-shadow-focus` ring in Electric Blue with 3px offset. Visible on both light and dark |
+| Keyboard navigation | All features accessible via keyboard; logical tab order; Command Bar (⌘K) for quick navigation |
 | Screen reader labels | All icons have `aria-label`; charts have text summary alternatives |
 | Reduced motion | Respect `prefers-reduced-motion`; all animations disabled |
-| Touch targets | Minimum 44×44px on mobile |
+| Touch targets | Minimum 44x44px on mobile |
 | Color-blind safety | Chart palette tested for deuteranopia/protanopia; shapes + patterns available as fallback |
 
 ---
@@ -623,11 +690,11 @@ Example (Balance Sheet, no accounts):
 
 All tokens structured for Figma import:
 
-1. **Color tokens** → Figma Variables (modes: Warm Light / Warm Dark)
-2. **Typography** → Figma Text Styles (Playfair narrative, Inter data, JetBrains terminal)
+1. **Color tokens** → Figma Variables (modes: Light / Dark)
+2. **Typography** → Figma Text Styles (Instrument Serif copilot, DM Sans data, IBM Plex Mono terminal)
 3. **Spacing** → Auto Layout values from 8px grid
 4. **Borders & shadows** → Figma Effect Styles
-5. **Radii** → Figma Variables (4px / 12px / 24px)
+5. **Radii** → Figma Variables (10px / 16px / 24px)
 
 ### Component naming convention
 
@@ -638,7 +705,7 @@ components/
     Button / Secondary / Medium
     Input / Default
     Input / Error
-    Card / Narrative Density
+    Card / Feed Density
     Card / Terminal Density
   domain/
     AmountDisplay / Positive / Large
@@ -649,16 +716,19 @@ components/
     TimelineEntry / Human Event
     TimelineEntry / Auto Event
     TimelineEntry / Milestone
-    AccountCard / Narrative
+    AccountCard / Feed
     AccountCard / Terminal Row
     ProposalCard / Pending
     ProposalCard / Approved
-    DensityToggle / Narrative Active
+    DensityToggle / Feed Active
     DensityToggle / Terminal Active
+    CommandBar / Default
+    CommandBar / With Results
   layout/
-    Sidebar / Expanded
-    Sidebar / Collapsed
+    IconRail / Default
+    IconRail / With Tooltip
     Topbar / Default
+    ContextPanel / Default (future)
     PageHeader / With Density Toggle
 ```
 
@@ -668,16 +738,17 @@ components/
 
 | Web | React Native equivalent |
 |---|---|
-| CSS variables | Theme objects (same token values, same warm palette) |
+| CSS variables | Theme objects (same token values, same neutral palette) |
 | shadcn/ui | React Native Paper or custom components |
 | Recharts | `react-native-svg-charts` or `victory-native` |
-| Sidebar nav | Bottom tab navigation (5 tabs max) |
+| Icon rail nav | Bottom tab navigation (5 tabs max) |
 | Tailwind + density toggle | NativeWind with context-based density |
-| Google Fonts (Playfair, Inter) | Self-bundled via `expo-font` |
+| Google Fonts (Instrument Serif, DM Sans) | Self-bundled via `expo-font` |
 
 **Mobile-specific:**
-- Density toggle → mobile defaults to Narrative View; Terminal unavailable (screen too small)
+- Density toggle → mobile defaults to Feed View; Terminal unavailable (screen too small)
 - Simplified dashboard (vertically stacked metric cards)
 - Swipe-able timeline
 - Push notifications for proposals + reviews
 - Biometric auth (FaceID / fingerprint)
+- Command Bar replaced with search screen

@@ -3,42 +3,44 @@
 :root {
   color-scheme: light;
 
-  --co-bg-app: #f6f1ea;
-  --co-bg-surface: #fffdf9;
+  --co-bg-app: #fafafa;
+  --co-bg-surface: #ffffff;
   --co-bg-surface-strong: #ffffff;
-  --co-bg-hover: #f1ebe2;
-  --co-bg-subtle: #fbf7f0;
-  --co-bg-inset: #ede6dc;
+  --co-bg-hover: #f0f0f0;
+  --co-bg-subtle: #f5f5f5;
+  --co-bg-inset: #e8e8e8;
 
-  --co-text-primary: #17202a;
-  --co-text-secondary: #5a6672;
-  --co-text-muted: #88919a;
+  --co-text-primary: #111111;
+  --co-text-secondary: #666666;
+  --co-text-muted: #999999;
 
-  --co-brand-primary: #22374a;
-  --co-brand-light: #36526a;
-  --co-brand-accent: #9f7e4a;
-  --co-status-up: #4b725c;
-  --co-status-up-bg: #eef4ef;
-  --co-status-down: #b55d53;
-  --co-status-down-bg: #fbefed;
-  --co-info: #657d8f;
-  --co-info-bg: #eef3f6;
+  --co-brand-primary: #0066ff;
+  --co-brand-light: #3384ff;
+  --co-brand-accent: #f5a623;
+  --co-status-up: #00a866;
+  --co-status-up-bg: #e6f9ef;
+  --co-status-down: #e03e3e;
+  --co-status-down-bg: #fde8e8;
+  --co-info: #6b7280;
+  --co-info-bg: #f0f1f3;
+  --co-status-warning: #f5a623;
+  --co-status-warning-bg: #fef6e6;
 
-  --co-chart-1: #22374a;
-  --co-chart-2: #657d8f;
-  --co-chart-3: #b3925f;
-  --co-chart-4: #7c6b53;
-  --co-chart-5: #557b72;
-  --co-chart-6: #b96c53;
+  --co-chart-1: #0066ff;
+  --co-chart-2: #00a866;
+  --co-chart-3: #f5a623;
+  --co-chart-4: #a855f7;
+  --co-chart-5: #e03e3e;
+  --co-chart-6: #6b7280;
 
-  --co-border: #ddd4c8;
-  --co-border-strong: #c8bcad;
-  --co-border-soft: #ebe4da;
-  --co-shadow-soft: 0 18px 36px rgb(23 32 42 / 6%);
-  --co-shadow-raised: 0 24px 48px rgb(23 32 42 / 10%);
-  --co-focus-ring: #6d879a;
+  --co-border: #e5e5e5;
+  --co-border-strong: #cccccc;
+  --co-border-soft: #f0f0f0;
+  --co-shadow-soft: 0 18px 36px rgb(0 0 0 / 5%);
+  --co-shadow-raised: 0 24px 48px rgb(0 0 0 / 8%);
+  --co-focus-ring: #0066ff;
   --co-focus-ring-offset: 3px;
-  --co-shadow-focus: 0 0 0 1px rgb(255 253 249 / 94%), 0 0 0 4px rgb(109 135 154 / 32%);
+  --co-shadow-focus: 0 0 0 1px rgb(255 255 255 / 94%), 0 0 0 4px rgb(0 102 255 / 24%);
 
   --font-regular: 400;
   --font-medium: 500;
@@ -63,9 +65,9 @@
   --space-3xl: 72px;
   --space-4xl: 96px;
 
-  --radius-sm: 12px;
-  --radius-md: 22px;
-  --radius-lg: 32px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --radius-full: 9999px;
 
   --motion-fast: 140ms;
@@ -80,34 +82,36 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --co-bg-app: #171411;
-  --co-bg-surface: #221e1a;
-  --co-bg-surface-strong: #29241f;
-  --co-bg-hover: #2a2520;
-  --co-bg-subtle: #1c1814;
-  --co-bg-inset: #120f0d;
+  --co-bg-app: #111111;
+  --co-bg-surface: #1a1a1a;
+  --co-bg-surface-strong: #222222;
+  --co-bg-hover: #2a2a2a;
+  --co-bg-subtle: #161616;
+  --co-bg-inset: #0d0d0d;
 
-  --co-text-primary: #f3ede5;
-  --co-text-secondary: #b8afa4;
-  --co-text-muted: #8c8278;
+  --co-text-primary: #f0f0f0;
+  --co-text-secondary: #a0a0a0;
+  --co-text-muted: #666666;
 
-  --co-brand-primary: #9db3c4;
-  --co-brand-light: #bfd0dd;
-  --co-brand-accent: #c9ae7a;
-  --co-status-up: #8db198;
-  --co-status-up-bg: #202920;
-  --co-status-down: #de897d;
-  --co-status-down-bg: #2d201d;
-  --co-info: #9eb4c4;
-  --co-info-bg: #1d262c;
+  --co-brand-primary: #4d94ff;
+  --co-brand-light: #6ba6ff;
+  --co-brand-accent: #ffb84d;
+  --co-status-up: #33cc80;
+  --co-status-up-bg: #112a1a;
+  --co-status-down: #ff6b6b;
+  --co-status-down-bg: #2a1515;
+  --co-info: #9ca3af;
+  --co-info-bg: #1a1d23;
+  --co-status-warning: #ffb84d;
+  --co-status-warning-bg: #2a2010;
 
-  --co-border: #3a322b;
-  --co-border-strong: #4c433a;
-  --co-border-soft: #2d2722;
+  --co-border: #2a2a2a;
+  --co-border-strong: #3a3a3a;
+  --co-border-soft: #222222;
   --co-shadow-soft: 0 20px 40px rgb(0 0 0 / 28%);
   --co-shadow-raised: 0 28px 56px rgb(0 0 0 / 36%);
-  --co-focus-ring: #b0c2cf;
-  --co-shadow-focus: 0 0 0 1px rgb(23 20 17 / 92%), 0 0 0 4px rgb(176 194 207 / 28%);
+  --co-focus-ring: #4d94ff;
+  --co-shadow-focus: 0 0 0 1px rgb(17 17 17 / 92%), 0 0 0 4px rgb(77 148 255 / 28%);
 }
 
 @theme inline {
@@ -145,9 +149,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 62%) 0%, rgb(255 255 255 / 0%) 22rem),
-    linear-gradient(180deg, var(--co-bg-subtle) 0%, var(--co-bg-app) 18rem, var(--co-bg-app) 100%);
+  background: var(--co-bg-app);
   color: var(--co-text-primary);
   font-family:
     var(--font-data),
@@ -173,7 +175,7 @@ main {
 
 a {
   color: inherit;
-  text-decoration-color: rgb(34 55 74 / 24%);
+  text-decoration-color: rgb(0 102 255 / 24%);
   text-underline-offset: 0.2em;
 }
 
@@ -209,7 +211,7 @@ p {
 }
 
 ::selection {
-  background: rgb(34 55 74 / 16%);
+  background: rgb(0 102 255 / 16%);
   color: var(--co-text-primary);
 }
 

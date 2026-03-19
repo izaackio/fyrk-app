@@ -1,19 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, Newsreader, Public_Sans } from "next/font/google";
+import { DM_Sans, IBM_Plex_Mono, Instrument_Serif } from "next/font/google";
 import type { ReactNode } from "react";
 
 import "./globals.css";
 
-const dataFont = Public_Sans({
+const dataFont = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-data",
   display: "swap"
 });
 
-const narrativeFont = Newsreader({
+const narrativeFont = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400"],
+  style: ["italic"],
   variable: "--font-narrative",
   display: "swap"
 });
@@ -76,8 +77,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   colorScheme: "light dark",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f1ea" },
-    { media: "(prefers-color-scheme: dark)", color: "#171411" }
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#111111" }
   ]
 };
 
