@@ -1,10 +1,10 @@
 # FYRK — Build Plan
 ## Sprint-by-Sprint Execution Roadmap + Multi-Agent Development Patterns
 
-> **Version:** 0.1
+> **Version:** 0.2 — Revised 2026-03-19 (design system migration + post-prototype sprints added)
 > **Source:** All documents in `/docs/` (including `FINANCIAL_LOGIC.md`)
-> **Timeline:** 12 weeks (6 × two-week sprints)
-> **Output:** Demo-ready prototype deployable to fyrk.com
+> **Timeline:** ~26 weeks (13 sprints, some overlap)
+> **Output:** Brand-ready prototype deployable to fyrk.com
 > **Consumed by:** All agents, human developers, project management
 
 ---
@@ -455,15 +455,253 @@ GATE:
 
 ---
 
+### Sprint 7: Design System Migration — "10x Financial Copilot" (Weeks 13–14)
+
+**Goal:** Migrate the entire codebase from "Warm Authority" to the approved "10x Financial Copilot" design system. New color palette, new typography (DM Sans + Instrument Serif), new ƒ logo mark, and three-panel layout.
+
+> **Full spec:** [DESIGN_SPRINT.md](./DESIGN_SPRINT.md) — detailed phase plan with file ownership, parallelization rules, and PR gates.
+> **Design concept:** [design-10x.html](./design-10x.html) — approved visual direction across Desktop, Mobile, Marketing, and Logo.
+> **Logo decision:** Proposal 3 — The Pure Typeset ƒ (Instrument Serif italic)
+
+```
+PHASES (see DESIGN_SPRINT.md for full detail):
+
+P1 — Foundation (fonts + colors + brand guidelines)
+  Files: layout.tsx, globals.css, BRAND_GUIDELINES.md
+  □ Swap Public Sans → DM Sans, Newsreader → Instrument Serif
+  □ Replace all color tokens (warm earth → high-contrast modern)
+  □ Rewrite BRAND_GUIDELINES.md v0.2 → v1.0
+  GATE: build passes, new fonts render, new colors visible
+
+P2 — Logo Mark
+  Files: icons.tsx, LandingPage.tsx
+  □ Replace FyrkMark SVG rectangle → Instrument Serif italic ƒ
+  □ Update landing page wordmark
+  GATE: ƒ glyph visible in sidebar and landing page
+
+P3 — Component Styling (4 parallel sub-phases)
+  P3a: theme.module.css — replace hardcoded navy/gold colors
+  P3b: shell.module.css — replace hardcoded colors in layout
+  P3c: landing.module.css — replace hardcoded colors in marketing
+  P3d: dashboard-insights.module.css — replace hardcoded colors
+  GATE: grep for old colors returns 0 matches in src/
+
+P4 — Layout Restructuring
+  Files: AppShell.tsx, SidebarNav.tsx, Topbar.tsx, shell.module.css
+  □ 288px sidebar → 64px icon rail
+  □ Add 380px context panel (right side)
+  □ Responsive: three-panel → two-panel → single + bottom tabs
+  GATE: three-panel layout renders correctly at all breakpoints
+
+P5 — Font Evaluation
+  □ Evaluate DM Sans rendering quality at UI sizes
+  □ Test tabular numerals for financial data alignment
+  □ Swap to Inter/Geist if DM Sans fails evaluation
+  GATE: font confirmed or swapped with screenshots
+
+PARALLELIZATION:
+  P1 → merge → P2, P3a, P3b, P3c, P3d, P5 (all parallel)
+  P3b → merge → P4
+```
+
+```
+GATE:
+  ✓ Zero references to old palette (Forest Navy, Sage, Terracotta) in src/
+  ✓ Zero references to old fonts (Playfair, Inter, JetBrains) in src/
+  ✓ App renders DM Sans + Instrument Serif + IBM Plex Mono
+  ✓ Logo shows Instrument Serif italic ƒ mark throughout
+  ✓ Three-panel layout: 64px rail + feed + 380px context panel
+  ✓ Dark mode fully functional with new palette
+  ✓ BRAND_GUIDELINES.md v1.0 consistent with codebase
+  ✓ npm run build passes with zero errors
+```
+
+---
+
+### Sprint 8: Interaction Quality & Polish (Weeks 15–16)
+
+**Goal:** Deliver world-class interaction quality benchmarked to Linear, Perplexity, and Stripe standards, now built on the 10x Financial Copilot design system.
+
+> **Builds on:** S7 (design system migration complete — new palette, fonts, logo, layout)
+
+```
+FRONTEND AGENT:
+□ Replace all placeholder routes/content with production-grade experiences:
+  - Timeline, Life Events, Financial Fitness, Quarterly Review, Proposals
+□ Full design-system hardening pass:
+  - Single-source tokens (remove duplicate/competing token definitions)
+  - Zero inline style usage in core primitives
+  - Component variants normalized for spacing, typography, states, and density
+□ App shell and navigation premium pass:
+  - Icon system upgrade (replace fallback glyph-style icons)
+  - Topbar parity with brand blueprint (search, notifications, household controls)
+□ Copilot feed implementation:
+  - Command Bar (⌘K) stub — overlay with search input
+  - Typed feed cards: Insight, Action, Proposal, Alert
+  - Feed-based dashboard replacing widget grid
+□ Signature component implementation pass:
+  - AllocationChart, NetWorthTrend, FitnessGauge, TimelineEntry
+□ Motion and micro-interaction pass
+□ Visual QA pass against BRAND_GUIDELINES.md v1.0
+
+GATE:
+  ✓ 0 placeholder screens remain in authenticated product routes
+  ✓ Design-system audit shows no duplicate token sources in active UI paths
+  ✓ Interaction polish pass completed (states, motion, reduced-motion)
+  ✓ Accessibility remains WCAG 2.1 AA on core flows
+  ✓ Lighthouse performance remains ≥90 on key pages
+  ✓ Product quality sign-off confirms benchmark-level UI execution
+```
+
+---
+
+### Sprint 9: Data Access & Provider Integration (Weeks 17–18)
+
+**Goal:** Connect to live financial data sources. Solve the data access bottleneck.
+
+> **Builds on:** S2 (CSV import, accounts schema), S4 (timeline schema)
+
+```
+DATA AGENT:
+□ TinkAdapter: Tink Link widget, PSD2 consent flow, transaction sync
+□ AvanzaAdapter: fhqvst/avanza npm package, TOTP auth, positions + transactions
+
+BACKEND AGENT:
+□ POST /api/providers/tink/connect + callback
+□ POST /api/providers/avanza/connect (TOTP auth flow)
+□ POST /api/sync/trigger (manual sync)
+□ PATCH /api/accounts/:id/balance (manual balance quick-update)
+
+FRONTEND AGENT:
+□ Provider connection settings page
+□ Tink Link widget integration
+□ Avanza TOTP setup flow
+□ Sync status indicators
+
+GATE:
+  ✓ Tink sandbox connects → test bank data flows into accounts
+  ✓ Avanza TOTP auth works → positions visible in balance sheet
+  ✓ Manual balance update works for non-connected accounts
+  ✓ Sync trigger works (manual) for all connected providers
+```
+
+---
+
+### Sprint 10: Auto-Generated Timeline & Charts (Weeks 19–20)
+
+**Goal:** The "wow moment" — financial story auto-constructed from transactions.
+
+> **Builds on:** S4 (timeline_entries), S3 (balance sheet history), S9 (live transaction data)
+
+```
+DATA AGENT:
+□ Transaction detection engine (income, housing, insurance, investments, subscriptions)
+
+BACKEND AGENT:
+□ TimelineGeneratorService: detected events → timeline_entries
+□ Confidence-based auto-confirm threshold
+
+FRONTEND AGENT:
+□ Enhanced timeline with auto-detected events + confidence badges
+□ Net worth trend chart, allocation donut chart, accounts breakdown bar chart
+□ Dashboard upgrade: mini charts, recent auto-detected events
+
+GATE:
+  ✓ Imported transactions produce auto-detected timeline events
+  ✓ Charts render on balance sheet page
+  ✓ Dashboard shows mini chart + recent events
+```
+
+---
+
+### Sprint 11: Intelligence & Optimization (Weeks 21–22)
+
+**Goal:** Data → intelligence → actionable value.
+
+> **Builds on:** S10 (detection engine), S3 (AI narrative)
+
+```
+DATA AGENT:
+□ Optimization engine: subscription audit, insurance benchmark, fund fee analysis, tax wrapper optimization
+
+AI AGENT:
+□ Enhanced weekly narrative with auto-detected events + optimization tips
+
+FRONTEND AGENT:
+□ Recommendations section on dashboard
+□ Enhanced accounts page with sync status + provider badges
+
+GATE:
+  ✓ Optimization recommendations generated from detected patterns
+  ✓ Recommendations show potential monthly/annual savings
+  ✓ AI narrative includes optimization tips
+```
+
+---
+
+### Sprint 12: Weekly Email & Notification Pipeline (Weeks 23–24)
+
+**Goal:** Fyrk comes to you — proactive delivery of intelligence.
+
+> **Builds on:** S11 (recommendations, enhanced narrative), S0 (waitlist email stub)
+
+```
+BACKEND AGENT:
+□ EmailService via Resend: weekly digest, consent expiry warning, welcome
+□ Notification preferences service + cron triggers
+
+FRONTEND AGENT:
+□ Notification preferences page
+□ Consent expiry banners + data freshness alerts
+
+GATE:
+  ✓ Weekly email digest delivers via Resend
+  ✓ Consent expiry warnings sent at 10 days before expiry
+  ✓ Notification preferences configurable
+```
+
+---
+
+### Sprint 13: Scale Preparation & Agent Architecture (Weeks 25–26)
+
+**Goal:** Prepare infrastructure for multi-user scale. Formalize commercial partnerships.
+
+> **Builds on:** S9-S12 (all data + intelligence features)
+
+```
+ARCHITECT:
+□ Temporal.io evaluation + worker deployment
+□ Migrate cron jobs to durable workflows
+
+BACKEND AGENT:
+□ Production Tink commercial agreement integration
+□ Per-household knowledge graph foundation
+□ Cross-household anonymized benchmarking (opt-in)
+
+GATE:
+  ✓ Temporal worker deployed and processing household workflows
+  ✓ Cost model validated at 100+ test workflows
+  ✓ GDPR export/deletion covers all provider-synced data
+```
+
+---
+
 ## 3. Milestone Definitions
 
-| Milestone | Sprint | Definition |
-|---|---|---|
-| **Buildable** | S1 | App builds, deploys, auth works, household creation works |
-| **Data-ready** | S2 | Accounts, holdings, and CSV import functional |
-| **Intelligent** | S3 | Balance sheet + AI narrative working — first "wow" moment |
-| **Feature-complete** | S5 | All 5 pillars represented in prototype |
-| **Demo-ready** | S6 | 4 demo households, polished UX, deployable to fyrk.com |
+| Milestone | Sprint | Weeks | Definition |
+|---|---|---|---|
+| **Buildable** | S1 ✅ | 1–2 | App builds, deploys, auth works, household creation works |
+| **Data-ready** | S2 ✅ | 3–4 | Accounts, holdings, and CSV import functional |
+| **Intelligent** | S3 ✅ | 5–6 | Balance sheet + AI narrative working — first "wow" moment |
+| **Feature-complete** | S5 ✅ | 9–10 | All 5 pillars represented in prototype |
+| **Demo-ready** | S6 🔄 | 11–12 | 4 demo households, polished UX baseline, deployable to fyrk.com |
+| **Brand-ready** | S7 ⬅️ NOW | 13–14 | Design system migrated to "10x Financial Copilot" — new palette, fonts, ƒ logo, 3-panel layout |
+| **Polished** | S8 | 15–16 | Interaction quality, copilot feed, motion, density modes at benchmark level |
+| **Connected** | S9 | 17–18 | Live data from banks (Tink) and brokers (Avanza API) flowing automatically |
+| **Auto-intelligent** | S10 | 19–20 | Financial timeline auto-generated from transactions, charts live |
+| **Advisor-grade** | S11 | 21–22 | Optimization recommendations with quantified savings potential |
+| **Proactive** | S12 | 23–24 | Weekly email digest, consent management, notification pipeline |
+| **Scalable** | S13 | 25–26 | Per-household agent workflows, production provider agreements |
 
 ---
 
@@ -474,7 +712,7 @@ GATE:
 | **Unit tests** | Vitest | Per service/util function | Critical business logic (net worth, allocation, fitness, scenario, CSV parsing) |
 | **API integration** | Vitest + Supabase test project | Per API endpoint | All P0 endpoints |
 | **Component tests** | Vitest + Testing Library | Key UI components | AmountDisplay, FitnessGauge, AllocationChart |
-| **E2E tests** | Playwright | Sprint 6 | Full onboarding + demo mode journey |
+| **E2E tests** | Playwright | Sprint 6 + Sprint 8 | Full onboarding + demo mode journey + final premium UX regression pack |
 | **Type checking** | TypeScript compiler (strict) | On every commit (CI) | 100% — zero `any` types |
 | **Linting** | ESLint | On every commit (CI) | Zero warnings |
 
@@ -516,6 +754,15 @@ Vercel: auto-deploy to production (fyrk.com)
 | S4 | Fitness score fairness/accuracy | Start with simple heuristics; iterate based on user feedback; transparency is key |
 | S5 | Real-time sync for proposals | Use Supabase Realtime; fallback to polling if issues |
 | S6 | Demo data realism | Use actual Swedish ISINs + realistic prices; review with domain expert |
+| S7 | Design system migration introduces regressions | Phased approach with per-file ownership, parallel agents on isolated files, PR gates with grep checks for old values. See [DESIGN_SPRINT.md](./DESIGN_SPRINT.md) |
+| S7 | Instrument_Serif not available in next/font/google | Fallback: use next/font/local with self-hosted .woff2 from Google Fonts CDN |
+| S8 | Visual polish sprint scope creep | Strict checklist against design-10x.html concept; no new features, styling only |
+| S9 | Tink API changes or sandbox limitations | Start with sandbox; validate all data types before production agreement |
+| S9 | Avanza unofficial API breaks or rate-limits | Build as opt-in with clear disclaimers; fallback to CSV always available |
+| S10 | False positive detections in auto-timeline | Confidence scoring + user confirmation flow; never auto-confirm below 0.8 |
+| S11 | Optimization recommendations perceived as financial advice | Non-advisory framing in all copy; "tax impact comparison" not "tax advice" |
+| S12 | Email deliverability issues | Use Resend with verified domain; monitor bounce rates |
+| S13 | Temporal infrastructure complexity | Keep cron fallback; migrate gradually; monitor cost per workflow |
 
 ---
 
@@ -547,3 +794,4 @@ All development context documents in `/docs/`:
 | 9 | [BRAND_GUIDELINES.md](./BRAND_GUIDELINES.md) | Brand system, design tokens, components, screen blueprints | Frontend agent + Figma |
 | 10 | [FINANCIAL_LOGIC.md](./FINANCIAL_LOGIC.md) | Deterministic calculation engine, formulas, assumptions, scenario math | Backend + AI logic contract |
 | 11 | [BUILD_PLAN.md](./BUILD_PLAN.md) | Sprint plan, agent assignments, testing, deployment | This document |
+| 12 | [DESIGN_SPRINT.md](./DESIGN_SPRINT.md) | Design system migration plan — phases, file ownership, PR gates | Sprint 7 execution guide |
