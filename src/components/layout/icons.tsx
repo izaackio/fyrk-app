@@ -24,12 +24,18 @@ const iconProps = {
 
 export function FyrkMark(props: IconProps) {
   return (
-    <svg aria-hidden {...iconProps} {...props}>
-      <rect height="18" rx="5" width="18" x="3" y="3" />
-      <path d="M8 8h8" />
-      <path d="M8 12h5" />
-      <path d="M8 16h8" />
-      <path d="M16 8v8" />
+    <svg aria-hidden viewBox="0 0 24 24" fill="currentColor" stroke="none" {...props}>
+      <text
+        x="12"
+        y="19"
+        textAnchor="middle"
+        fontFamily="var(--font-narrative), 'Instrument Serif', Georgia, serif"
+        fontStyle="italic"
+        fontSize="26"
+        fontWeight="400"
+      >
+        ƒ
+      </text>
     </svg>
   );
 }

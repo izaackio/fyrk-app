@@ -1,3 +1,4 @@
+import { FyrkMark } from "@/components/layout/icons";
 import { WaitlistForm } from "@/components/marketing/WaitlistForm";
 
 import styles from "./landing.module.css";
@@ -175,7 +176,28 @@ export function LandingPage() {
       <div className={styles.shell}>
         <header className={styles.header}>
           <div className={styles.brandBlock}>
-            <p className={styles.wordmark}>FYRK</p>
+            <div style={{ alignItems: "center", display: "inline-flex", gap: 8 }}>
+              <FyrkMark
+                width={32}
+                height={32}
+                style={{ color: "var(--co-brand-primary)", flex: "0 0 auto" }}
+              />
+              <p
+                className={styles.wordmark}
+                style={{
+                  color: "var(--co-brand-primary)",
+                  fontFamily: "var(--font-data), ui-sans-serif, system-ui, sans-serif",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  letterSpacing: "0.02em",
+                  lineHeight: 1,
+                  margin: 0,
+                  textTransform: "none",
+                }}
+              >
+                fyrk
+              </p>
+            </div>
             <p className={styles.headerTagline}>Household finance operating system</p>
           </div>
 
