@@ -1,10 +1,10 @@
 # FYRK — Project Context
 ## AI Development Brief
 
-> **Version:** 0.1 — Prototype
-> **Last updated:** 2026-02-20
-> **Status:** Pre-development
-> **Related docs:** [PRD](./PRD.md) · [Architecture](./ARCHITECTURE.md) · [Data Model](./DATA_MODEL.md) · [API Spec](./API_SPEC.md) · [LLM Integration](./LLM_INTEGRATION.md) · [External Data](./EXTERNAL_DATA.md) · [Security](./SECURITY.md) · [Brand Guidelines](./BRAND_GUIDELINES.md) · [Build Plan](./BUILD_PLAN.md)
+> **Version:** 1.0 — Active Development
+> **Last updated:** 2026-03-23
+> **Status:** Sprint 7 (Design system migration) — see [ROADMAP.md](./ROADMAP.md)
+> **Related docs:** [PRD](./PRD.md) · [Roadmap](./ROADMAP.md) · [Architecture](./ARCHITECTURE.md) · [Data Model](./DATA_MODEL.md) · [API Spec](./API_SPEC.md) · [LLM Integration](./LLM_INTEGRATION.md) · [External Data](./EXTERNAL_DATA.md) · [Security](./SECURITY.md) · [Brand Guidelines](./BRAND_GUIDELINES.md)
 
 ---
 

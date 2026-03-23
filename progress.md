@@ -2,6 +2,9 @@
 
 This document is the running delivery log for Fyrk. Update it at the end of every sprint cycle and after major merges.
 
+> **Product roadmap:** [`docs/ROADMAP.md`](docs/ROADMAP.md) — outcome-focused milestone arc + feature traceability
+> **Sprint execution:** [`docs/sprints/`](docs/sprints/) — task-level execution, parallelization, PR gates
+
 ## Status Legend
 - `Not Started`: no implementation work started
 - `In Progress`: active branch work and/or open PRs

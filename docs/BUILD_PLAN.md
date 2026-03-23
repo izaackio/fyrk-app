@@ -1,4 +1,12 @@
-# FYRK — Build Plan
+# FYRK — Build Plan (DEPRECATED)
+
+> **⚠️ DEPRECATED:** This document has been replaced by two focused documents:
+> - **Product roadmap:** [`ROADMAP.md`](./ROADMAP.md) — outcome-focused milestone arc, feature traceability, risk mitigations
+> - **Sprint execution:** [`sprints/SPRINT_GUIDELINES.md`](./sprints/SPRINT_GUIDELINES.md) — how sprints are structured, parallelized, and delivered
+> - **Multi-agent patterns:** [`ARCHITECTURE.md`](./ARCHITECTURE.md) §11 — agent assignments, file ownership, coordination contracts
+>
+> This file is retained as a historical reference. Do not update it.
+
 ## Sprint-by-Sprint Execution Roadmap + Multi-Agent Development Patterns
 
 > **Version:** 0.2 — Revised 2026-03-19 (design system migration + post-prototype sprints added)
