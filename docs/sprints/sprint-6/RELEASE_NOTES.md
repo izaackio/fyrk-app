@@ -1,6 +1,4 @@
-# Sprint 6 Release Candidate Summary (DEPRECATED)
-
-> **Moved to:** [`sprints/sprint-6/RELEASE_NOTES.md`](./sprints/sprint-6/RELEASE_NOTES.md)
+# Sprint 6 Release Candidate Summary
 
 - Date: 2026-03-11
 - Branch target: `codex/s6-integration-release`
