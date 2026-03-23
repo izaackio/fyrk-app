@@ -1,9 +1,9 @@
 # FYRK — Technical Architecture
-## System Design & Stack Decisions
+## System Design, Stack Decisions & Multi-Agent Patterns
 
-> **Version:** 0.1
-> **Source:** [CONTEXT.md](./CONTEXT.md) · [PRD.md](./PRD.md)
-> **Consumed by:** Architect agent, Backend agent, Frontend agent
+> **Version:** 1.0 — Updated 2026-03-23
+> **Source:** [CONTEXT.md](./CONTEXT.md) · [PRD.md](./PRD.md) · [ROADMAP.md](./ROADMAP.md)
+> **Consumed by:** All agents — defines system structure + agent coordination contracts
 
 ---
 
@@ -12,15 +12,14 @@
 | Layer | Technology | Version | Rationale |
 |---|---|---|---|
 | **Runtime** | Node.js | 22 LTS | Unified JS/TS across stack |
-| **Framework** | Next.js | 15 (App Router) | SSR + API routes + RSC in one codebase |
-| **Language** | TypeScript | 5.x, strict mode | Type safety across full stack |
+| **Framework** | Next.js | 16 (App Router) | SSR + API routes + RSC in one codebase |
+| **Language** | TypeScript | 5.9, strict mode | Type safety across full stack |
 | **Database** | Supabase (PostgreSQL 16) | Latest | Free tier, RLS, realtime, auth, storage |
 | **ORM** | Drizzle ORM | Latest | Type-safe, lightweight, great PostgreSQL support |
 | **Auth** | Supabase Auth | Built-in | Magic link, session management, RLS integration |
-| **Styling** | Tailwind CSS 4 | Latest | Rapid development, consistent design |
-| **Component Library** | shadcn/ui | Latest | Accessible, customizable, Radix-based |
+| **Styling** | CSS Modules + Tailwind CSS 4 | Latest | Scoped component styles + utility layer |
 | **Charts** | Recharts | Latest | React-native financial charts |
-| **State Management** | React Server Components + Zustand | Latest | Server-first; Zustand for client interactions |
+| **State Management** | React Server Components | Latest | Server-first rendering; minimal client state |
 | **Form Handling** | React Hook Form + Zod | Latest | Validation + type safety |
 | **AI/LLM** | OpenAI (GPT-4o) | Latest | Structured output, function calling |
 | **Email** | Resend | Latest | Transactional email (invites, magic links, reviews) |
@@ -426,3 +425,53 @@ Architecture choices are made to support a React Native mobile app sharing the s
 - Service layer is framework-agnostic (pure TypeScript)
 - Auth via Supabase works identically in React Native
 - Design tokens defined as platform-agnostic values in config
+
+---
+
+## 11. Multi-Agent Development Patterns
+
+This project is designed for parallel AI-assisted development. Multiple agents work concurrently on isolated domains, coordinated by shared contracts and file-level exclusivity.
+
+### Agent assignments
+
+| Agent | Domain | Primary docs | Output |
+|-------|--------|-------------|--------|
+| **Architect** | Project scaffolding, infra, CI/CD | CONTEXT, ARCHITECTURE | Project setup, config, deployment |
+| **DB Agent** | Schema, migrations, seed data, RLS | DATA_MODEL, SECURITY | Drizzle schema, migrations, seed scripts |
+| **Backend Agent** | API routes, services, validation, financial logic | API_SPEC, DATA_MODEL, SECURITY, FINANCIAL_LOGIC | Route handlers, services, middleware |
+| **Frontend Agent** | UI components, pages, interactions | BRAND_GUIDELINES, PRD, API_SPEC | React components, pages, CSS modules |
+| **AI Agent** | LLM pipelines, prompts, generation | LLM_INTEGRATION, DATA_MODEL, FINANCIAL_LOGIC | AI service, prompts, output schemas |
+| **Data Agent** | CSV parsers, market data, providers | EXTERNAL_DATA, DATA_MODEL | Import service, provider adapters |
+
+### File ownership boundaries
+
+Agents must never modify each other's files. Boundaries enforced by directory structure:
+
+```
+src/
+  app/           → Frontend Agent (pages, layouts)
+  app/api/       → Backend Agent (route handlers)
+  components/    → Frontend Agent (UI components + CSS modules)
+  services/      → Backend Agent (business logic)
+  db/schema/     → DB Agent (EXCLUSIVE — no other agent touches these)
+  db/seed/       → DB Agent + Data Agent
+  db/migrations/ → DB Agent (generated only)
+  lib/ai/        → AI Agent (EXCLUSIVE)
+  lib/csv/       → Data Agent (EXCLUSIVE)
+  lib/market-data/ → Data Agent (EXCLUSIVE)
+  lib/calculations/ → Backend Agent + AI Agent (coordinate via types)
+  lib/auth/      → Backend Agent
+  lib/validations/ → Backend Agent (Zod schemas shared with Frontend)
+  types/         → Any agent can READ; Backend Agent OWNS
+```
+
+### Shared contracts (DO NOT BREAK)
+
+1. **`src/types/domain.ts`** — canonical TypeScript types for all entities. DB Agent generates from Drizzle schema. All agents import from here.
+2. **`src/lib/validations/`** — Zod schemas for API input/output. Backend Agent owns. Frontend Agent imports for form validation.
+3. **`src/db/schema/index.ts`** — Drizzle schema re-exports. Only DB Agent modifies; all agents can import for type inference.
+4. **`src/lib/calculations/*`** — deterministic financial math engine. Backend Agent owns implementation; AI Agent consumes outputs only (LLM never does math).
+
+### Sprint execution
+
+Sprint-level task coordination, parallelization rules, and PR gate protocols are defined in [`docs/sprints/SPRINT_GUIDELINES.md`](./sprints/SPRINT_GUIDELINES.md). Per-sprint task breakdown lives in [`docs/sprints/sprint-{N}/`](./sprints/).
