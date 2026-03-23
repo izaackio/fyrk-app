@@ -18,6 +18,7 @@
 | **T4** | Color migration: shell.module.css | `shell.module.css` | TODO | — |
 | **T5** | Color migration: landing.module.css | `landing.module.css` | TODO | — |
 | **T6** | Color migration: dashboard-insights.module.css | `dashboard-insights.module.css` | TODO | — |
+| **T7** | Backpopulate sprint 0-6 records | `docs/sprints/sprint-{0-6}/SPRINT.md` | TODO | — |
 
 ---
 
@@ -29,13 +30,14 @@ T2 --> COMPLETE (merged)
 
 Remaining (all parallel — zero shared files):
 
-T3 (theme.module.css)     -+
-T4 (shell.module.css)     -+--> ALL merge --> Sprint 7 DONE
-T5 (landing.module.css)   -+
-T6 (dashboard-insights)   -+
+T3 (theme.module.css)         -+
+T4 (shell.module.css)         -+--> ALL merge --> Sprint 7 DONE
+T5 (landing.module.css)       -+
+T6 (dashboard-insights)       -+
+T7 (backpopulate sprint 0-6)  -+
 ```
 
-**T3, T4, T5, T6 can ALL run simultaneously.** They touch completely different files.
+**T3, T4, T5, T6, T7 can ALL run simultaneously.** They touch completely different files (T7 only creates new docs).
 
 ---
 

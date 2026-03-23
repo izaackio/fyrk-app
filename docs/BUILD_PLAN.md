@@ -459,12 +459,13 @@ GATE:
 
 **Goal:** Migrate the entire codebase from "Warm Authority" to the approved "10x Financial Copilot" design system. New color palette, new typography (DM Sans + Instrument Serif), new ƒ logo mark, and three-panel layout.
 
-> **Full spec:** [DESIGN_SPRINT.md](./DESIGN_SPRINT.md) — detailed phase plan with file ownership, parallelization rules, and PR gates.
+> **Authoritative execution tracker:** [`sprints/sprint-7/SPRINT.md`](./sprints/sprint-7/SPRINT.md) — task index, dependency graph, Definition of Done, and agent prompts.
+> **Sprint framework:** [`sprints/SPRINT_GUIDELINES.md`](./sprints/SPRINT_GUIDELINES.md) — how sprints are structured, parallelized, and executed.
 > **Design concept:** [design-10x.html](./design-10x.html) — approved visual direction across Desktop, Mobile, Marketing, and Logo.
 > **Logo decision:** Proposal 3 — The Pure Typeset ƒ (Instrument Serif italic)
 
 ```
-PHASES (see DESIGN_SPRINT.md for full detail):
+PHASES (see sprints/sprint-7/SPRINT.md for task index):
 
 P1 — Foundation (fonts + colors + brand guidelines)
   Files: layout.tsx, globals.css, BRAND_GUIDELINES.md
@@ -754,7 +755,7 @@ Vercel: auto-deploy to production (fyrk.com)
 | S4 | Fitness score fairness/accuracy | Start with simple heuristics; iterate based on user feedback; transparency is key |
 | S5 | Real-time sync for proposals | Use Supabase Realtime; fallback to polling if issues |
 | S6 | Demo data realism | Use actual Swedish ISINs + realistic prices; review with domain expert |
-| S7 | Design system migration introduces regressions | Phased approach with per-file ownership, parallel agents on isolated files, PR gates with grep checks for old values. See [DESIGN_SPRINT.md](./DESIGN_SPRINT.md) |
+| S7 | Design system migration introduces regressions | Phased approach with per-file ownership, parallel agents on isolated files, PR gates with grep checks for old values. See [sprints/sprint-7/SPRINT.md](./sprints/sprint-7/SPRINT.md) |
 | S7 | Instrument_Serif not available in next/font/google | Fallback: use next/font/local with self-hosted .woff2 from Google Fonts CDN |
 | S8 | Visual polish sprint scope creep | Strict checklist against design-10x.html concept; no new features, styling only |
 | S9 | Tink API changes or sandbox limitations | Start with sandbox; validate all data types before production agreement |
@@ -794,4 +795,6 @@ All development context documents in `/docs/`:
 | 9 | [BRAND_GUIDELINES.md](./BRAND_GUIDELINES.md) | Brand system, design tokens, components, screen blueprints | Frontend agent + Figma |
 | 10 | [FINANCIAL_LOGIC.md](./FINANCIAL_LOGIC.md) | Deterministic calculation engine, formulas, assumptions, scenario math | Backend + AI logic contract |
 | 11 | [BUILD_PLAN.md](./BUILD_PLAN.md) | Sprint plan, agent assignments, testing, deployment | This document |
-| 12 | [DESIGN_SPRINT.md](./DESIGN_SPRINT.md) | Design system migration plan — phases, file ownership, PR gates | Sprint 7 execution guide |
+| 12 | [DESIGN_SPRINT.md](./DESIGN_SPRINT.md) | ~~Design system migration plan~~ (deprecated — see sprints/) | Archived |
+| 13 | [sprints/SPRINT_GUIDELINES.md](./sprints/SPRINT_GUIDELINES.md) | Sprint execution framework — structure, parallelization, PR gates | All sprints |
+| 14 | [sprints/sprint-7/SPRINT.md](./sprints/sprint-7/SPRINT.md) | Sprint 7 task index, dependency graph, agent prompts | Active sprint |

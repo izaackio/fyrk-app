@@ -1,7 +1,11 @@
-# FYRK — Design System Sprint
+# FYRK — Design System Sprint (DEPRECATED)
 ## "10x Financial Copilot" Migration
 
-> **Version:** 1.0
+> **⚠️ DEPRECATED:** This document has been superseded by the sprint execution framework.
+> **Use instead:** [`sprints/sprint-7/SPRINT.md`](./sprints/sprint-7/SPRINT.md) — authoritative task index, dependency graph, agent prompts.
+> **Sprint guidelines:** [`sprints/SPRINT_GUIDELINES.md`](./sprints/SPRINT_GUIDELINES.md) — how all sprints are structured and executed.
+
+> **Version:** 1.0 (archived)
 > **Created:** 2026-03-19
 > **Source:** [design-10x.html](./design-10x.html) (approved concept) · [BRAND_GUIDELINES.md](./BRAND_GUIDELINES.md) (to be rewritten)
 > **Outcome:** Codebase fully migrated from "Warm Authority" to "10x Financial Copilot" design system

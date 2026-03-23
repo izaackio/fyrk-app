@@ -1,4 +1,8 @@
-# Sprint 7 DB Stability Audit
+# Sprint 7 DB Stability Audit (DEPRECATED)
+
+> **⚠️ DEPRECATED:** Sprint execution now lives under [`sprints/sprint-7/SPRINT.md`](./sprints/sprint-7/SPRINT.md).
+> This document is retained as a reference artifact for the DB stability audit that was part of Sprint 7 Phase A (PR #38).
+> **Sprint framework:** [`sprints/SPRINT_GUIDELINES.md`](./sprints/SPRINT_GUIDELINES.md)
 
 ## Scope
 
