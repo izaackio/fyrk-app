@@ -1,9 +1,10 @@
 # FYRK — Product Requirements Document
 ## Prototype Scope
 
-> **Version:** 0.1
+> **Version:** 1.0 — Updated 2026-03-23
 > **Source:** [CONTEXT.md](./CONTEXT.md) · [Pitch Deck](./fyrk_pitch_deck_v1.md)
 > **Consumed by:** Frontend agents, Backend agents, QA
+> **Feature traceability:** See [ROADMAP.md](./ROADMAP.md) §Feature Traceability for feature → sprint mapping
 
 ---
 
