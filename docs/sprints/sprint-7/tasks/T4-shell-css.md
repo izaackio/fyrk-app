@@ -43,7 +43,7 @@ Do NOT touch any other file in the repository.
 
 ## Instructions
 
-There are exactly **12 occurrences** of old-palette colors in this file. Replace each one using the mappings below.
+There are exactly **13 occurrences** of old-palette colors in this file. Replace each one using the mappings below.
 
 ### Occurrence 1 — Line 21 (background radial gradient, amber accent)
 
@@ -165,6 +165,16 @@ There are exactly **12 occurrences** of old-palette colors in this file. Replace
   box-shadow: 0 24px 40px rgb(0 0 0 / 12%);
 ```
 
+### Occurrence 13 — Line 543 (warm off-white text color)
+
+```css
+/* BEFORE */
+  color: #f8f6f1;
+
+/* AFTER */
+  color: #f0f0f0;
+```
+
 ### Color mapping reference
 
 | Find | Replace | Meaning |
@@ -172,6 +182,7 @@ There are exactly **12 occurrences** of old-palette colors in this file. Replace
 | `rgb(159 126 74 / ...)` | `rgb(245 166 35 / ...)` | Gold accent -> amber accent (keep alpha) |
 | `rgb(34 55 74 / ...)` | `rgb(0 102 255 / ...)` | Brand navy -> brand blue (keep alpha) |
 | `rgb(23 32 42 / ...)` | `rgb(0 0 0 / ...)` | Warm black shadow -> neutral black (keep alpha) |
+| `#f8f6f1` | `#f0f0f0` | Warm off-white -> neutral off-white |
 
 ---
 
@@ -187,10 +198,10 @@ npm run build
 npm run lint
 
 # This grep MUST return 0 matches
-grep -n "rgb(34 55 74\|rgb(159 126 74\|rgb(23 32 42\|#22374a\|#9f7e4a" src/components/layout/shell.module.css
+grep -n "rgb(34 55 74\|rgb(159 126 74\|rgb(23 32 42\|#22374a\|#9f7e4a\|#f8f6f1" src/components/layout/shell.module.css
 
 # Count check: should show 0
-grep -c "rgb(34 55 74\|rgb(159 126 74\|rgb(23 32 42" src/components/layout/shell.module.css
+grep -c "rgb(34 55 74\|rgb(159 126 74\|rgb(23 32 42\|#f8f6f1" src/components/layout/shell.module.css
 ```
 
 ---
@@ -205,10 +216,11 @@ git checkout -b design/sprint-7-t4-shell-css origin/main
 git add src/components/layout/shell.module.css
 git commit -m "design(S7-T4): migrate shell.module.css to new palette
 
-Replace 12 hardcoded old-palette color values:
+Replace 13 hardcoded old-palette color values:
 - Amber accent gradients (rgb(159 126 74)) -> amber (rgb(245 166 35))
 - Navy brand gradients (rgb(34 55 74)) -> blue (rgb(0 102 255))
 - Warm-black shadows (rgb(23 32 42)) -> neutral (rgb(0 0 0))
+- Warm off-white (#f8f6f1) -> neutral (#f0f0f0)
 
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
@@ -217,7 +229,7 @@ git push -u origin design/sprint-7-t4-shell-css
 gh pr create --title "design(S7-T4): migrate shell.module.css to new palette" \
   --body "$(cat <<'EOF'
 ## Summary
-- Replace 12 hardcoded old-palette color values in shell.module.css
+- Replace 13 hardcoded old-palette color values in shell.module.css
 - Amber accent gradients -> new amber (rgb(245 166 35))
 - Navy brand gradients -> blue (rgb(0 102 255))
 - Warm-black shadows -> neutral black (rgb(0 0 0))

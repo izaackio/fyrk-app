@@ -18,7 +18,7 @@
 | **T4** | Color migration: shell.module.css | `shell.module.css` | TODO | — |
 | **T5** | Color migration: landing.module.css | `landing.module.css` | TODO | — |
 | **T6** | Color migration: dashboard-insights.module.css | `dashboard-insights.module.css` | TODO | — |
-| **T7** | Backpopulate sprint 0-6 records | `docs/sprints/sprint-{0-6}/SPRINT.md` | TODO | — |
+| **T7** | Backpopulate sprint 0-6 records | `docs/sprints/sprint-{0-6}/SPRINT.md` | COMPLETE | #55 merged |
 
 ---
 
@@ -34,10 +34,10 @@ T3 (theme.module.css)         -+
 T4 (shell.module.css)         -+--> ALL merge --> Sprint 7 DONE
 T5 (landing.module.css)       -+
 T6 (dashboard-insights)       -+
-T7 (backpopulate sprint 0-6)  -+
+T7 (backpopulate sprint 0-6)  --> COMPLETE (#55)
 ```
 
-**T3, T4, T5, T6, T7 can ALL run simultaneously.** They touch completely different files (T7 only creates new docs).
+**T3, T4, T5, T6 can ALL run simultaneously.** They touch completely different files.
 
 ---
 
@@ -47,11 +47,12 @@ After all task PRs are merged to main, verify:
 
 ```
 AUTOMATED:
-  [ ] npm run build — zero errors
+  [ ] npm run build — zero errors (NOTE: pre-existing type error in dashboard-view-model may fail build — not a Sprint 7 regression)
   [ ] npm run lint — zero violations
 
 ZERO OLD-PALETTE (this grep MUST return 0 results):
-  grep -rn "rgb(34 55 74\|rgb(159 126 74\|rgb(23 32 42\|rgb(21 34 46\|rgb(25 38 50\|rgb(48 65 79\|rgb(71 89 104\|#22374a\|#9f7e4a" src/ --include="*.css" --include="*.tsx"
+  NOTE: Exclude macOS duplicate files ("* 2.*", "* 3.*") — they are copy artifacts, not source files.
+  grep -rn "rgb(34 55 74\|rgb(159 126 74\|rgb(23 32 42\|rgb(21 34 46\|rgb(25 38 50\|rgb(48 65 79\|rgb(71 89 104\|#22374a\|#9f7e4a\|#f8f6f1" src/ --include="*.css" --include="*.tsx" | grep -v " [23]\."
 
 VISUAL:
   [ ] App renders with DM Sans body text
@@ -91,6 +92,11 @@ rgb(25 38 50 / ...)               -> rgb(0 50 140 / ...)       [keep same alpha]
 #9f7e4a                           -> var(--co-brand-accent)    [or #f5a623 in gradients]
 #4b725c                           -> var(--co-status-up)       [or #00a866]
 #b55d53                           -> var(--co-status-down)     [or #e03e3e]
+#f8f6f1                           -> #f0f0f0                   [warm off-white -> neutral]
+#f5efe6 / #f7f2ea                 -> #f0f0f0                   [warm off-whites -> neutral]
+rgb(251 247 240 / ...)            -> rgb(250 250 250 / ...)    [warm cream -> neutral]
 ```
+
+**Important:** macOS duplicate files (`* 2.css`, `* 3.css`) exist in the repo as copy artifacts. Ignore them — only modify canonical source files.
 
 **Rule:** Prefer `var(--co-*)` over hardcoded hex where CSS syntax allows. Use raw hex only inside gradient color stops or shadow definitions that require literal values.
