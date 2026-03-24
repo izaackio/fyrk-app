@@ -166,10 +166,11 @@ export async function GET(request: Request): Promise<Response> {
 - Light/dark theme via `[data-theme]` attribute
 
 ### Color palette (light mode reference)
-- Background: `#fdfdfc` (cream), Surface: `#ffffff`
-- Text primary: `#1a1a1a`, Text secondary: `#5e6266`
-- Brand primary: `#2a3b4c` (deep blue-gray)
-- Status up: `#4a7c59` (sage green), Status down: `#cc5a50` (rust red)
+- Background: `#fafafa` (neutral), Surface: `#ffffff`
+- Text primary: `#111111`, Text secondary: `#666666`
+- Brand primary: `#0066ff` (blue), Brand accent: `#f5a623` (amber)
+- Status up: `#00a866` (green), Status down: `#e03e3e` (red)
+- Chart purple: `#7b61ff`, Warning: `#e68a00`
 
 ---
 

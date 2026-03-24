@@ -43,7 +43,7 @@ Do NOT touch any other file in the repository.
 
 ## Instructions
 
-There are exactly **17 occurrences** of old-palette colors in this file. Replace each one using the mappings below.
+There are **17 lines** containing old-palette colors in this file, but many lines have multiple `rgb()` calls, totaling **25 individual color replacements** plus additional warm off-white cleanup (see bottom). Replace each one using the mappings below.
 
 ### Occurrence 1-2 — Line 14 (hero background gradient, navy brand)
 
